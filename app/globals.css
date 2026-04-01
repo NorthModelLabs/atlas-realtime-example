@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050505;
+  --foreground: #e0e0e0;
+  --accent: #00ff88;
+  --panel: #0a0a0a;
+  --border: #2a2a2a;
+  --muted: #888888;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-panel: var(--panel);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* { border-radius: 0 !important; }
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 6px rgba(0, 255, 136, 0.6);
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow: 0 0 14px rgba(0, 255, 136, 0.25);
+  }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.06; }
+  50% { opacity: 0.1; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+.panel-glow-border {
+  position: relative;
+}
+
+.panel-glow-border::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -1px;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 255, 136, 0.3) 0%,
+    rgba(0, 255, 136, 0.05) 30%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  height: 2px;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--border);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  margin-top: -4px;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 2px;
+  background: var(--border);
+  border: none;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  border: none;
+  border-radius: 0;
+}
+
+textarea::-webkit-scrollbar,
+.custom-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+textarea::-webkit-scrollbar-track,
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+textarea::-webkit-scrollbar-thumb,
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
