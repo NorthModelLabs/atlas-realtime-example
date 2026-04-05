@@ -88,7 +88,7 @@ export default function Demo() {
 
   return (
     <div>
-      <video ref={session.videoRef} autoPlay playsInline />
+      <div ref={session.videoRef} style={{ width: 512, height: 512 }} />
 
       <button onClick={() => session.connect(faceFile)}>
         Connect
@@ -149,17 +149,21 @@ const session = useAtlasSession({
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `status` | `string` | `"idle"` \| `"connecting"` \| `"connected"` \| `"disconnecting"` \| `"disconnected"` |
-| `videoRef` | `RefObject` | Attach to a `<video>` element to display the avatar |
+| `status` | `string` | `"idle"` \| `"connecting"` \| `"connected"` \| `"disconnected"` \| `"error"` |
+| `error` | `string \| null` | Error message if status is `"error"` |
+| `videoRef` | `RefObject<HTMLDivElement>` | Attach to a `<div>` — avatar video renders inside |
 | `connect(face?, faceUrl?)` | `function` | Start a session with a face image or URL |
 | `disconnect()` | `function` | End the session |
-| `publishAudio(base64)` | `function` | Send TTS audio to the avatar for lip-sync |
+| `publishAudio(audio)` | `function` | Send TTS audio (base64, Blob, or ArrayBuffer) to the avatar for lip-sync |
 | `sendChat(text)` | `function` | Send a chat message (conversation mode) |
+| `setMicEnabled(enabled)` | `function` | Mute / unmute the microphone |
+| `setVolume(v)` | `function` | Set playback volume (0–100) |
 | `messages` | `array` | Chat message history |
+| `muted` | `boolean` | Whether the mic is muted |
 | `latency` | `number` | Current round-trip latency in ms |
-| `volume` | `number` | Current audio volume level |
+| `volume` | `number` | Current playback volume level |
 | `sessionId` | `string \| null` | Active session ID |
-| `room` | `Room \| null` | LiveKit room instance |
+| `room` | `Room \| null` | Underlying LiveKit Room for advanced scenarios |
 
 ---
 
