@@ -121,7 +121,7 @@ const ttsRes = await fetch(
     },
     body: JSON.stringify({
       text: "Hello! How are you?",
-      model_id: "eleven_multilingual_v2",
+      model_id: "eleven_turbo_v2_5",
     }),
   },
 );

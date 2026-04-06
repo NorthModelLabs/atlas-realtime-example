@@ -3,6 +3,11 @@
 import { useState, useRef, useCallback, useEffect, type DragEvent, type ChangeEvent } from "react";
 import { useAtlasSession } from "@northmodellabs/atlas-react";
 
+const SHOWCASE_FACES = Array.from({ length: 74 }, (_, i) => ({
+  id: i + 1,
+  src: `/faces/${i + 1}.jpg`,
+}));
+
 type ChatMsg = {
   id: string;
   role: "user" | "atlas" | "system";
@@ -142,6 +147,7 @@ export default function DemoPage() {
   const [configReady, setConfigReady] = useState<{ llm: boolean; tts: boolean } | null>(null);
 
   const [listening, setListening] = useState(false);
+  const [loadingFaceId, setLoadingFaceId] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const swapInputRef = useRef<HTMLInputElement>(null);
@@ -246,6 +252,24 @@ export default function DemoPage() {
     },
     [session.sessionId, addMsg],
   );
+
+  const handleSelectShowcaseFace = useCallback(async (face: typeof SHOWCASE_FACES[number]) => {
+    setLoadingFaceId(face.id);
+    try {
+      const resp = await fetch(face.src);
+      const blob = await resp.blob();
+      const file = new File([blob], `face-${face.id}.jpg`, { type: "image/jpeg" });
+      if (session.status === "connected") {
+        await handleSwapFace(file);
+      } else {
+        handleFile(file);
+      }
+    } catch {
+      /* ignore */
+    } finally {
+      setLoadingFaceId(null);
+    }
+  }, [session.status, handleSwapFace, handleFile]);
 
   const playTtsResponse = useCallback(async (base64Audio: string): Promise<number> => {
     try {
@@ -644,6 +668,34 @@ export default function DemoPage() {
               }}
               className="hidden"
             />
+
+            {/* Showcase face grid */}
+            <div className="mt-3">
+              <span className="block font-mono text-[9px] tracking-[0.15em] text-[#555] uppercase mb-2">
+                Or choose a reference
+              </span>
+              <div className="grid grid-cols-10 gap-1">
+                {SHOWCASE_FACES.map((face) => (
+                  <button
+                    key={face.id}
+                    onClick={() => handleSelectShowcaseFace(face)}
+                    disabled={loadingFaceId !== null || swapping}
+                    className={`relative aspect-square overflow-hidden border transition-all duration-150 ${
+                      loadingFaceId === face.id
+                        ? "border-accent opacity-60"
+                        : "border-[#222] hover:border-accent hover:shadow-[0_0_8px_rgba(0,255,136,0.12)]"
+                    }`}
+                  >
+                    <img src={face.src} alt={`Face ${face.id}`} className="w-full h-full object-cover" loading="lazy" />
+                    {loadingFaceId === face.id && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <span className="w-2 h-2 bg-accent animate-pulse" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {!faceFile && !isConnected && (
               <div className="mt-3">
