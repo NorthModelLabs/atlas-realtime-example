@@ -4,9 +4,6 @@ const LLM_API_KEY = process.env.LLM_API_KEY || "";
 const LLM_BASE_URL = process.env.LLM_BASE_URL || "";
 const LLM_MODEL = process.env.LLM_MODEL || "";
 
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || "";
-const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || "";
-
 const SYSTEM_PROMPT =
   "You are a friendly, concise AI assistant. Keep responses short (1-3 sentences) since they will be spoken aloud via TTS.";
 
@@ -88,38 +85,5 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!ELEVENLABS_API_KEY || !ELEVENLABS_VOICE_ID) {
-    return NextResponse.json({ text: llmText, audio: null });
-  }
-
-  try {
-    const ttsRes = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`,
-      {
-        method: "POST",
-        headers: {
-          "xi-api-key": ELEVENLABS_API_KEY,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: llmText,
-          model_id: "eleven_turbo_v2_5",
-          voice_settings: { stability: 0.5, similarity_boost: 0.75 },
-        }),
-      },
-    );
-
-    if (!ttsRes.ok) {
-      console.error("ElevenLabs error:", ttsRes.status, await ttsRes.text());
-      return NextResponse.json({ text: llmText, audio: null });
-    }
-
-    const audioBuffer = await ttsRes.arrayBuffer();
-    const base64 = Buffer.from(audioBuffer).toString("base64");
-
-    return NextResponse.json({ text: llmText, audio: base64 });
-  } catch (err) {
-    console.error("ElevenLabs fetch error:", err);
-    return NextResponse.json({ text: llmText, audio: null });
-  }
+  return NextResponse.json({ text: llmText });
 }

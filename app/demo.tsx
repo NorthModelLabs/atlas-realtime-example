@@ -3,11 +3,9 @@
 import { useState, useRef, useCallback, useEffect, type DragEvent, type ChangeEvent } from "react";
 import { useAtlasSession } from "@northmodellabs/atlas-react";
 import { LocalAudioTrack, Track } from "livekit-client";
+import { useScribe, CommitStrategy } from "@elevenlabs/react";
 
-const SHOWCASE_FACES = Array.from({ length: 74 }, (_, i) => ({
-  id: i + 1,
-  src: `/faces/${i + 1}.jpg`,
-}));
+const DEFAULT_FACE_URL = "/faces/default.png";
 
 type ChatMsg = {
   id: string;
@@ -18,11 +16,6 @@ type ChatMsg = {
 interface ChatHistory {
   role: "user" | "assistant";
   content: string;
-}
-
-interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResultList;
-  resultIndex: number;
 }
 
 let msgCounter = 0;
@@ -131,29 +124,6 @@ function formatTime(s: number) {
   return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 }
 
-function createSpeechRecognition() {
-  const SpeechRecognition =
-    (globalThis as unknown as Record<string, unknown>).SpeechRecognition ||
-    (globalThis as unknown as Record<string, unknown>).webkitSpeechRecognition;
-  if (!SpeechRecognition) return null;
-  const rec = new (SpeechRecognition as new () => SpeechRecognitionLike)();
-  rec.continuous = true;
-  rec.interimResults = false;
-  rec.lang = "en-US";
-  return rec;
-}
-
-interface SpeechRecognitionLike {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start(): void;
-  stop(): void;
-  onresult: ((e: SpeechRecognitionEvent) => void) | null;
-  onend: (() => void) | null;
-  onerror: ((e: Event & { error?: string }) => void) | null;
-}
-
 export default function DemoPage() {
   const session = useAtlasSession({
     autoEnableMic: false,
@@ -194,18 +164,13 @@ export default function DemoPage() {
 
   const [configReady, setConfigReady] = useState<{ llm: boolean; tts: boolean } | null>(null);
 
-  const [listening, setListening] = useState(false);
-  const [loadingFaceId, setLoadingFaceId] = useState<number | null>(null);
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [copied, setCopied] = useState(false);
-  const micDeniedRef = useRef(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const swapInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatHistoryRef = useRef<ChatHistory[]>([]);
-  const recognitionRef = useRef<ReturnType<typeof createSpeechRecognition> | null>(null);
-  const sttBufferRef = useRef("");
 
   useEffect(() => {
     fetch("/api/config")
@@ -303,27 +268,18 @@ export default function DemoPage() {
     [session.sessionId, addMsg],
   );
 
-  const handleSelectShowcaseFace = useCallback(async (face: typeof SHOWCASE_FACES[number]) => {
-    setLoadingFaceId(face.id);
-    try {
-      const resp = await fetch(face.src);
-      const blob = await resp.blob();
-      const file = new File([blob], `face-${face.id}.jpg`, { type: "image/jpeg" });
-      if (session.status === "connected") {
-        await handleSwapFace(file);
-      } else {
+  useEffect(() => {
+    fetch(DEFAULT_FACE_URL)
+      .then((r) => r.blob())
+      .then((blob) => {
+        const file = new File([blob], "default-face.jpg", { type: "image/jpeg" });
         handleFile(file);
-      }
-    } catch {
-      /* ignore */
-    } finally {
-      setLoadingFaceId(null);
-    }
-  }, [session.status, handleSwapFace, handleFile]);
+      })
+      .catch(() => {});
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const destRef = useRef<MediaStreamAudioDestinationNode | null>(null);
-  const lkTrackRef = useRef<LocalAudioTrack | null>(null);
   const ttsSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
   useEffect(() => {
@@ -336,7 +292,6 @@ export default function DemoPage() {
 
     audioCtxRef.current = audioCtx;
     destRef.current = dest;
-    lkTrackRef.current = lkTrack;
 
     session.room.localParticipant.publishTrack(lkTrack, {
       name: "tts-audio",
@@ -351,7 +306,6 @@ export default function DemoPage() {
       audioCtx.close().catch(() => {});
       audioCtxRef.current = null;
       destRef.current = null;
-      lkTrackRef.current = null;
     };
   }, [session.status, session.room]);
 
@@ -396,7 +350,6 @@ export default function DemoPage() {
     stopListening();
     ttsSourceRef.current?.stop();
     ttsSourceRef.current = null;
-    micDeniedRef.current = false;
     await session.disconnect();
     addMsg("system", "Session ended");
     setSessionTime(0);
@@ -424,62 +377,41 @@ export default function DemoPage() {
     sendChatRef.current?.(text);
   }, []);
 
-  // --- Web Speech API for hands-free voice conversation ---
-  const startListening = useCallback(() => {
-    if (recognitionRef.current || !aiEnabled || micDeniedRef.current) return;
-    const rec = createSpeechRecognition();
-    if (!rec) return;
+  const scribe = useScribe({
+    modelId: "scribe_v2_realtime",
+    commitStrategy: CommitStrategy.VAD,
+    vadSilenceThresholdSecs: 0.8,
+    languageCode: "en",
+    onCommittedTranscript: (data) => {
+      if (data.text.trim()) sendChatRef.current?.(data.text.trim());
+    },
+  });
 
-    rec.onresult = (e: SpeechRecognitionEvent) => {
-      let transcript = "";
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        const result = e.results[i];
-        if (result.isFinal) {
-          transcript += result[0].transcript;
-        }
-      }
-      if (transcript.trim()) {
-        sttBufferRef.current = "";
-        sendChat(transcript.trim());
-      }
-    };
+  const scribeRef = useRef(scribe);
+  scribeRef.current = scribe;
 
-    rec.onend = () => {
-      if (recognitionRef.current === rec && !micDeniedRef.current) {
-        try { rec.start(); } catch { /* already started */ }
-      }
-    };
-
-    rec.onerror = (e: Event & { error?: string }) => {
-      if (e.error === "aborted" || e.error === "no-speech") return;
-      if (e.error === "not-allowed" || e.error === "service-not-allowed") {
-        micDeniedRef.current = true;
-        recognitionRef.current = null;
-        rec.onend = null;
-        setListening(false);
-        return;
-      }
-      console.error("Speech recognition error:", e.error);
-    };
-
+  const startListening = useCallback(async () => {
+    const s = scribeRef.current;
+    if (s.isConnected || !aiEnabled) return;
     try {
-      rec.start();
-      recognitionRef.current = rec;
-      setListening(true);
-    } catch {
-      micDeniedRef.current = true;
+      const res = await fetch("/api/scribe-token");
+      const { token } = await res.json();
+      if (!token) return;
+      await s.connect({
+        token,
+        microphone: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+    } catch (err) {
+      console.warn("Failed to start ElevenLabs STT:", err);
     }
-  }, [aiEnabled, sendChat]);
+  }, [aiEnabled]);
 
   const stopListening = useCallback(() => {
-    if (recognitionRef.current) {
-      const rec = recognitionRef.current;
-      recognitionRef.current = null;
-      rec.onend = null;
-      rec.stop();
-    }
-    setListening(false);
-    sttBufferRef.current = "";
+    scribeRef.current.disconnect();
   }, []);
 
   sendChatRef.current = (text: string) => {
@@ -504,9 +436,17 @@ export default function DemoPage() {
           if (data.text) {
             addMsg("atlas", data.text);
             chatHistoryRef.current.push({ role: "assistant", content: data.text });
-          }
-          if (data.audio) {
-            playTtsResponse(data.audio);
+
+            fetch("/api/tts", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text: data.text }),
+            })
+              .then((r) => (r.ok ? r.json() : null))
+              .then((tts) => {
+                if (tts?.audio) playTtsResponse(tts.audio);
+              })
+              .catch(() => {});
           }
         })
         .catch(() => {
@@ -586,7 +526,7 @@ export default function DemoPage() {
             {localMessages.length === 0 && (
               <p className="font-mono text-[10px] text-[#666] text-center mt-8">
                 {aiEnabled
-                  ? listening
+                  ? scribe.isConnected
                     ? "Listening — speak or type below..."
                     : "Type a message to start..."
                   : "Start speaking..."}
@@ -619,6 +559,16 @@ export default function DemoPage() {
                 )}
               </div>
             ))}
+            {scribe.partialTranscript && (
+              <div className="flex flex-col items-end">
+                <span className="font-mono text-[9px] tracking-[0.15em] text-[#888] uppercase mb-1">
+                  You
+                </span>
+                <div className="px-3 py-2 bg-[#151515] border border-[#333] text-[#666] text-[12px] italic">
+                  {scribe.partialTranscript}...
+                </div>
+              </div>
+            )}
             {aiThinking && (
               <div className="flex flex-col items-start">
                 <span className="font-mono text-[9px] tracking-[0.15em] text-[#888] uppercase mb-1">
@@ -772,34 +722,6 @@ export default function DemoPage() {
               }}
               className="hidden"
             />
-
-            {/* Showcase face grid */}
-            <div className="mt-3">
-              <span className="block font-mono text-[9px] tracking-[0.15em] text-[#555] uppercase mb-2">
-                Or choose a reference
-              </span>
-              <div className="grid grid-cols-10 gap-1">
-                {SHOWCASE_FACES.map((face) => (
-                  <button
-                    key={face.id}
-                    onClick={() => handleSelectShowcaseFace(face)}
-                    disabled={loadingFaceId !== null || swapping}
-                    className={`relative aspect-square overflow-hidden border transition-all duration-150 ${
-                      loadingFaceId === face.id
-                        ? "border-accent opacity-60"
-                        : "border-[#222] hover:border-accent hover:shadow-[0_0_8px_rgba(0,255,136,0.12)]"
-                    }`}
-                  >
-                    <img src={face.src} alt={`Face ${face.id}`} className="w-full h-full object-cover" loading="lazy" />
-                    {loadingFaceId === face.id && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span className="w-2 h-2 bg-accent animate-pulse" />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
 
             {!faceFile && !isConnected && (
               <div className="mt-3">
@@ -962,16 +884,16 @@ export default function DemoPage() {
                   </label>
                   <div className="flex items-center gap-3">
                     <button
-                      onClick={() => listening ? stopListening() : startListening()}
+                      onClick={() => scribe.isConnected ? stopListening() : startListening()}
                       className={`w-10 h-10 flex items-center justify-center border transition-all duration-200 ${
-                        !listening
+                        !scribe.isConnected
                           ? "border-[#444] text-[#666]"
                           : "border-accent text-accent shadow-[0_0_10px_rgba(0,255,136,0.15)]"
                       }`}
                     >
-                      <MicIcon muted={!listening} />
+                      <MicIcon muted={!scribe.isConnected} />
                     </button>
-                    {listening && aiEnabled && (
+                    {scribe.isConnected && aiEnabled && (
                       <span className="flex items-center gap-1.5 font-mono text-[9px] text-accent tracking-[0.1em]">
                         <span className="w-1.5 h-1.5 bg-accent animate-pulse rounded-full" />
                         STT active

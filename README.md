@@ -2,16 +2,16 @@
 
 A minimal Next.js example that demonstrates [Atlas Realtime](https://www.northmodellabs.com) avatar sessions using the [`@northmodellabs/atlas-react`](https://www.npmjs.com/package/@northmodellabs/atlas-react) SDK. Supports both **1-to-1** (private) and **public** (multi-viewer) modes.
 
-> **New: Multi-Viewer Support** — Share your avatar session with unlimited viewers. One user drives the avatar, others watch the same stream in real time. Zero extra GPU cost. [See below →](#multi-viewer-public-mode)
+> **New: ElevenLabs STT** — Voice input now uses ElevenLabs Scribe v2 with hardware echo cancellation, eliminating the feedback loop where the avatar talks to itself. [See below →](#voice-input-elevenlabs-stt)
 
-**What this app does:** You bring your own LLM, TTS (e.g. ElevenLabs), and audio pipeline. Atlas provides the GPU compute and WebRTC video — you get a live avatar that lip-syncs to whatever audio you send.
+**What this app does:** You bring your own LLM, TTS (e.g. ElevenLabs), and audio pipeline. Atlas provides the GPU compute and WebRTC video — you get a live avatar that lip-syncs to whatever audio you send. A default face auto-loads on startup — just click Connect.
 
 ## Quick Start
 
 ```bash
 npx create-next-app@latest my-app --yes
 cd my-app
-npm install @northmodellabs/atlas-react livekit-client
+npm install @northmodellabs/atlas-react livekit-client @elevenlabs/react
 ```
 
 Create `.env.local`:
@@ -32,10 +32,10 @@ That's it. Open [http://localhost:3000](http://localhost:3000).
 ## Install
 
 ```bash
-npm install @northmodellabs/atlas-react livekit-client
+npm install @northmodellabs/atlas-react livekit-client @elevenlabs/react
 ```
 
-Two packages. `@northmodellabs/atlas-react` is the React hook, `livekit-client` is the WebRTC transport it uses under the hood.
+`@northmodellabs/atlas-react` is the React hook, `livekit-client` is the WebRTC transport, and `@elevenlabs/react` provides STT (speech-to-text) with echo cancellation.
 
 ## Usage
 
@@ -190,15 +190,26 @@ function playTtsAudio(base64Audio: string) {
   });
 }
 
-// 4. Use it: generate TTS and play through the avatar
+// 4. Use it: get text from LLM first, then fetch TTS audio separately
 async function handleUserMessage(text: string) {
-  const res = await fetch("/api/chat", {
+  // Step 1: Get LLM text response (fast — shows immediately)
+  const chatRes = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text }),
   });
-  const { audio } = await res.json();
-  if (audio) playTtsAudio(audio);
+  const { text: reply } = await chatRes.json();
+
+  // Step 2: Fetch TTS audio in background (avatar speaks when ready)
+  if (reply) {
+    const ttsRes = await fetch("/api/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: reply }),
+    });
+    const { audio } = await ttsRes.json();
+    if (audio) playTtsAudio(audio);
+  }
 }
 ```
 
@@ -208,6 +219,86 @@ async function handleUserMessage(text: string) {
 - When TTS plays, a `BufferSource` connects to the same destination → audio flows through → avatar lip-syncs
 - When TTS ends, the `BufferSource` disconnects → back to silence → avatar returns to idle
 - No track re-publishing, no mic toggling, no freeze
+- LLM text and TTS audio are fetched separately — text appears instantly, audio follows
+
+---
+
+## Voice Input (ElevenLabs STT)
+
+This app uses **ElevenLabs Scribe v2 Realtime** for speech-to-text instead of the browser's Web Speech API.
+
+### The problem with Web Speech API
+
+The browser's built-in speech recognition picks up *everything* the microphone hears — including the avatar's TTS audio playing through your speakers. This creates a feedback loop where the avatar transcribes its own voice and responds to itself endlessly. The Web Speech API doesn't expose its audio pipeline, so there's no way to apply echo cancellation.
+
+### How ElevenLabs STT fixes it
+
+ElevenLabs Scribe connects to the mic via `getUserMedia` with `echoCancellation: true`. The browser's built-in Acoustic Echo Cancellation (AEC) strips the speaker output from the mic signal at the hardware/OS level *before* audio reaches the STT model. The avatar's voice is never transcribed.
+
+```bash
+npm install @elevenlabs/react
+```
+
+```typescript
+import { useScribe, CommitStrategy } from "@elevenlabs/react";
+
+// Use a ref to avoid dependency cycles with useEffect
+const scribeRef = useRef(scribe);
+scribeRef.current = scribe;
+
+const scribe = useScribe({
+  modelId: "scribe_v2_realtime",
+  commitStrategy: CommitStrategy.VAD,    // auto-commit on silence
+  vadSilenceThresholdSecs: 0.8,
+  languageCode: "en",
+  onCommittedTranscript: (data) => {
+    if (data.text.trim()) sendChat(data.text.trim());
+  },
+});
+
+// Connect with echo cancellation enabled
+async function startListening() {
+  const res = await fetch("/api/scribe-token");
+  const { token } = await res.json();
+  await scribeRef.current.connect({
+    token,
+    microphone: {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true,
+    },
+  });
+}
+```
+
+### Server-side token endpoint
+
+Scribe requires a single-use WebSocket token. Keep your API key on the server:
+
+```typescript
+// app/api/scribe-token/route.ts
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  const res = await fetch(
+    "https://api.elevenlabs.io/v1/single-use-token/realtime_scribe",
+    {
+      method: "POST",
+      headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY! },
+    },
+  );
+  const data = await res.json();
+  return NextResponse.json({ token: data.token });
+}
+```
+
+### React dependency gotcha
+
+The `useScribe` hook returns a new object on every render. If you use `scribe` directly in a `useCallback` dependency array, it causes the callback to be recreated every render, which triggers any `useEffect` that depends on it — leading to a rapid connect/disconnect blinking loop. Store the scribe instance in a `useRef` and access it via `scribeRef.current` inside callbacks to keep references stable.
+
+### Requirements
+
+Add `ELEVENLABS_API_KEY` to `.env.local`. The same key is used for both TTS and STT.
 
 ---
 
@@ -419,7 +510,9 @@ Browser  →  /api/session (Next.js)  →  /v1/realtime/session (Atlas API)
 | `/api/session/[id]` | PATCH | Swap face mid-session |
 | `/api/session/[id]` | DELETE | End session |
 | `/api/session/[id]/viewer` | POST | Get a view-only token for multi-viewer |
-| `/api/chat` | POST | Text → LLM → ElevenLabs TTS → audio response |
+| `/api/chat` | POST | Text → LLM → text response (fast, no audio) |
+| `/api/tts` | POST | Text → ElevenLabs → base64 audio |
+| `/api/scribe-token` | GET | Single-use ElevenLabs Scribe WebSocket token |
 | `/api/config` | GET | Check which optional keys are configured |
 
 ## Environment Variables
@@ -431,10 +524,10 @@ Browser  →  /api/session (Next.js)  →  /v1/realtime/session (Atlas API)
 | `LLM_API_KEY` | No | OpenAI / Helicone key — enables AI chat |
 | `LLM_BASE_URL` | No | LLM endpoint (`https://api.openai.com/v1`) |
 | `LLM_MODEL` | No | Model name (`gpt-4o-mini`) |
-| `ELEVENLABS_API_KEY` | No | ElevenLabs key — enables voice responses |
+| `ELEVENLABS_API_KEY` | No | ElevenLabs key — enables TTS voice + STT speech input |
 | `ELEVENLABS_VOICE_ID` | No | ElevenLabs voice (`JBFqnCBsd6RMkjVDRZzb`) |
 
-Without the optional keys, the app still runs — avatar connects and lip-syncs — but AI chat responses are disabled.
+Without the optional keys, the app still runs — avatar connects and lip-syncs — but AI chat and voice input are disabled.
 
 ## Stack
 
@@ -443,6 +536,7 @@ Without the optional keys, the app still runs — avatar connects and lip-syncs 
 - **Tailwind CSS v4**
 - **[@northmodellabs/atlas-react](https://www.npmjs.com/package/@northmodellabs/atlas-react)** — React hook for Atlas sessions
 - **[livekit-client](https://www.npmjs.com/package/livekit-client)** — WebRTC transport
+- **[@elevenlabs/react](https://www.npmjs.com/package/@elevenlabs/react)** — ElevenLabs STT (Scribe v2 Realtime)
 
 ## Deploy
 
