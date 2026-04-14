@@ -109,31 +109,105 @@ export default function Demo() {
 
 ### 3. Send audio to the avatar (passthrough mode)
 
-In passthrough mode, you generate TTS audio yourself (ElevenLabs, OpenAI, etc.) and publish it to the avatar:
+In passthrough mode, you generate TTS audio yourself (ElevenLabs, OpenAI, etc.) and send it to the avatar for lip-sync.
+
+> **Important: Persistent Audio Track Pattern** — Don't use `session.publishAudio()` directly in passthrough mode. It tears down the audio track immediately after playback, which causes the avatar to freeze. Instead, use a **persistent audio track** that stays published for the entire session and feeds silence when idle. This is how the avatar stays animated continuously.
 
 ```typescript
-// Generate TTS with ElevenLabs
-const ttsRes = await fetch(
-  `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-  {
-    method: "POST",
-    headers: {
-      "xi-api-key": ELEVENLABS_KEY,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      text: "Hello! How are you?",
-      model_id: "eleven_turbo_v2_5",
-    }),
+import { useEffect, useRef, useCallback } from "react";
+import { useAtlasSession } from "@northmodellabs/atlas-react";
+import { LocalAudioTrack, Track } from "livekit-client";
+
+// 1. Create the session with autoEnableMic: false
+const session = useAtlasSession({
+  autoEnableMic: false,
+  createSession: async (face) => {
+    const form = new FormData();
+    form.append("face", face);
+    form.append("mode", "passthrough");
+    const res = await fetch("/api/session", { method: "POST", body: form });
+    const data = await res.json();
+    return { sessionId: data.session_id, livekitUrl: data.livekit_url, token: data.token };
   },
-);
+  deleteSession: async (id) => {
+    await fetch(`/api/session/${id}`, { method: "DELETE" });
+  },
+});
 
-const audioBuffer = await ttsRes.arrayBuffer();
-const base64Audio = btoa(String.fromCharCode(...new Uint8Array(audioBuffer)));
+// 2. Publish a persistent audio track when connected
+const audioCtxRef = useRef<AudioContext | null>(null);
+const destRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+const ttsSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
-// Publish to the avatar — it will lip-sync in real time
-await session.publishAudio(base64Audio);
+useEffect(() => {
+  if (session.status !== "connected" || !session.room) return;
+
+  const audioCtx = new AudioContext();
+  const dest = audioCtx.createMediaStreamDestination();
+  const mediaTrack = dest.stream.getAudioTracks()[0];
+  const lkTrack = new LocalAudioTrack(mediaTrack);
+
+  audioCtxRef.current = audioCtx;
+  destRef.current = dest;
+
+  session.room.localParticipant.publishTrack(lkTrack, {
+    name: "tts-audio",
+    source: Track.Source.Unknown,
+  });
+
+  return () => {
+    ttsSourceRef.current?.stop();
+    try { session.room?.localParticipant.unpublishTrack(lkTrack); } catch {}
+    lkTrack.stop();
+    audioCtx.close().catch(() => {});
+    audioCtxRef.current = null;
+    destRef.current = null;
+  };
+}, [session.status, session.room]);
+
+// 3. Play TTS audio through the persistent track
+function playTtsAudio(base64Audio: string) {
+  const audioCtx = audioCtxRef.current;
+  const dest = destRef.current;
+  if (!audioCtx || !dest) return;
+
+  ttsSourceRef.current?.stop();
+
+  const binary = atob(base64Audio);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+  audioCtx.decodeAudioData(bytes.buffer.slice(0)).then((audioBuffer) => {
+    const source = audioCtx.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(dest);
+    ttsSourceRef.current = source;
+    source.onended = () => {
+      source.disconnect();
+      ttsSourceRef.current = null;
+    };
+    source.start();
+  });
+}
+
+// 4. Use it: generate TTS and play through the avatar
+async function handleUserMessage(text: string) {
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+  });
+  const { audio } = await res.json();
+  if (audio) playTtsAudio(audio);
+}
 ```
+
+**How it works:**
+- A single `MediaStreamDestination` is published to the LiveKit room for the entire session
+- When idle, the destination outputs silence → GPU renders idle animation (avatar stays alive)
+- When TTS plays, a `BufferSource` connects to the same destination → audio flows through → avatar lip-syncs
+- When TTS ends, the `BufferSource` disconnects → back to silence → avatar returns to idle
+- No track re-publishing, no mic toggling, no freeze
 
 ---
 
@@ -156,7 +230,7 @@ const session = useAtlasSession({
 | `videoRef` | `RefObject<HTMLDivElement>` | Attach to a `<div>` — avatar video renders inside |
 | `connect(face?, faceUrl?)` | `function` | Start a session with a face image or URL |
 | `disconnect()` | `function` | End the session |
-| `publishAudio(audio)` | `function` | Send TTS audio (base64, Blob, or ArrayBuffer) to the avatar for lip-sync |
+| `publishAudio(audio)` | `function` | Send TTS audio (base64, Blob, or ArrayBuffer) — **see note below** |
 | `sendChat(text)` | `function` | Send a chat message (conversation mode) |
 | `setMicEnabled(enabled)` | `function` | Mute / unmute the microphone |
 | `setVolume(v)` | `function` | Set playback volume (0–100) |
@@ -166,6 +240,8 @@ const session = useAtlasSession({
 | `volume` | `number` | Current playback volume level |
 | `sessionId` | `string \| null` | Active session ID |
 | `room` | `Room \| null` | Underlying LiveKit Room for advanced scenarios |
+
+> **Note on `publishAudio`:** In passthrough mode, prefer the **persistent audio track pattern** (shown above) over calling `publishAudio()` directly. `publishAudio` tears down the track after each call, which can cause the avatar to freeze between messages. The persistent track pattern keeps a single audio track alive for the entire session, feeding silence when idle and TTS audio when speaking.
 
 ---
 

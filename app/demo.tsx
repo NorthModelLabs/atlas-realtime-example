@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect, type DragEvent, type ChangeEvent } from "react";
 import { useAtlasSession } from "@northmodellabs/atlas-react";
+import { LocalAudioTrack, Track } from "livekit-client";
 
 const SHOWCASE_FACES = Array.from({ length: 74 }, (_, i) => ({
   id: i + 1,
@@ -190,7 +191,6 @@ export default function DemoPage() {
   const [localMessages, setLocalMessages] = useState<ChatMsg[]>([]);
   const [swapping, setSwapping] = useState(false);
   const [aiThinking, setAiThinking] = useState(false);
-  const [avatarSpeaking, setAvatarSpeaking] = useState(false);
 
   const [configReady, setConfigReady] = useState<{ llm: boolean; tts: boolean } | null>(null);
 
@@ -198,7 +198,7 @@ export default function DemoPage() {
   const [loadingFaceId, setLoadingFaceId] = useState<number | null>(null);
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [copied, setCopied] = useState(false);
-  const [viewerCount, setViewerCount] = useState(0);
+  const micDeniedRef = useRef(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const swapInputRef = useRef<HTMLInputElement>(null);
@@ -206,7 +206,6 @@ export default function DemoPage() {
   const chatHistoryRef = useRef<ChatHistory[]>([]);
   const recognitionRef = useRef<ReturnType<typeof createSpeechRecognition> | null>(null);
   const sttBufferRef = useRef("");
-  const respondingRef = useRef(false);
 
   useEffect(() => {
     fetch("/api/config")
@@ -322,23 +321,65 @@ export default function DemoPage() {
     }
   }, [session.status, handleSwapFace, handleFile]);
 
-  const playTtsResponse = useCallback(async (base64Audio: string): Promise<number> => {
-    try {
-      const binary = atob(base64Audio);
-      const bytes = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-      const ctx = new AudioContext();
-      const buf = await ctx.decodeAudioData(bytes.buffer.slice(0));
-      const durationMs = buf.duration * 1000;
-      ctx.close();
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const destRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+  const lkTrackRef = useRef<LocalAudioTrack | null>(null);
+  const ttsSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
-      await session.publishAudio(base64Audio);
-      return durationMs;
-    } catch (err) {
-      console.error("Failed to publish TTS audio:", err);
-      return 0;
-    }
-  }, [session]);
+  useEffect(() => {
+    if (session.status !== "connected" || !session.room) return;
+
+    const audioCtx = new AudioContext();
+    const dest = audioCtx.createMediaStreamDestination();
+    const mediaTrack = dest.stream.getAudioTracks()[0];
+    const lkTrack = new LocalAudioTrack(mediaTrack);
+
+    audioCtxRef.current = audioCtx;
+    destRef.current = dest;
+    lkTrackRef.current = lkTrack;
+
+    session.room.localParticipant.publishTrack(lkTrack, {
+      name: "tts-audio",
+      source: Track.Source.Unknown,
+    }).catch((err) => console.warn("Failed to publish audio track:", err));
+
+    return () => {
+      ttsSourceRef.current?.stop();
+      ttsSourceRef.current = null;
+      try { session.room?.localParticipant.unpublishTrack(lkTrack); } catch { /* best effort */ }
+      lkTrack.stop();
+      audioCtx.close().catch(() => {});
+      audioCtxRef.current = null;
+      destRef.current = null;
+      lkTrackRef.current = null;
+    };
+  }, [session.status, session.room]);
+
+  const playTtsResponse = useCallback((base64Audio: string) => {
+    const audioCtx = audioCtxRef.current;
+    const dest = destRef.current;
+    if (!audioCtx || !dest) return;
+
+    ttsSourceRef.current?.stop();
+
+    const binary = atob(base64Audio);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+    audioCtx.decodeAudioData(bytes.buffer.slice(0))
+      .then((audioBuffer) => {
+        const source = audioCtx.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(dest);
+        ttsSourceRef.current = source;
+        source.onended = () => {
+          source.disconnect();
+          ttsSourceRef.current = null;
+        };
+        source.start();
+      })
+      .catch((err) => console.warn("TTS playback failed:", err));
+  }, []);
 
   const hasFace = !!faceFile || faceUrl.trim().startsWith("https://");
   const aiEnabled = configReady?.llm === true;
@@ -353,6 +394,9 @@ export default function DemoPage() {
 
   const disconnect = async () => {
     stopListening();
+    ttsSourceRef.current?.stop();
+    ttsSourceRef.current = null;
+    micDeniedRef.current = false;
     await session.disconnect();
     addMsg("system", "Session ended");
     setSessionTime(0);
@@ -382,12 +426,11 @@ export default function DemoPage() {
 
   // --- Web Speech API for hands-free voice conversation ---
   const startListening = useCallback(() => {
-    if (recognitionRef.current || !aiEnabled) return;
+    if (recognitionRef.current || !aiEnabled || micDeniedRef.current) return;
     const rec = createSpeechRecognition();
     if (!rec) return;
 
     rec.onresult = (e: SpeechRecognitionEvent) => {
-      if (respondingRef.current) return;
       let transcript = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const result = e.results[i];
@@ -402,24 +445,30 @@ export default function DemoPage() {
     };
 
     rec.onend = () => {
-      if (recognitionRef.current === rec) {
+      if (recognitionRef.current === rec && !micDeniedRef.current) {
         try { rec.start(); } catch { /* already started */ }
       }
     };
 
     rec.onerror = (e: Event & { error?: string }) => {
       if (e.error === "aborted" || e.error === "no-speech") return;
-      if (e.error === "not-allowed") {
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+        micDeniedRef.current = true;
         recognitionRef.current = null;
+        rec.onend = null;
         setListening(false);
         return;
       }
       console.error("Speech recognition error:", e.error);
     };
 
-    rec.start();
-    recognitionRef.current = rec;
-    setListening(true);
+    try {
+      rec.start();
+      recognitionRef.current = rec;
+      setListening(true);
+    } catch {
+      micDeniedRef.current = true;
+    }
   }, [aiEnabled, sendChat]);
 
   const stopListening = useCallback(() => {
@@ -433,56 +482,37 @@ export default function DemoPage() {
     sttBufferRef.current = "";
   }, []);
 
-  sendChatRef.current = async (text: string) => {
-    if (!text.trim() || respondingRef.current) return;
+  sendChatRef.current = (text: string) => {
+    if (!text.trim()) return;
     addMsg("user", text);
 
     if (aiEnabled) {
-      respondingRef.current = true;
-      stopListening();
       setAiThinking(true);
       chatHistoryRef.current.push({ role: "user", content: text });
 
-      try {
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, history: chatHistoryRef.current.slice(0, -1) }),
-        });
-
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({ message: "AI request failed" }));
-          addMsg("system", err.message || "AI request failed");
+      fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, history: chatHistoryRef.current.slice(0, -1) }),
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("AI request failed");
+          return res.json();
+        })
+        .then((data) => {
           setAiThinking(false);
-          return;
-        }
-
-        const data = await res.json();
-        setAiThinking(false);
-
-        if (data.audio) {
-          const durationMs = await playTtsResponse(data.audio);
-
           if (data.text) {
             addMsg("atlas", data.text);
             chatHistoryRef.current.push({ role: "assistant", content: data.text });
           }
-
-          setAvatarSpeaking(true);
-          await new Promise((r) => setTimeout(r, durationMs + 500));
-          setAvatarSpeaking(false);
-        } else if (data.text) {
-          addMsg("atlas", data.text);
-          chatHistoryRef.current.push({ role: "assistant", content: data.text });
-        }
-      } catch {
-        addMsg("system", "Failed to reach AI");
-        setAiThinking(false);
-      } finally {
-        setAvatarSpeaking(false);
-        respondingRef.current = false;
-        startListening();
-      }
+          if (data.audio) {
+            playTtsResponse(data.audio);
+          }
+        })
+        .catch(() => {
+          addMsg("system", "Failed to reach AI");
+          setAiThinking(false);
+        });
     } else {
       session.sendChat(text);
     }
@@ -589,13 +619,13 @@ export default function DemoPage() {
                 )}
               </div>
             ))}
-            {(aiThinking || avatarSpeaking) && (
+            {aiThinking && (
               <div className="flex flex-col items-start">
                 <span className="font-mono text-[9px] tracking-[0.15em] text-[#888] uppercase mb-1">
                   Atlas
                 </span>
                 <div className="px-3 py-2 bg-[#0a1a0f] border border-[#1a3a20] text-accent text-[12px]">
-                  <span className="animate-pulse">{aiThinking ? "Thinking..." : "Speaking..."}</span>
+                  <span className="animate-pulse">Thinking...</span>
                 </div>
               </div>
             )}
@@ -605,7 +635,7 @@ export default function DemoPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (chatInput.trim() && !aiThinking && !avatarSpeaking) {
+                if (chatInput.trim() && !aiThinking) {
                   sendChat(chatInput.trim());
                   setChatInput("");
                 }
@@ -617,12 +647,12 @@ export default function DemoPage() {
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 placeholder={aiEnabled ? "Ask something..." : "Type a message..."}
-                disabled={aiThinking || avatarSpeaking}
+                disabled={aiThinking}
                 className="flex-1 bg-[#0a0a0a] border border-[#333] px-3 py-2 text-[12px] text-foreground placeholder-[#555] font-sans focus:outline-none focus:border-accent transition-all duration-200 disabled:opacity-50"
               />
               <button
                 type="submit"
-                disabled={!chatInput.trim() || aiThinking || avatarSpeaking}
+                disabled={!chatInput.trim() || aiThinking}
                 className="px-3 py-2 border border-accent text-accent font-mono text-[10px] tracking-[0.1em] uppercase hover:bg-accent hover:text-[#050505] transition-all duration-200 disabled:border-[#333] disabled:text-[#555] disabled:cursor-not-allowed"
               >
                 Send
