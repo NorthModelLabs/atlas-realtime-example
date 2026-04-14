@@ -1,6 +1,8 @@
 # Atlas Realtime — Example App
 
-A minimal Next.js example that demonstrates [Atlas Realtime](https://www.northmodellabs.com) avatar sessions in **passthrough mode** using the [`@northmodellabs/atlas-react`](https://www.npmjs.com/package/@northmodellabs/atlas-react) SDK.
+A minimal Next.js example that demonstrates [Atlas Realtime](https://www.northmodellabs.com) avatar sessions using the [`@northmodellabs/atlas-react`](https://www.npmjs.com/package/@northmodellabs/atlas-react) SDK. Supports both **1-to-1** (private) and **public** (multi-viewer) modes.
+
+> **New: Multi-Viewer Support** — Share your avatar session with unlimited viewers. One user drives the avatar, others watch the same stream in real time. Zero extra GPU cost. [See below →](#multi-viewer-public-mode)
 
 **What this app does:** You bring your own LLM, TTS (e.g. ElevenLabs), and audio pipeline. Atlas provides the GPU compute and WebRTC video — you get a live avatar that lip-syncs to whatever audio you send.
 
@@ -167,6 +169,63 @@ const session = useAtlasSession({
 
 ---
 
+## Session Modes
+
+### 1-to-1 (Private)
+
+The default. One user creates a session, gets a token, and connects. Nobody else can see the avatar.
+
+```
+Browser  →  POST /api/session  →  Atlas creates room  →  connect with token
+```
+
+### Multi-Viewer (Public Mode)
+
+One user creates and drives the session. Additional viewers get **view-only tokens** for the same room — they can watch but not publish audio/video.
+
+```
+Host browser    →  POST /api/session           →  full token (can publish)
+Viewer browser  →  POST /api/session/:id/viewer →  view-only token (subscribe only)
+```
+
+To add viewers to an active session:
+
+```typescript
+// Server-side: get a viewer token
+const res = await fetch(`${ATLAS_API_URL}/v1/realtime/session/${sessionId}/viewer`, {
+  method: "POST",
+  headers: { Authorization: `Bearer ${ATLAS_API_KEY}` },
+});
+const { token, livekit_url, room } = await res.json();
+// Give this token to the viewer client
+```
+
+```typescript
+// Client-side: viewer connects with livekit-client
+import { Room, RoomEvent } from "livekit-client";
+
+const room = new Room();
+await room.connect(livekit_url, token);
+
+room.on(RoomEvent.TrackSubscribed, (track) => {
+  if (track.kind === "video") {
+    const el = track.attach();
+    document.getElementById("viewer-video").appendChild(el);
+  }
+});
+```
+
+Viewer tokens have these permissions:
+| Permission | Value |
+|-----------|-------|
+| `can_publish` | `false` |
+| `can_subscribe` | `true` |
+| `can_publish_data` | `false` |
+
+No extra GPU cost — viewers just subscribe to the existing video/audio tracks in the LiveKit room.
+
+---
+
 ## Full Architecture
 
 ```
@@ -179,6 +238,7 @@ Browser  →  /api/session (Next.js)  →  /v1/realtime/session (Atlas API)
 | `/api/session/[id]` | GET | Check session status |
 | `/api/session/[id]` | PATCH | Swap face mid-session |
 | `/api/session/[id]` | DELETE | End session |
+| `/api/session/[id]/viewer` | POST | **NEW** — Get a view-only token for multi-viewer |
 | `/api/chat` | POST | Text → LLM → ElevenLabs TTS → audio response |
 | `/api/config` | GET | Check which optional keys are configured |
 
