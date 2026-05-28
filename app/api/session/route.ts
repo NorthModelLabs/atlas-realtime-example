@@ -2,14 +2,31 @@ import { NextRequest, NextResponse } from "next/server";
 
 const ATLAS_API_URL = process.env.ATLAS_API_URL || "";
 const ATLAS_API_KEY = process.env.ATLAS_API_KEY || "";
+const ATLAS_MODEL_VARIANT = process.env.ATLAS_MODEL_VARIANT || "";
 
 const VALID_MODES = new Set(["conversation", "passthrough"]);
+const VALID_MODEL_VARIANTS = new Set(["best", "experimental", "test", "test2", "test3", "test4", "test5"]);
+
+function atlasHeaders(contentType?: string) {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${ATLAS_API_KEY}`,
+  };
+  if (contentType) headers["Content-Type"] = contentType;
+  if (ATLAS_MODEL_VARIANT) headers["X-Model-Variant"] = ATLAS_MODEL_VARIANT;
+  return headers;
+}
 
 export async function POST(req: NextRequest) {
   try {
     if (!ATLAS_API_KEY || !ATLAS_API_URL) {
       return NextResponse.json(
         { error: "server_error", message: "ATLAS_API_KEY or ATLAS_API_URL not configured." },
+        { status: 500 },
+      );
+    }
+    if (ATLAS_MODEL_VARIANT && !VALID_MODEL_VARIANTS.has(ATLAS_MODEL_VARIANT)) {
+      return NextResponse.json(
+        { error: "server_error", message: "ATLAS_MODEL_VARIANT is not valid." },
         { status: 500 },
       );
     }
@@ -43,7 +60,7 @@ export async function POST(req: NextRequest) {
       try {
         upstreamResp = await fetch(`${ATLAS_API_URL}/v1/realtime/session`, {
           method: "POST",
-          headers: { Authorization: `Bearer ${ATLAS_API_KEY}` },
+          headers: atlasHeaders(),
           body: upstream,
         });
       } catch (fetchErr) {
@@ -84,10 +101,7 @@ export async function POST(req: NextRequest) {
       try {
         upstreamResp = await fetch(`${ATLAS_API_URL}/v1/realtime/session`, {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${ATLAS_API_KEY}`,
-            "Content-Type": "application/json",
-          },
+          headers: atlasHeaders("application/json"),
           body: JSON.stringify(payload),
         });
       } catch (fetchErr) {
