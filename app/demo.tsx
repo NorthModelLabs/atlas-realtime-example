@@ -18,7 +18,7 @@ type ChatMsg = {
   text: string;
 };
 
-export type UiMode = "studio" | "tiktok" | "teacher" | "meet";
+export type UiMode = "studio" | "tiktok" | "teacher" | "meet" | "mirror";
 export type VoiceMode = "ai" | "mirror";
 
 interface ChatHistory {
@@ -26,12 +26,13 @@ interface ChatHistory {
   content: string;
 }
 
-const UI_MODES = new Set<UiMode>(["studio", "tiktok", "teacher", "meet"]);
+const UI_MODES = new Set<UiMode>(["studio", "tiktok", "teacher", "meet", "mirror"]);
 const UI_FORMATS: { id: UiMode; label: string; urlLabel: string }[] = [
   { id: "studio", label: "Studio", urlLabel: "Default URL mode" },
   { id: "tiktok", label: "TikTok", urlLabel: "?ui=tiktok" },
   { id: "teacher", label: "Teach", urlLabel: "?ui=teacher" },
   { id: "meet", label: "Meet", urlLabel: "?ui=meet" },
+  { id: "mirror", label: "Mirror", urlLabel: "?ui=mirror" },
 ];
 const VOICE_MODES: { id: VoiceMode; label: string; description: string }[] = [
   { id: "ai", label: "AI voice", description: "LLM + ElevenLabs speak through Atlas" },
@@ -42,13 +43,17 @@ let msgCounter = 0;
 
 function getInitialUiMode(fallback: UiMode): UiMode {
   if (typeof window === "undefined") return fallback;
-  const requestedUi = new URLSearchParams(window.location.search).get("ui");
+  const params = new URLSearchParams(window.location.search);
+  const requestedUi = params.get("ui");
+  if (!requestedUi && params.get("voice") === "mirror") return "mirror";
   return requestedUi && UI_MODES.has(requestedUi as UiMode) ? (requestedUi as UiMode) : fallback;
 }
 
 function getInitialVoiceMode(fallback: VoiceMode): VoiceMode {
   if (typeof window === "undefined") return fallback;
-  const requestedVoice = new URLSearchParams(window.location.search).get("voice");
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("ui") === "mirror") return "mirror";
+  const requestedVoice = params.get("voice");
   return requestedVoice === "mirror" ? "mirror" : fallback;
 }
 
@@ -269,10 +274,23 @@ export default function DemoPage({
       .catch(() => setConfigReady({ llm: false, tts: false }));
   }, []);
 
-  const updateUiMode = useCallback((nextMode: UiMode) => {
+  const updateFormatMode = useCallback((nextMode: UiMode) => {
+    if (nextMode === "mirror") {
+      setUiMode("mirror");
+      setVoiceMode("mirror");
+      setTiktokToolsOpen(false);
+      const url = new URL(window.location.href);
+      url.searchParams.set("ui", "mirror");
+      url.searchParams.delete("voice");
+      window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+      return;
+    }
+
+    setVoiceMode("ai");
     setUiMode(nextMode);
     setTiktokToolsOpen(false);
     const url = new URL(window.location.href);
+    url.searchParams.delete("voice");
     if (nextMode === "studio") {
       url.searchParams.delete("ui");
     } else {
@@ -284,13 +302,20 @@ export default function DemoPage({
   const updateVoiceMode = useCallback((nextMode: VoiceMode) => {
     setVoiceMode(nextMode);
     const url = new URL(window.location.href);
-    if (nextMode === "ai") {
+    if (nextMode === "mirror") {
+      setUiMode("mirror");
+      setTiktokToolsOpen(false);
+      url.searchParams.set("ui", "mirror");
       url.searchParams.delete("voice");
     } else {
-      url.searchParams.set("voice", nextMode);
+      if (uiMode === "mirror") {
+        setUiMode("studio");
+        url.searchParams.delete("ui");
+      }
+      url.searchParams.delete("voice");
     }
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
-  }, []);
+  }, [uiMode]);
 
   useEffect(() => {
     setTiktokToolsOpen(false);
@@ -734,15 +759,16 @@ export default function DemoPage({
   const overlayMessages = localMessages.filter((msg) => msg.role !== "system").slice(-2);
   const latestAtlasMessage = [...localMessages].reverse().find((msg) => msg.role === "atlas");
   const voiceInputActive = voiceMode === "mirror" ? mirrorInputActive : scribe.isConnected;
+  const activeFormatMode: UiMode = uiMode;
   const formatPicker = (className = "") => (
     <div className={`format-picker ${className}`}>
       {UI_FORMATS.map((format) => (
         <button
           key={format.id}
           type="button"
-          onClick={() => updateUiMode(format.id)}
-          className={uiMode === format.id ? "is-active" : ""}
-          aria-label={`Switch to ${format.label} UI`}
+          onClick={() => updateFormatMode(format.id)}
+          className={activeFormatMode === format.id ? "is-active" : ""}
+          aria-label={format.id === "mirror" ? "Switch to mirror voice mode" : `Switch to ${format.label} UI`}
         >
           {format.label}
         </button>
@@ -1744,13 +1770,13 @@ export default function DemoPage({
               {UI_FORMATS.map((format, index) => (
                 <button
                   key={format.id}
-                  onClick={() => updateUiMode(format.id)}
+                  onClick={() => updateFormatMode(format.id)}
                   className={`py-2.5 font-mono text-[10px] uppercase tracking-[0.16em] transition-all duration-200 ${
                     index % 2 === 1 ? "border-l border-border" : ""
                   } ${
                     index > 1 ? "border-t border-border" : ""
                   } ${
-                    uiMode === format.id
+                    activeFormatMode === format.id
                       ? "bg-[#050505] text-accent shadow-[inset_0_0_20px_rgba(0,255,136,0.06),0_0_12px_rgba(0,255,136,0.1)]"
                       : "text-[#555] hover:text-[#888]"
                   }`}
@@ -1760,7 +1786,7 @@ export default function DemoPage({
               ))}
             </div>
             <p className="font-mono text-[9px] text-[#555] mt-2">
-              {UI_FORMATS.find((format) => format.id === uiMode)?.urlLabel}
+              {UI_FORMATS.find((format) => format.id === activeFormatMode)?.urlLabel}
             </p>
           </div>
 
