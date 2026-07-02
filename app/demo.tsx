@@ -1090,12 +1090,8 @@ export default function DemoPage({
         {formatPicker("global-format-picker mirror-format-picker")}
 
         <main className="mirror-shell">
-          <div className="mirror-heading">
-            <span>Mirror</span>
-          </div>
-
           <section className="mirror-stage">
-            <div className="mirror-card">
+            <div className={`mirror-card ${mirrorInputActive ? "is-expanded" : ""}`}>
               <div className="mirror-video-wrap">
                 <div
                   ref={session.videoRef}
@@ -1133,7 +1129,7 @@ export default function DemoPage({
             </div>
           </section>
 
-          <aside className="mirror-control-dock">
+          <aside className="mirror-control-dock" aria-label="Mirror controls">
             <div className="mirror-avatar-row">
               {FACE_PRESETS.map((preset) => (
                 <button
