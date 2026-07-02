@@ -19,6 +19,7 @@ type ChatMsg = {
 };
 
 export type UiMode = "studio" | "tiktok" | "teacher" | "meet";
+export type VoiceMode = "ai" | "mirror";
 
 interface ChatHistory {
   role: "user" | "assistant";
@@ -32,6 +33,10 @@ const UI_FORMATS: { id: UiMode; label: string; urlLabel: string }[] = [
   { id: "teacher", label: "Teach", urlLabel: "?ui=teacher" },
   { id: "meet", label: "Meet", urlLabel: "?ui=meet" },
 ];
+const VOICE_MODES: { id: VoiceMode; label: string; description: string }[] = [
+  { id: "ai", label: "AI voice", description: "LLM + ElevenLabs speak through Atlas" },
+  { id: "mirror", label: "Mirror", description: "Your microphone drives the avatar directly" },
+];
 
 let msgCounter = 0;
 
@@ -39,6 +44,12 @@ function getInitialUiMode(fallback: UiMode): UiMode {
   if (typeof window === "undefined") return fallback;
   const requestedUi = new URLSearchParams(window.location.search).get("ui");
   return requestedUi && UI_MODES.has(requestedUi as UiMode) ? (requestedUi as UiMode) : fallback;
+}
+
+function getInitialVoiceMode(fallback: VoiceMode): VoiceMode {
+  if (typeof window === "undefined") return fallback;
+  const requestedVoice = new URLSearchParams(window.location.search).get("voice");
+  return requestedVoice === "mirror" ? "mirror" : fallback;
 }
 
 function MicIcon({ muted }: { muted: boolean }) {
@@ -182,7 +193,13 @@ function formatTime(s: number) {
   return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 }
 
-export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?: UiMode }) {
+export default function DemoPage({
+  initialUiMode = "studio",
+  initialVoiceMode = "ai",
+}: {
+  initialUiMode?: UiMode;
+  initialVoiceMode?: VoiceMode;
+}) {
   const session = useAtlasSession({
     autoEnableMic: false,
     createSession: async (face, faceUrl) => {
@@ -233,9 +250,11 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
 
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [uiMode, setUiMode] = useState<UiMode>(() => getInitialUiMode(initialUiMode));
+  const [voiceMode, setVoiceMode] = useState<VoiceMode>(() => getInitialVoiceMode(initialVoiceMode));
   const [copied, setCopied] = useState(false);
   const [tiktokToolsOpen, setTiktokToolsOpen] = useState(false);
   const [meetLeaveArmed, setMeetLeaveArmed] = useState(false);
+  const [mirrorInputActive, setMirrorInputActive] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const swapInputRef = useRef<HTMLInputElement>(null);
@@ -258,6 +277,17 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
       url.searchParams.delete("ui");
     } else {
       url.searchParams.set("ui", nextMode);
+    }
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  }, []);
+
+  const updateVoiceMode = useCallback((nextMode: VoiceMode) => {
+    setVoiceMode(nextMode);
+    const url = new URL(window.location.href);
+    if (nextMode === "ai") {
+      url.searchParams.delete("voice");
+    } else {
+      url.searchParams.set("voice", nextMode);
     }
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
   }, []);
@@ -429,6 +459,48 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
   const audioCtxRef = useRef<AudioContext | null>(null);
   const destRef = useRef<MediaStreamAudioDestinationNode | null>(null);
   const ttsSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const mirrorStreamRef = useRef<MediaStream | null>(null);
+  const mirrorSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+
+  const stopMirrorInput = useCallback(() => {
+    try {
+      mirrorSourceRef.current?.disconnect();
+    } catch {
+      /* best effort */
+    }
+    mirrorSourceRef.current = null;
+    mirrorStreamRef.current?.getTracks().forEach((track) => track.stop());
+    mirrorStreamRef.current = null;
+    setMirrorInputActive(false);
+  }, []);
+
+  const startMirrorInput = useCallback(async () => {
+    if (mirrorSourceRef.current) return;
+    const audioCtx = audioCtxRef.current;
+    const dest = destRef.current;
+    if (!audioCtx || !dest) return;
+
+    try {
+      if (audioCtx.state === "suspended") {
+        await audioCtx.resume();
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+      const source = audioCtx.createMediaStreamSource(stream);
+      source.connect(dest);
+      mirrorStreamRef.current = stream;
+      mirrorSourceRef.current = source;
+      setMirrorInputActive(true);
+    } catch (err) {
+      console.warn("Failed to start mirror microphone:", err);
+      addMsg("system", "Mirror microphone could not start");
+    }
+  }, [addMsg]);
 
   useEffect(() => {
     if (session.status !== "connected" || !session.room) return;
@@ -449,13 +521,14 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
     return () => {
       ttsSourceRef.current?.stop();
       ttsSourceRef.current = null;
+      stopMirrorInput();
       try { session.room?.localParticipant.unpublishTrack(lkTrack); } catch { /* best effort */ }
       lkTrack.stop();
       audioCtx.close().catch(() => {});
       audioCtxRef.current = null;
       destRef.current = null;
     };
-  }, [session.status, session.room]);
+  }, [session.status, session.room, stopMirrorInput]);
 
   const playTtsResponse = useCallback((base64Audio: string) => {
     const audioCtx = audioCtxRef.current;
@@ -484,8 +557,7 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
   }, []);
 
   const hasFace = !!faceFile || faceUrl.trim().startsWith("https://");
-  const aiEnabled = configReady?.llm === true;
-
+  const aiEnabled = voiceMode === "ai" && configReady?.llm === true;
   const connect = async () => {
     if (!hasFace) return;
     setLocalMessages([]);
@@ -496,6 +568,7 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
 
   const disconnect = async () => {
     setMeetLeaveArmed(false);
+    stopMirrorInput();
     stopListening();
     ttsSourceRef.current?.stop();
     ttsSourceRef.current = null;
@@ -537,6 +610,7 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
     vadSilenceThresholdSecs: 0.8,
     languageCode: "en",
     onCommittedTranscript: (data) => {
+      if (voiceMode !== "ai") return;
       if (data.text.trim()) sendChatRef.current?.(data.text.trim());
     },
   });
@@ -546,7 +620,7 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
 
   const startListening = useCallback(async () => {
     const s = scribeRef.current;
-    if (s.isConnected || !aiEnabled) return;
+    if (s.isConnected || !aiEnabled || voiceMode !== "ai") return;
     try {
       const res = await fetch("/api/scribe-token");
       const { token } = await res.json();
@@ -562,15 +636,51 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
     } catch (err) {
       console.warn("Failed to start ElevenLabs STT:", err);
     }
-  }, [aiEnabled]);
+  }, [aiEnabled, voiceMode]);
 
   const stopListening = useCallback(() => {
     scribeRef.current.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (session.status !== "connected") {
+      stopMirrorInput();
+      return;
+    }
+
+    if (voiceMode === "mirror") {
+      stopListening();
+      ttsSourceRef.current?.stop();
+      ttsSourceRef.current = null;
+      void startMirrorInput();
+    } else {
+      stopMirrorInput();
+    }
+  }, [session.status, voiceMode, startMirrorInput, stopMirrorInput, stopListening]);
+
+  const toggleVoiceInput = useCallback(() => {
+    if (voiceMode === "mirror") {
+      if (mirrorInputActive) {
+        stopMirrorInput();
+      } else {
+        void startMirrorInput();
+      }
+      return;
+    }
+    if (scribeRef.current.isConnected) {
+      stopListening();
+    } else {
+      void startListening();
+    }
+  }, [mirrorInputActive, startListening, startMirrorInput, stopListening, stopMirrorInput, voiceMode]);
+
   sendChatRef.current = (text: string) => {
     if (!text.trim()) return;
     addMsg("user", text);
+
+    if (voiceMode === "mirror") {
+      return;
+    }
 
     if (aiEnabled) {
       setAiThinking(true);
@@ -614,15 +724,16 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
 
   // Auto-start listening when connected + AI enabled
   useEffect(() => {
-    if (session.status === "connected" && aiEnabled) {
+    if (session.status === "connected" && aiEnabled && voiceMode === "ai") {
       startListening();
     }
     return () => { stopListening(); };
-  }, [session.status, aiEnabled, startListening, stopListening]);
+  }, [session.status, aiEnabled, voiceMode, startListening, stopListening]);
 
   const isTiktokUi = uiMode === "tiktok";
   const overlayMessages = localMessages.filter((msg) => msg.role !== "system").slice(-2);
   const latestAtlasMessage = [...localMessages].reverse().find((msg) => msg.role === "atlas");
+  const voiceInputActive = voiceMode === "mirror" ? mirrorInputActive : scribe.isConnected;
   const formatPicker = (className = "") => (
     <div className={`format-picker ${className}`}>
       {UI_FORMATS.map((format) => (
@@ -634,6 +745,22 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
           aria-label={`Switch to ${format.label} UI`}
         >
           {format.label}
+        </button>
+      ))}
+    </div>
+  );
+  const voiceModePicker = (className = "") => (
+    <div className={`voice-mode-picker ${className}`}>
+      {VOICE_MODES.map((mode) => (
+        <button
+          key={mode.id}
+          type="button"
+          onClick={() => updateVoiceMode(mode.id)}
+          className={voiceMode === mode.id ? "is-active" : ""}
+          aria-label={`Use ${mode.label}`}
+          title={mode.description}
+        >
+          {mode.label}
         </button>
       ))}
     </div>
@@ -724,14 +851,19 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
               )}
             </div>
             <div className="teacher-avatar-copy">
-              <span>{isConnected ? "Live tutor" : "Tutor preview"}</span>
-              <h2>Ask Atlas</h2>
+              <span>{voiceMode === "mirror" ? "Mirror voice" : isConnected ? "Live tutor" : "Tutor preview"}</span>
+              <h2>{voiceMode === "mirror" ? "Speak through Atlas" : "Ask Atlas"}</h2>
               <p>
-                {isConnected
-                  ? latestAtlasMessage?.text || "Ask about any step on the board."
-                  : "Start a short guided explanation, or ask a question about the graph."}
+                {voiceMode === "mirror"
+                  ? mirrorInputActive
+                    ? "Your microphone is driving the avatar directly."
+                    : "Call the avatar, then allow mic access to mirror your voice."
+                  : isConnected
+                    ? latestAtlasMessage?.text || "Ask about any step on the board."
+                    : "Start a short guided explanation, or ask a question about the graph."}
               </p>
             </div>
+            {voiceModePicker("teacher-voice-picker")}
             <div className="teacher-avatar-strip">
               {FACE_PRESETS.map((preset) => (
                 <button
@@ -761,26 +893,38 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
                 <DownloadIcon /> Image
               </button>
             </div>
-            <form
-              className="teacher-prompt"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (chatInput.trim() && !aiThinking) {
-                  sendChat(chatInput.trim());
-                  setChatInput("");
-                }
-              }}
-            >
-              <input
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                placeholder="Ask about the board..."
-                disabled={aiThinking}
-              />
-              <button type="submit" disabled={!chatInput.trim() || aiThinking}>
-                Send
+            {voiceMode === "ai" ? (
+              <form
+                className="teacher-prompt"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (chatInput.trim() && !aiThinking) {
+                    sendChat(chatInput.trim());
+                    setChatInput("");
+                  }
+                }}
+              >
+                <input
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Ask about the board..."
+                  disabled={aiThinking}
+                />
+                <button type="submit" disabled={!chatInput.trim() || aiThinking}>
+                  Send
+                </button>
+              </form>
+            ) : (
+              <button
+                type="button"
+                onClick={toggleVoiceInput}
+                disabled={!isConnected}
+                className={`teacher-mirror-button ${mirrorInputActive ? "is-live" : ""}`}
+              >
+                <MicIcon muted={!mirrorInputActive} />
+                {mirrorInputActive ? "Mirror live" : isConnected ? "Start mirror" : "Call avatar first"}
               </button>
-            </form>
+            )}
           </aside>
         </main>
       </div>
@@ -792,6 +936,7 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
       <div className="meet-ui h-screen w-screen overflow-hidden bg-[#202124] text-white">
         {hiddenFaceInputs}
         {formatPicker("global-format-picker meet-global-format-picker")}
+        {voiceModePicker("meet-voice-picker")}
         <header className="meet-topbar">
           <div>
             <strong>{new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</strong>
@@ -827,7 +972,11 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
               <span>{isConnected ? `${formatTime(sessionTime)} · connected` : "Waiting in lobby"}</span>
             </div>
             <div className="meet-floating-caption">
-              {latestAtlasMessage?.text || "Ready when you are. Start the call to talk with Atlas."}
+              {voiceMode === "mirror"
+                ? mirrorInputActive
+                  ? "Mirror is live. Speak normally and Atlas will carry your voice."
+                  : "Start the call, then enable mirror mic."
+                : latestAtlasMessage?.text || "Ready when you are. Start the call to talk with Atlas."}
             </div>
           </section>
 
@@ -848,11 +997,12 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
           </button>
           <button
             type="button"
-            onClick={() => scribe.isConnected ? stopListening() : startListening()}
-            className={scribe.isConnected ? "is-live" : ""}
-            aria-label={scribe.isConnected ? "Mute microphone" : "Start microphone"}
+            onClick={toggleVoiceInput}
+            className={voiceInputActive ? "is-live" : ""}
+            aria-label={voiceInputActive ? "Mute microphone" : "Start microphone"}
+            title={voiceMode === "mirror" ? "Mirror microphone" : "AI microphone"}
           >
-            <MicIcon muted={!scribe.isConnected} />
+            <MicIcon muted={!voiceInputActive} />
           </button>
           <button
             type="button"
@@ -1056,7 +1206,13 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
             <div className="pointer-events-none absolute inset-x-5 bottom-32 z-20 flex flex-col items-start gap-2">
               {isConnected && overlayMessages.length === 0 && !scribe.partialTranscript && !aiThinking && (
                 <div className="tiktok-caption text-[20px] font-semibold leading-tight text-white/80">
-                  {aiEnabled && scribe.isConnected ? "Listening..." : "Type or speak to start"}
+                  {voiceMode === "mirror"
+                    ? mirrorInputActive
+                      ? "Mirror live"
+                      : "Tap mic to mirror"
+                    : aiEnabled && scribe.isConnected
+                      ? "Listening..."
+                      : "Type or speak to start"}
                 </div>
               )}
               {overlayMessages.map((msg) => (
@@ -1164,15 +1320,15 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
                 <>
                   <button
                     type="button"
-                    onClick={() => scribe.isConnected ? stopListening() : startListening()}
-                    className={`tiktok-action-button ${scribe.isConnected ? "tiktok-action-live" : ""}`}
-                    aria-label={scribe.isConnected ? "Mute microphone" : "Start microphone"}
-                    title={scribe.isConnected ? "Mute microphone" : "Start microphone"}
+                    onClick={toggleVoiceInput}
+                    className={`tiktok-action-button ${voiceInputActive ? "tiktok-action-live" : ""}`}
+                    aria-label={voiceInputActive ? "Mute microphone" : "Start microphone"}
+                    title={voiceMode === "mirror" ? "Mirror microphone" : "AI microphone"}
                   >
-                    <MicIcon muted={!scribe.isConnected} />
+                    <MicIcon muted={!voiceInputActive} />
                   </button>
                   <span className="tiktok-action-label">
-                    {scribe.isConnected ? "Live" : "Mic"}
+                    {voiceMode === "mirror" ? (mirrorInputActive ? "Mirror" : "Mic") : voiceInputActive ? "Live" : "Mic"}
                   </span>
                 </>
               )}
@@ -1207,6 +1363,18 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
 
               {tiktokToolsOpen && (
                 <div className="tiktok-tools-menu absolute bottom-0 right-16 flex flex-col gap-2 p-2">
+                  <div className="tiktok-tools-voice">
+                    {VOICE_MODES.map((mode) => (
+                      <button
+                        key={mode.id}
+                        type="button"
+                        onClick={() => updateVoiceMode(mode.id)}
+                        className={voiceMode === mode.id ? "is-selected" : ""}
+                      >
+                        {mode.label}
+                      </button>
+                    ))}
+                  </div>
                   {FACE_PRESETS.map((preset) => (
                     <button
                       key={preset.id}
@@ -1240,7 +1408,7 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
               )}
             </div>
 
-            {isConnected && (
+            {isConnected && voiceMode === "ai" && (
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -1283,7 +1451,11 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
           <div className="flex-1 overflow-y-auto custom-scroll px-4 py-3 space-y-3">
             {localMessages.length === 0 && (
               <p className="font-mono text-[10px] text-[#666] text-center mt-8">
-                {aiEnabled
+                {voiceMode === "mirror"
+                  ? mirrorInputActive
+                    ? "Mirror is live — speak normally..."
+                    : "Enable the mirror mic to speak through Atlas..."
+                  : aiEnabled
                   ? scribe.isConnected
                     ? "Listening — speak or type below..."
                     : "Type a message to start..."
@@ -1340,32 +1512,47 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
             <div ref={chatEndRef} />
           </div>
           <div className="px-4 py-3 border-t border-border shrink-0">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (chatInput.trim() && !aiThinking) {
-                  sendChat(chatInput.trim());
-                  setChatInput("");
-                }
-              }}
-              className="flex gap-2"
-            >
-              <input
-                type="text"
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                placeholder={aiEnabled ? "Ask something..." : "Type a message..."}
-                disabled={aiThinking}
-                className="flex-1 bg-[#0a0a0a] border border-[#333] px-3 py-2 text-[12px] text-foreground placeholder-[#555] font-sans focus:outline-none focus:border-accent transition-all duration-200 disabled:opacity-50"
-              />
-              <button
-                type="submit"
-                disabled={!chatInput.trim() || aiThinking}
-                className="px-3 py-2 border border-accent text-accent font-mono text-[10px] tracking-[0.1em] uppercase hover:bg-accent hover:text-[#050505] transition-all duration-200 disabled:border-[#333] disabled:text-[#555] disabled:cursor-not-allowed"
+            {voiceMode === "ai" ? (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (chatInput.trim() && !aiThinking) {
+                    sendChat(chatInput.trim());
+                    setChatInput("");
+                  }
+                }}
+                className="flex gap-2"
               >
-                Send
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder={aiEnabled ? "Ask something..." : "Type a message..."}
+                  disabled={aiThinking}
+                  className="flex-1 bg-[#0a0a0a] border border-[#333] px-3 py-2 text-[12px] text-foreground placeholder-[#555] font-sans focus:outline-none focus:border-accent transition-all duration-200 disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={!chatInput.trim() || aiThinking}
+                  className="px-3 py-2 border border-accent text-accent font-mono text-[10px] tracking-[0.1em] uppercase hover:bg-accent hover:text-[#050505] transition-all duration-200 disabled:border-[#333] disabled:text-[#555] disabled:cursor-not-allowed"
+                >
+                  Send
+                </button>
+              </form>
+            ) : (
+              <button
+                type="button"
+                onClick={toggleVoiceInput}
+                disabled={!isConnected}
+                className={`w-full border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] transition-all duration-200 ${
+                  mirrorInputActive
+                    ? "border-accent text-accent"
+                    : "border-[#333] text-[#888] hover:border-accent hover:text-accent"
+                } disabled:opacity-40`}
+              >
+                {mirrorInputActive ? "Mirror mic live" : isConnected ? "Start mirror mic" : "Connect to mirror voice"}
               </button>
-            </form>
+            )}
           </div>
         </div>
       )}
@@ -1381,7 +1568,7 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
 
         <div className="flex-1 overflow-y-auto custom-scroll">
           {/* AI Status Banner */}
-          {configReady && (
+          {configReady && voiceMode === "ai" && (
             <div className={`px-6 py-3 border-b ${!configReady.llm || !configReady.tts ? "border-[#3a2a00] bg-[#1a1400]" : "border-[#0a3a15] bg-[#0a1a0f]"}`}>
               {!configReady.llm || !configReady.tts ? (
                 <div className="flex items-start gap-2">
@@ -1410,6 +1597,19 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
                   </p>
                 </div>
               )}
+            </div>
+          )}
+          {voiceMode === "mirror" && (
+            <div className="px-6 py-3 border-b border-[#0a3a15] bg-[#0a1a0f]">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-accent" />
+                <p className="font-mono text-[10px] text-accent tracking-[0.1em]">
+                  Mirror voice enabled
+                </p>
+              </div>
+              <p className="font-mono text-[9px] text-[#5f8f72] mt-1 leading-relaxed">
+                Your mic is routed directly into the avatar. LLM and ElevenLabs are bypassed.
+              </p>
             </div>
           )}
 
@@ -1510,15 +1710,28 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
           {/* Mode label */}
           <div className="px-6 py-5 border-b border-border">
             <label className="block font-mono text-[10px] tracking-[0.2em] text-muted uppercase mb-3">
-              Mode
+              Voice
             </label>
-            <div className="flex border border-border">
-              <div className="flex-1 py-2.5 font-mono text-[10px] tracking-[0.2em] uppercase text-center bg-[#050505] text-accent shadow-[inset_0_0_20px_rgba(0,255,136,0.06),0_0_12px_rgba(0,255,136,0.1)]">
-                Passthrough
-              </div>
+            <div className="grid grid-cols-2 border border-border">
+              {VOICE_MODES.map((mode, index) => (
+                <button
+                  key={mode.id}
+                  type="button"
+                  onClick={() => updateVoiceMode(mode.id)}
+                  className={`py-2.5 font-mono text-[10px] uppercase tracking-[0.16em] transition-all duration-200 ${
+                    index > 0 ? "border-l border-border" : ""
+                  } ${
+                    voiceMode === mode.id
+                      ? "bg-[#050505] text-accent shadow-[inset_0_0_20px_rgba(0,255,136,0.06),0_0_12px_rgba(0,255,136,0.1)]"
+                      : "text-[#555] hover:text-[#888]"
+                  }`}
+                >
+                  {mode.label}
+                </button>
+              ))}
             </div>
             <p className="font-mono text-[9px] text-[#555] mt-2">
-              You bring LLM, TTS, and audio — we provide the GPU compute and WebRTC video
+              {VOICE_MODES.find((mode) => mode.id === voiceMode)?.description}
             </p>
           </div>
 
@@ -1672,19 +1885,19 @@ export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?:
                   </label>
                   <div className="flex items-center gap-3">
                     <button
-                      onClick={() => scribe.isConnected ? stopListening() : startListening()}
+                      onClick={toggleVoiceInput}
                       className={`w-10 h-10 flex items-center justify-center border transition-all duration-200 ${
-                        !scribe.isConnected
+                        !voiceInputActive
                           ? "border-[#444] text-[#666]"
                           : "border-accent text-accent shadow-[0_0_10px_rgba(0,255,136,0.15)]"
                       }`}
                     >
-                      <MicIcon muted={!scribe.isConnected} />
+                      <MicIcon muted={!voiceInputActive} />
                     </button>
-                    {scribe.isConnected && aiEnabled && (
+                    {voiceInputActive && (
                       <span className="flex items-center gap-1.5 font-mono text-[9px] text-accent tracking-[0.1em]">
                         <span className="w-1.5 h-1.5 bg-accent animate-pulse rounded-full" />
-                        STT active
+                        {voiceMode === "mirror" ? "Mirror live" : "STT active"}
                       </span>
                     )}
                   </div>
