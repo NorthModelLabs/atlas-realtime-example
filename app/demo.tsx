@@ -1091,9 +1091,7 @@ export default function DemoPage({
 
         <main className="mirror-shell">
           <div className="mirror-heading">
-            <span>Atlas mirror</span>
-            <h1>Mirror voice</h1>
-            <p>Mic direct to avatar. No LLM, no TTS.</p>
+            <span>Mirror</span>
           </div>
 
           <section className="mirror-stage">
@@ -1117,14 +1115,8 @@ export default function DemoPage({
                 )}
               </div>
 
-              <div className="mirror-signal" aria-hidden="true">
-                {Array.from({ length: 22 }).map((_, index) => (
-                  <span
-                    key={index}
-                    className={mirrorInputActive ? "is-live" : ""}
-                    style={{ height: `${18 + ((index * 13) % 44)}px` }}
-                  />
-                ))}
+              <div className={`mirror-signal ${mirrorInputActive ? "is-live" : ""}`} aria-hidden="true">
+                <span />
               </div>
 
               <div className="mirror-status-row">
