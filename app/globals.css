@@ -295,27 +295,27 @@
 .mirror-shell {
   align-items: center;
   display: grid;
-  gap: 28px;
+  gap: 18px;
   grid-template-columns: minmax(0, 1fr);
   min-height: 100vh;
-  padding: 92px 32px 34px;
+  padding: 94px 24px 28px;
+  place-items: center;
 }
 
 .mirror-stage {
   align-items: center;
-  display: grid;
-  gap: 34px;
-  grid-template-columns: minmax(280px, 0.78fr) minmax(360px, 1.1fr);
+  display: flex;
+  justify-content: center;
   margin: 0 auto;
-  max-width: 1320px;
+  max-width: 760px;
   width: 100%;
 }
 
-.mirror-stage-copy {
-  max-width: 430px;
+.mirror-heading {
+  text-align: center;
 }
 
-.mirror-stage-copy span,
+.mirror-heading span,
 .mirror-status-row span,
 .mirror-note span {
   color: #737373;
@@ -327,35 +327,37 @@
   text-transform: uppercase;
 }
 
-.mirror-stage-copy h1 {
+.mirror-heading h1 {
   color: #111111;
-  font-size: clamp(48px, 7vw, 96px);
-  font-weight: 650;
+  font-size: clamp(34px, 5vw, 52px);
+  font-weight: 620;
   letter-spacing: 0;
-  line-height: 0.94;
-  margin-top: 14px;
+  line-height: 1;
+  margin-top: 8px;
 }
 
-.mirror-stage-copy p {
+.mirror-heading p {
   color: #555555;
-  font-size: 18px;
-  line-height: 1.5;
-  margin-top: 22px;
-  max-width: 390px;
+  font-size: 14px;
+  line-height: 1.35;
+  margin-top: 10px;
 }
 
 .mirror-card {
   background: #111111;
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.2);
   color: white;
-  min-height: min(68vh, 720px);
+  max-width: 640px;
+  min-height: auto;
   overflow: hidden;
-  padding: 18px;
+  padding: 14px;
+  width: min(100%, 640px);
 }
 
 .mirror-video-wrap {
   background: #f4f4f0;
-  height: min(54vh, 560px);
+  aspect-ratio: 4 / 3;
+  height: auto;
   overflow: hidden;
   position: relative;
 }
@@ -389,10 +391,10 @@
 .mirror-signal {
   align-items: center;
   display: flex;
-  gap: 8px;
-  height: 78px;
+  gap: 7px;
+  height: 54px;
   justify-content: center;
-  padding: 16px 12px 4px;
+  padding: 10px 12px 0;
 }
 
 .mirror-signal span {
@@ -415,19 +417,27 @@
 }
 
 .mirror-status-row {
-  align-items: end;
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 8px 4px;
+  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  padding: 6px 8px 4px;
+  text-align: center;
+}
+
+.mirror-status-row span:first-child {
+  text-align: left;
+}
+
+.mirror-status-row span:last-child {
+  text-align: right;
 }
 
 .mirror-status-row strong {
   color: white;
   display: block;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 560;
   letter-spacing: 0;
-  margin-top: 5px;
 }
 
 .mirror-control-dock {
@@ -435,11 +445,11 @@
   background: rgba(255, 255, 255, 0.86);
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.12);
   display: grid;
-  gap: 18px;
+  gap: 14px;
   grid-template-columns: 1fr auto 1fr;
   margin: 0 auto;
-  max-width: 1040px;
-  padding: 14px;
+  max-width: 760px;
+  padding: 12px;
   width: 100%;
 }
 
@@ -456,10 +466,10 @@
   background: #efefeb;
   color: #111111;
   display: flex;
-  height: 54px;
+  height: 48px;
   justify-content: center;
   overflow: hidden;
-  width: 54px;
+  width: 48px;
 }
 
 .mirror-avatar-row button.is-selected {
@@ -489,14 +499,14 @@
   font-weight: 700;
   gap: 9px;
   justify-content: center;
-  min-height: 54px;
-  padding: 0 18px;
+  min-height: 48px;
+  padding: 0 16px;
 }
 
 .mirror-main-actions button {
   background: #e8e8e3;
   color: #111111;
-  min-width: 150px;
+  min-width: 132px;
 }
 
 .mirror-main-actions button.is-primary,

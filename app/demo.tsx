@@ -1090,15 +1090,13 @@ export default function DemoPage({
         {formatPicker("global-format-picker mirror-format-picker")}
 
         <main className="mirror-shell">
-          <section className="mirror-stage">
-            <div className="mirror-stage-copy">
-              <span>Atlas mirror</span>
-              <h1>Your voice, Atlas on screen.</h1>
-              <p>
-                Speak normally. Mirror mode routes your microphone straight into the avatar and skips the LLM + TTS path.
-              </p>
-            </div>
+          <div className="mirror-heading">
+            <span>Atlas mirror</span>
+            <h1>Mirror voice</h1>
+            <p>Mic direct to avatar. No LLM, no TTS.</p>
+          </div>
 
+          <section className="mirror-stage">
             <div className="mirror-card">
               <div className="mirror-video-wrap">
                 <div
@@ -1130,16 +1128,14 @@ export default function DemoPage({
               </div>
 
               <div className="mirror-status-row">
-                <div>
-                  <span>{isConnected ? "Connected" : session.status === "connecting" ? "Connecting" : "Ready"}</span>
-                  <strong>
-                    {mirrorInputActive
-                      ? "Mirror mic live"
-                      : isConnected
-                        ? "Enable mic to speak through Atlas"
-                        : "Start a mirror session"}
-                  </strong>
-                </div>
+                <span>{isConnected ? "Connected" : session.status === "connecting" ? "Connecting" : "Ready"}</span>
+                <strong>
+                  {mirrorInputActive
+                    ? "Mirror mic live"
+                    : isConnected
+                      ? "Mic is muted"
+                      : "Ready to start"}
+                </strong>
                 {isConnected && <span>{formatTime(sessionTime)}</span>}
               </div>
             </div>
