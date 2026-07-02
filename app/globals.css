@@ -485,11 +485,11 @@
 .mirror-main-actions,
 .mirror-note {
   align-items: center;
-  background: rgba(226, 226, 221, 0.58);
+  background: transparent;
   display: flex;
   gap: 6px;
-  min-height: 58px;
-  padding: 7px;
+  min-height: 64px;
+  padding: 0;
 }
 
 .mirror-avatar-row button {
@@ -497,11 +497,11 @@
   background: rgba(247, 247, 244, 0.72);
   color: #111111;
   display: flex;
-  height: 42px;
+  height: 64px;
   justify-content: center;
   overflow: hidden;
   transition: background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
-  width: 42px;
+  width: 64px;
 }
 
 .mirror-avatar-row button.is-selected {
@@ -523,7 +523,6 @@
 
 .mirror-main-actions {
   justify-content: center;
-  padding-inline: 8px;
 }
 
 .mirror-main-actions button,
@@ -536,14 +535,14 @@
   font-weight: 700;
   gap: 9px;
   justify-content: center;
-  min-height: 58px;
-  padding: 0 18px;
+  min-height: 64px;
+  padding: 0 22px;
   transition: background 180ms ease, color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
 .mirror-main-actions button {
   color: #111111;
-  min-width: 136px;
+  min-width: 148px;
 }
 
 .mirror-main-actions button.is-primary,
@@ -551,7 +550,7 @@
   background: #111111;
   box-shadow: 0 12px 32px rgba(17, 17, 17, 0.18);
   color: white;
-  min-width: 152px;
+  min-width: 170px;
 }
 
 .mirror-main-actions button.is-danger {
@@ -567,12 +566,11 @@
 
 .mirror-note {
   justify-content: flex-end;
-  padding-left: 10px;
 }
 
 .mirror-note button {
   color: #111111;
-  min-width: 122px;
+  min-width: 142px;
 }
 
 .mirror-note span {
