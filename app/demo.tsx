@@ -1172,13 +1172,6 @@ export default function DemoPage({
               </button>
             </div>
 
-            <div className="mirror-note">
-              <span>{visibility === "public" ? "Public room" : "Private room"}</span>
-              <button type="button" onClick={() => !isConnected && setVisibility((value) => value === "private" ? "public" : "private")} disabled={isConnected}>
-                {visibility === "public" ? <GlobeIcon /> : <LockIcon />}
-                {visibility === "public" ? "Public" : "Private"}
-              </button>
-            </div>
           </aside>
         </main>
       </div>

@@ -313,8 +313,7 @@
   width: 100%;
 }
 
-.mirror-status-row span,
-.mirror-note span {
+.mirror-status-row span {
   color: #737373;
   display: block;
   font-family: var(--font-geist-mono);
@@ -472,9 +471,9 @@
   background: transparent;
   border: 0;
   box-shadow: none;
-  display: grid;
+  display: flex;
   gap: 12px;
-  grid-template-columns: 1fr auto 1fr;
+  justify-content: center;
   margin: 0 auto;
   max-width: 620px;
   padding: 0;
@@ -482,8 +481,7 @@
 }
 
 .mirror-avatar-row,
-.mirror-main-actions,
-.mirror-note {
+.mirror-main-actions {
   align-items: center;
   background: transparent;
   display: flex;
@@ -525,8 +523,7 @@
   justify-content: center;
 }
 
-.mirror-main-actions button,
-.mirror-note button {
+.mirror-main-actions button {
   align-items: center;
   background: rgba(226, 226, 221, 0.58);
   border: 0;
@@ -559,23 +556,8 @@
   color: #a11d23;
 }
 
-.mirror-main-actions button:disabled,
-.mirror-note button:disabled {
+.mirror-main-actions button:disabled {
   opacity: 0.38;
-}
-
-.mirror-note {
-  justify-content: flex-end;
-}
-
-.mirror-note button {
-  color: #111111;
-  min-width: 142px;
-}
-
-.mirror-note span {
-  color: #8a8a84;
-  line-height: 1.15;
 }
 
 @keyframes mirror-level {
@@ -1360,12 +1342,11 @@
   }
 
   .mirror-control-dock {
-    grid-template-columns: 1fr;
+    flex-wrap: wrap;
   }
 
   .mirror-avatar-row,
-  .mirror-main-actions,
-  .mirror-note {
+  .mirror-main-actions {
     justify-content: center;
   }
 
