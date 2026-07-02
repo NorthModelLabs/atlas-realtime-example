@@ -1083,6 +1083,124 @@ export default function DemoPage({
     );
   }
 
+  if (uiMode === "mirror") {
+    return (
+      <div className="mirror-ui min-h-screen w-screen overflow-hidden bg-[#f7f7f4] text-[#111111]">
+        {hiddenFaceInputs}
+        {formatPicker("global-format-picker mirror-format-picker")}
+
+        <main className="mirror-shell">
+          <section className="mirror-stage">
+            <div className="mirror-stage-copy">
+              <span>Atlas mirror</span>
+              <h1>Your voice, Atlas on screen.</h1>
+              <p>
+                Speak normally. Mirror mode routes your microphone straight into the avatar and skips the LLM + TTS path.
+              </p>
+            </div>
+
+            <div className="mirror-card">
+              <div className="mirror-video-wrap">
+                <div
+                  ref={session.videoRef}
+                  className="mirror-video"
+                  style={{ display: isConnected ? "flex" : "none" }}
+                />
+                {!isConnected && (
+                  <div className="mirror-face-hold">
+                    {facePreview ? (
+                      <Image src={facePreview} alt="" width={420} height={420} unoptimized />
+                    ) : (
+                      <button type="button" onClick={() => fileInputRef.current?.click()} aria-label="Choose avatar">
+                        <UploadIcon />
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="mirror-signal" aria-hidden="true">
+                {Array.from({ length: 22 }).map((_, index) => (
+                  <span
+                    key={index}
+                    className={mirrorInputActive ? "is-live" : ""}
+                    style={{ height: `${18 + ((index * 13) % 44)}px` }}
+                  />
+                ))}
+              </div>
+
+              <div className="mirror-status-row">
+                <div>
+                  <span>{isConnected ? "Connected" : session.status === "connecting" ? "Connecting" : "Ready"}</span>
+                  <strong>
+                    {mirrorInputActive
+                      ? "Mirror mic live"
+                      : isConnected
+                        ? "Enable mic to speak through Atlas"
+                        : "Start a mirror session"}
+                  </strong>
+                </div>
+                {isConnected && <span>{formatTime(sessionTime)}</span>}
+              </div>
+            </div>
+          </section>
+
+          <aside className="mirror-control-dock">
+            <div className="mirror-avatar-row">
+              {FACE_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => void selectPresetFace(preset)}
+                  className={selectedFaceId === preset.id ? "is-selected" : ""}
+                  aria-label={`Use ${preset.label} avatar`}
+                  title={preset.label}
+                >
+                  <Image src={preset.src} alt="" width={72} height={72} unoptimized />
+                </button>
+              ))}
+              <button type="button" onClick={() => fileInputRef.current?.click()} aria-label="Upload avatar" title="Upload avatar">
+                <UploadIcon />
+              </button>
+              <button type="button" onClick={downloadCurrentFace} disabled={!facePreview} aria-label="Download avatar" title="Download avatar">
+                <DownloadIcon />
+              </button>
+            </div>
+
+            <div className="mirror-main-actions">
+              <button
+                type="button"
+                onClick={() => (isConnected ? void disconnect() : hasFace ? void connect() : undefined)}
+                disabled={!isConnected && !hasFace}
+                className={isConnected ? "is-danger" : "is-primary"}
+              >
+                {isConnected ? <StopIcon /> : <PlayIcon />}
+                {isConnected ? "End" : "Start"}
+              </button>
+              <button
+                type="button"
+                onClick={toggleVoiceInput}
+                disabled={!isConnected}
+                className={mirrorInputActive ? "is-live" : ""}
+              >
+                <MicIcon muted={!mirrorInputActive} />
+                {mirrorInputActive ? "Mute mirror" : "Mirror mic"}
+              </button>
+            </div>
+
+            <div className="mirror-note">
+              <span>{visibility === "public" ? "Public room" : "Private room"}</span>
+              <button type="button" onClick={() => !isConnected && setVisibility((value) => value === "private" ? "public" : "private")} disabled={isConnected}>
+                {visibility === "public" ? <GlobeIcon /> : <LockIcon />}
+                {visibility === "public" ? "Public" : "Private"}
+              </button>
+            </div>
+          </aside>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`h-screen w-screen overflow-hidden bg-[#050505] font-sans ${
