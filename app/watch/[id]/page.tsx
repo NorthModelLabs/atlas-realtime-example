@@ -1,24 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState, use } from "react";
-import { Room, RoomEvent, Track, type RemoteTrackPublication } from "livekit-client";
+import { Room, RoomEvent, Track } from "livekit-client";
 
 type ViewerState = "loading" | "connecting" | "connected" | "ended" | "error";
 
 export default function WatchPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: sessionId } = use(params);
-  const [state, setState] = useState<ViewerState>("loading");
-  const [error, setError] = useState("");
+  const isValidSessionId = /^ses_[a-f0-9]{20}$/.test(sessionId);
+  const [state, setState] = useState<ViewerState>(isValidSessionId ? "loading" : "error");
+  const [error, setError] = useState(isValidSessionId ? "" : "Invalid session link.");
   const [elapsed, setElapsed] = useState(0);
   const videoRef = useRef<HTMLDivElement>(null);
   const roomRef = useRef<Room | null>(null);
 
   useEffect(() => {
-    if (!/^ses_[a-f0-9]{20}$/.test(sessionId)) {
-      setError("Invalid session link.");
-      setState("error");
-      return;
-    }
+    if (!isValidSessionId) return;
 
     let cancelled = false;
 
@@ -43,7 +40,7 @@ export default function WatchPage({ params }: { params: Promise<{ id: string }> 
         });
         roomRef.current = room;
 
-        room.on(RoomEvent.TrackSubscribed, (track, publication) => {
+        room.on(RoomEvent.TrackSubscribed, (track) => {
           if (track.kind === Track.Kind.Video && videoRef.current) {
             const el = track.attach();
             el.style.width = "100%";
@@ -81,7 +78,7 @@ export default function WatchPage({ params }: { params: Promise<{ id: string }> 
       cancelled = true;
       roomRef.current?.disconnect();
     };
-  }, [sessionId]);
+  }, [sessionId, isValidSessionId]);
 
   useEffect(() => {
     if (state !== "connected") return;

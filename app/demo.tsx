@@ -1,11 +1,16 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useRef, useCallback, useEffect, type DragEvent, type ChangeEvent } from "react";
 import { useAtlasSession } from "@northmodellabs/atlas-react";
 import { LocalAudioTrack, Track } from "livekit-client";
 import { useScribe, CommitStrategy } from "@elevenlabs/react";
 
 const DEFAULT_FACE_URL = "/faces/default.png";
+const FACE_PRESETS = [
+  { id: "default", label: "Default", src: DEFAULT_FACE_URL },
+  { id: "reel-alt", label: "Reel", src: "/faces/reel-alt.png" },
+];
 
 type ChatMsg = {
   id: string;
@@ -13,12 +18,28 @@ type ChatMsg = {
   text: string;
 };
 
+export type UiMode = "studio" | "tiktok" | "teacher" | "meet";
+
 interface ChatHistory {
   role: "user" | "assistant";
   content: string;
 }
 
+const UI_MODES = new Set<UiMode>(["studio", "tiktok", "teacher", "meet"]);
+const UI_FORMATS: { id: UiMode; label: string; urlLabel: string }[] = [
+  { id: "studio", label: "Studio", urlLabel: "Default URL mode" },
+  { id: "tiktok", label: "TikTok", urlLabel: "?ui=tiktok" },
+  { id: "teacher", label: "Teach", urlLabel: "?ui=teacher" },
+  { id: "meet", label: "Meet", urlLabel: "?ui=meet" },
+];
+
 let msgCounter = 0;
+
+function getInitialUiMode(fallback: UiMode): UiMode {
+  if (typeof window === "undefined") return fallback;
+  const requestedUi = new URLSearchParams(window.location.search).get("ui");
+  return requestedUi && UI_MODES.has(requestedUi as UiMode) ? (requestedUi as UiMode) : fallback;
+}
 
 function MicIcon({ muted }: { muted: boolean }) {
   return (
@@ -45,6 +66,16 @@ function UploadIcon() {
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
       <path d="M12 16V4m0 0l-4 4m4-4l4 4" />
       <path d="M20 16v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <path d="M12 3v11" />
+      <path d="M7 10l5 5 5-5" />
+      <path d="M5 20h14" />
     </svg>
   );
 }
@@ -109,6 +140,33 @@ function GlobeIcon() {
   );
 }
 
+function PlayIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M8 5v14l11-7L8 5z" />
+    </svg>
+  );
+}
+
+function StopIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <rect x="7" y="7" width="10" height="10" rx="2" />
+    </svg>
+  );
+}
+
+function StudioIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <path d="M5 6h14M5 12h14M5 18h14" />
+      <circle cx="8" cy="6" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="12" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="11" cy="18" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 function LockIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -124,7 +182,7 @@ function formatTime(s: number) {
   return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 }
 
-export default function DemoPage() {
+export default function DemoPage({ initialUiMode = "studio" }: { initialUiMode?: UiMode }) {
   const session = useAtlasSession({
     autoEnableMic: false,
     createSession: async (face, faceUrl) => {
@@ -148,29 +206,42 @@ export default function DemoPage() {
       return { sessionId: data.session_id, livekitUrl: data.livekit_url, token: data.token };
     },
     deleteSession: async (sessionId) => {
-      await fetch(`/api/session/${sessionId}`, { method: "DELETE" });
+      try {
+        const res = await fetch(`/api/session/${sessionId}`, { method: "DELETE" });
+        if (!res.ok) {
+          console.warn(`[DELETE /api/session/${sessionId}] failed with ${res.status}`);
+        }
+      } catch (err) {
+        console.warn(`[DELETE /api/session/${sessionId}] failed`, err);
+      }
     },
   });
 
   const [sessionTime, setSessionTime] = useState(0);
   const [faceFile, setFaceFile] = useState<File | null>(null);
   const [facePreview, setFacePreview] = useState<string | null>(null);
+  const [selectedFaceId, setSelectedFaceId] = useState("default");
   const [faceUrl, setFaceUrl] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [localMessages, setLocalMessages] = useState<ChatMsg[]>([]);
   const [swapping, setSwapping] = useState(false);
   const [aiThinking, setAiThinking] = useState(false);
+  const [faceLoading, setFaceLoading] = useState(false);
 
   const [configReady, setConfigReady] = useState<{ llm: boolean; tts: boolean } | null>(null);
 
   const [visibility, setVisibility] = useState<"private" | "public">("private");
+  const [uiMode, setUiMode] = useState<UiMode>(() => getInitialUiMode(initialUiMode));
   const [copied, setCopied] = useState(false);
+  const [tiktokToolsOpen, setTiktokToolsOpen] = useState(false);
+  const [meetLeaveArmed, setMeetLeaveArmed] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const swapInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatHistoryRef = useRef<ChatHistory[]>([]);
+  const faceSelectionVersionRef = useRef(0);
 
   useEffect(() => {
     fetch("/api/config")
@@ -178,6 +249,27 @@ export default function DemoPage() {
       .then((data) => setConfigReady(data))
       .catch(() => setConfigReady({ llm: false, tts: false }));
   }, []);
+
+  const updateUiMode = useCallback((nextMode: UiMode) => {
+    setUiMode(nextMode);
+    setTiktokToolsOpen(false);
+    const url = new URL(window.location.href);
+    if (nextMode === "studio") {
+      url.searchParams.delete("ui");
+    } else {
+      url.searchParams.set("ui", nextMode);
+    }
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  }, []);
+
+  useEffect(() => {
+    setTiktokToolsOpen(false);
+    setMeetLeaveArmed(false);
+  }, [session.status]);
+
+  useEffect(() => {
+    setMeetLeaveArmed(false);
+  }, [uiMode]);
 
   const addMsg = useCallback((role: ChatMsg["role"], text: string) => {
     setLocalMessages((prev) => [...prev, { id: `msg-${++msgCounter}`, role, text }]);
@@ -211,12 +303,22 @@ export default function DemoPage() {
     return () => clearInterval(interval);
   }, [session.status]);
 
-  const handleFile = useCallback((file: File) => {
+  const isConnected = session.status === "connected";
+  const isDisconnected = session.status === "idle" || session.status === "disconnected";
+
+  const handleFile = useCallback((file: File, faceId = "custom", version?: number) => {
     if (!file.type.startsWith("image/")) return;
+    const selectionVersion = version ?? faceSelectionVersionRef.current + 1;
+    faceSelectionVersionRef.current = selectionVersion;
     setFaceFile(file);
+    setSelectedFaceId(faceId);
     setFaceUrl("");
     const reader = new FileReader();
-    reader.onload = (e) => setFacePreview(e.target?.result as string);
+    reader.onload = (e) => {
+      if (faceSelectionVersionRef.current === selectionVersion) {
+        setFacePreview(e.target?.result as string);
+      }
+    };
     reader.readAsDataURL(file);
   }, []);
 
@@ -239,8 +341,8 @@ export default function DemoPage() {
   );
 
   const handleSwapFace = useCallback(
-    async (file: File) => {
-      if (!session.sessionId || !file.type.startsWith("image/")) return;
+    async (file: File, faceId = "custom") => {
+      if (!session.sessionId || !file.type.startsWith("image/")) return false;
       setSwapping(true);
       try {
         const form = new FormData();
@@ -252,14 +354,19 @@ export default function DemoPage() {
         if (!res.ok) {
           const data = await res.json();
           addMsg("system", `Face swap failed: ${data.message || "Unknown error"}`);
+          return false;
         } else {
           addMsg("system", "Face swapped");
+          faceSelectionVersionRef.current += 1;
+          setSelectedFaceId(faceId);
           const reader = new FileReader();
           reader.onload = (e) => setFacePreview(e.target?.result as string);
           reader.readAsDataURL(file);
+          return true;
         }
       } catch {
         addMsg("system", "Face swap failed");
+        return false;
       } finally {
         setSwapping(false);
         if (swapInputRef.current) swapInputRef.current.value = "";
@@ -268,12 +375,53 @@ export default function DemoPage() {
     [session.sessionId, addMsg],
   );
 
+  const selectPresetFace = useCallback(
+    async (preset: (typeof FACE_PRESETS)[number]) => {
+      const selectionVersion = faceSelectionVersionRef.current + 1;
+      faceSelectionVersionRef.current = selectionVersion;
+      setSelectedFaceId(preset.id);
+      setFacePreview(preset.src);
+      setFaceLoading(true);
+      try {
+        const res = await fetch(preset.src);
+        const blob = await res.blob();
+        const file = new File([blob], `${preset.id}.png`, { type: blob.type || "image/png" });
+        if (faceSelectionVersionRef.current !== selectionVersion) return;
+        if (isConnected) {
+          await handleSwapFace(file, preset.id);
+        } else {
+          handleFile(file, preset.id, selectionVersion);
+        }
+      } catch {
+        if (faceSelectionVersionRef.current === selectionVersion) {
+          addMsg("system", "Could not load avatar");
+        }
+      } finally {
+        if (faceSelectionVersionRef.current === selectionVersion) {
+          setFaceLoading(false);
+        }
+      }
+    },
+    [addMsg, handleFile, handleSwapFace, isConnected],
+  );
+
+  const downloadCurrentFace = useCallback(() => {
+    if (!facePreview) return;
+    const link = document.createElement("a");
+    link.href = facePreview;
+    link.download = `atlas-avatar-${selectedFaceId || "image"}.png`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }, [facePreview, selectedFaceId]);
+
   useEffect(() => {
     fetch(DEFAULT_FACE_URL)
       .then((r) => r.blob())
       .then((blob) => {
+        if (faceSelectionVersionRef.current !== 0) return;
         const file = new File([blob], "default-face.jpg", { type: "image/jpeg" });
-        handleFile(file);
+        handleFile(file, "default");
       })
       .catch(() => {});
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -347,6 +495,7 @@ export default function DemoPage() {
   };
 
   const disconnect = async () => {
+    setMeetLeaveArmed(false);
     stopListening();
     ttsSourceRef.current?.stop();
     ttsSourceRef.current = null;
@@ -354,6 +503,11 @@ export default function DemoPage() {
     addMsg("system", "Session ended");
     setSessionTime(0);
     chatHistoryRef.current = [];
+  };
+
+  const armMeetLeave = () => {
+    setMeetLeaveArmed(true);
+    window.setTimeout(() => setMeetLeaveArmed(false), 2200);
   };
 
   const viewerUrl = session.sessionId
@@ -466,28 +620,367 @@ export default function DemoPage() {
     return () => { stopListening(); };
   }, [session.status, aiEnabled, startListening, stopListening]);
 
-  const isConnected = session.status === "connected";
-  const isDisconnected = session.status === "idle" || session.status === "disconnected";
+  const isTiktokUi = uiMode === "tiktok";
+  const overlayMessages = localMessages.filter((msg) => msg.role !== "system").slice(-2);
+  const latestAtlasMessage = [...localMessages].reverse().find((msg) => msg.role === "atlas");
+  const formatPicker = (className = "") => (
+    <div className={`format-picker ${className}`}>
+      {UI_FORMATS.map((format) => (
+        <button
+          key={format.id}
+          type="button"
+          onClick={() => updateUiMode(format.id)}
+          className={uiMode === format.id ? "is-active" : ""}
+          aria-label={`Switch to ${format.label} UI`}
+        >
+          {format.label}
+        </button>
+      ))}
+    </div>
+  );
+  const hiddenFaceInputs = (
+    <>
+      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
+      <input
+        ref={swapInputRef}
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleSwapFace(file);
+        }}
+        className="hidden"
+      />
+    </>
+  );
+
+  if (uiMode === "teacher") {
+    return (
+      <div className="teacher-ui min-h-screen w-screen bg-[#edf1f5] text-[#111827]">
+        {hiddenFaceInputs}
+        {formatPicker("global-format-picker")}
+        <header className="teacher-topbar">
+          <div>
+            <h1>Visual calculus</h1>
+          </div>
+        </header>
+
+        <main className="teacher-shell">
+          <section className="teacher-board">
+            <div className="teacher-canvas">
+              <div className="teacher-axis teacher-axis-x" />
+              <div className="teacher-axis teacher-axis-y" />
+              <span className="teacher-axis-label teacher-axis-label-x">x</span>
+              <span className="teacher-axis-label teacher-axis-label-y">y</span>
+              <svg className="teacher-curve" viewBox="0 0 720 420" aria-hidden="true">
+                <path d="M38 318 C160 188 226 355 338 214 C424 104 486 92 590 145 C642 170 668 202 694 238" />
+                <circle cx="338" cy="214" r="6" />
+                <circle cx="590" cy="145" r="6" />
+              </svg>
+              <div className="teacher-equation teacher-equation-main">
+                <span aria-label="f of x equals x squared minus 4 x plus 3">
+                  f(x) = x<sup>2</sup> - 4x + 3
+                </span>
+              </div>
+              <div className="teacher-equation teacher-equation-note">
+                <span aria-label="f prime of x equals 2 x minus 4">
+                  derivative: f&apos;(x) = 2x - 4
+                </span>
+              </div>
+            </div>
+            <div className="teacher-problem-row">
+              <div className="is-active">
+                <span>Step 1</span>
+                Notice the curve
+              </div>
+              <div>
+                <span>Step 2</span>
+                Locate the flat point
+              </div>
+              <div>
+                <span>Step 3</span>
+                Explain the derivative
+              </div>
+            </div>
+          </section>
+
+          <aside className="teacher-avatar-panel">
+            <div className="teacher-avatar-frame">
+              <div
+                ref={session.videoRef}
+                className="teacher-video"
+                style={{ display: isConnected ? "flex" : "none" }}
+              />
+              {!isConnected && (
+                <div className="teacher-face-preview">
+                  {facePreview ? (
+                    <Image src={facePreview} alt="" width={420} height={420} unoptimized />
+                  ) : (
+                    <button type="button" onClick={() => fileInputRef.current?.click()} aria-label="Choose face">
+                      <UploadIcon />
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="teacher-avatar-copy">
+              <span>{isConnected ? "Live tutor" : "Tutor preview"}</span>
+              <h2>Ask Atlas</h2>
+              <p>
+                {isConnected
+                  ? latestAtlasMessage?.text || "Ask about any step on the board."
+                  : "Start a short guided explanation, or ask a question about the graph."}
+              </p>
+            </div>
+            <div className="teacher-avatar-strip">
+              {FACE_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => void selectPresetFace(preset)}
+                  className={selectedFaceId === preset.id ? "is-selected" : ""}
+                  aria-label={`Use ${preset.label} avatar`}
+                >
+                  <Image src={preset.src} alt="" width={96} height={96} unoptimized />
+                </button>
+              ))}
+              <button type="button" onClick={() => fileInputRef.current?.click()} aria-label="Upload avatar">
+                <UploadIcon />
+              </button>
+            </div>
+            <div className="teacher-actions">
+              <button
+                type="button"
+                onClick={() => (isConnected ? void disconnect() : hasFace ? void connect() : undefined)}
+                disabled={!isConnected && !hasFace}
+                className={isConnected ? "is-danger" : "is-primary"}
+              >
+                {isConnected ? "End call" : "Call avatar"}
+              </button>
+              <button type="button" onClick={downloadCurrentFace} disabled={!facePreview}>
+                <DownloadIcon /> Image
+              </button>
+            </div>
+            <form
+              className="teacher-prompt"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (chatInput.trim() && !aiThinking) {
+                  sendChat(chatInput.trim());
+                  setChatInput("");
+                }
+              }}
+            >
+              <input
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Ask about the board..."
+                disabled={aiThinking}
+              />
+              <button type="submit" disabled={!chatInput.trim() || aiThinking}>
+                Send
+              </button>
+            </form>
+          </aside>
+        </main>
+      </div>
+    );
+  }
+
+  if (uiMode === "meet") {
+    return (
+      <div className="meet-ui h-screen w-screen overflow-hidden bg-[#202124] text-white">
+        {hiddenFaceInputs}
+        {formatPicker("global-format-picker meet-global-format-picker")}
+        <header className="meet-topbar">
+          <div>
+            <strong>{new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</strong>
+            <span>atlas-demo</span>
+            <span className="meet-info-dot">i</span>
+          </div>
+          <div className="meet-room-pill">
+            <span>{selectedFaceId.slice(0, 1).toUpperCase()}</span>
+            <strong>1</strong>
+          </div>
+        </header>
+
+        <main className="meet-stage">
+          <section className="meet-main-tile">
+            <div
+              ref={session.videoRef}
+              className="meet-video"
+              style={{ display: isConnected ? "flex" : "none" }}
+            />
+            {!isConnected && (
+              <div className="meet-face-preview">
+                {facePreview ? (
+                  <Image src={facePreview} alt="" width={960} height={960} unoptimized />
+                ) : (
+                  <button type="button" onClick={() => fileInputRef.current?.click()} aria-label="Choose avatar">
+                    <UploadIcon />
+                  </button>
+                )}
+              </div>
+            )}
+            <div className="meet-avatar-status">
+              <strong>Atlas Realtime</strong>
+              <span>{isConnected ? `${formatTime(sessionTime)} · connected` : "Waiting in lobby"}</span>
+            </div>
+            <div className="meet-floating-caption">
+              {latestAtlasMessage?.text || "Ready when you are. Start the call to talk with Atlas."}
+            </div>
+          </section>
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="meet-self-chip"
+            aria-label="Choose avatar"
+            title="Choose avatar"
+          >
+            {facePreview ? <Image src={facePreview} alt="" width={80} height={80} unoptimized /> : <UploadIcon />}
+          </button>
+        </main>
+
+        <div className="meet-bottom-bar">
+          <button type="button" aria-label="More call actions" title="More">
+            ...
+          </button>
+          <button
+            type="button"
+            onClick={() => scribe.isConnected ? stopListening() : startListening()}
+            className={scribe.isConnected ? "is-live" : ""}
+            aria-label={scribe.isConnected ? "Mute microphone" : "Start microphone"}
+          >
+            <MicIcon muted={!scribe.isConnected} />
+          </button>
+          <button
+            type="button"
+            aria-label="Avatar video"
+            title="Avatar video"
+          >
+            <VolumeIcon />
+          </button>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            aria-label="Change avatar"
+            title="Change avatar"
+          >
+            {facePreview ? <Image src={facePreview} alt="" width={64} height={64} unoptimized /> : <UploadIcon />}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!isConnected) {
+                if (hasFace) void connect();
+                return;
+              }
+              if (meetLeaveArmed) {
+                void disconnect();
+              } else {
+                armMeetLeave();
+              }
+            }}
+            disabled={!isConnected && !hasFace}
+            className={isConnected ? `is-danger ${meetLeaveArmed ? "is-armed" : ""}` : "is-call"}
+            aria-label={isConnected ? (meetLeaveArmed ? "Confirm leave call" : "Arm leave call") : "Join call"}
+            title={isConnected ? (meetLeaveArmed ? "Click again to leave" : "Click once more to leave") : "Join call"}
+          >
+            {isConnected ? <StopIcon /> : <PlayIcon />}
+          </button>
+          <button type="button" onClick={downloadCurrentFace} disabled={!facePreview} aria-label="Download image">
+            <DownloadIcon />
+          </button>
+        </div>
+
+        <div className="meet-corner-controls">
+          <button type="button" aria-label="Open chat" title="Chat">
+            <CopyIcon />
+          </button>
+          <button type="button" onClick={() => setVisibility((value) => value === "private" ? "public" : "private")} aria-label="Toggle visibility" title="Visibility">
+            {visibility === "public" ? <GlobeIcon /> : <LockIcon />}
+          </button>
+        </div>
+
+      </div>
+    );
+  }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#050505] font-sans">
+    <div
+      className={`h-screen w-screen overflow-hidden bg-[#050505] font-sans ${
+        isTiktokUi ? "tiktok-ui relative" : "flex"
+      }`}
+    >
+      {formatPicker("global-format-picker")}
       {/* Video Panel */}
-      <div className="relative flex-1 flex items-center justify-center overflow-hidden bg-black">
+      <div
+        className={`relative flex items-center justify-center overflow-hidden bg-black ${
+          isTiktokUi ? "tiktok-reel" : "flex-1"
+        }`}
+      >
         <div
           ref={session.videoRef}
-          className="w-full h-full max-w-[512px] max-h-[512px] mx-auto flex items-center justify-center"
+          className={`w-full h-full mx-auto flex items-center justify-center ${
+            isTiktokUi ? "max-w-none max-h-none" : "max-w-[512px] max-h-[512px]"
+          }`}
           style={{ display: isConnected ? "flex" : "none" }}
         />
 
         {!isConnected && (
-          <div className="animate-breathe">
-            <svg width="180" height="220" viewBox="0 0 180 220" fill="none" className="text-[#e0e0e0]">
-              <circle cx="90" cy="72" r="36" stroke="currentColor" strokeWidth="1" />
-              <path d="M30 200c0-33.137 26.863-60 60-60s60 26.863 60 60" stroke="currentColor" strokeWidth="1" />
-            </svg>
-          </div>
+          isTiktokUi ? (
+            <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+              {facePreview && (
+                <Image
+                  src={facePreview}
+                  alt=""
+                  width={640}
+                  height={960}
+                  unoptimized
+                  className="h-full w-full scale-110 object-cover opacity-45 blur-xl"
+                />
+              )}
+              <div className="absolute inset-0 bg-black/45" />
+              <div className="absolute flex flex-col items-center gap-4 px-10 text-center">
+                {facePreview ? (
+                <Image
+                  src={facePreview}
+                  alt=""
+                  width={112}
+                  height={112}
+                  unoptimized
+                  className="tiktok-face-photo h-28 w-28 object-cover ring-2 ring-white/80"
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="tiktok-action-button tiktok-face-picker"
+                  aria-label="Choose face"
+                >
+                    <UploadIcon />
+                  </button>
+                )}
+                <div className="tiktok-caption text-[24px] font-bold leading-tight text-white">
+                  Atlas Realtime
+                </div>
+                <div className="tiktok-caption text-[14px] leading-snug text-white/70">
+                  {hasFace ? "Tap start to go live" : "Choose a face to start"}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="animate-breathe">
+              <svg width="180" height="220" viewBox="0 0 180 220" fill="none" className="text-[#e0e0e0]">
+                <circle cx="90" cy="72" r="36" stroke="currentColor" strokeWidth="1" />
+                <path d="M30 200c0-33.137 26.863-60 60-60s60 26.863 60 60" stroke="currentColor" strokeWidth="1" />
+              </svg>
+            </div>
+          )
         )}
 
+        {!isTiktokUi && (
         <div className="absolute bottom-6 left-6 flex items-center gap-2.5 font-mono text-[10px] tracking-[0.25em] uppercase select-none z-10">
           {isConnected ? (
             <>
@@ -512,10 +1005,275 @@ export default function DemoPage() {
             <span className="text-[#555]">Disconnected</span>
           )}
         </div>
+        )}
+
+        {isTiktokUi && (
+          <>
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
+            <input
+              ref={swapInputRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleSwapFace(file);
+              }}
+              className="hidden"
+            />
+
+            {!isConnected && (
+              <div className="tiktok-avatar-strip absolute inset-x-4 top-4 z-30 flex gap-3 overflow-x-auto px-1 pb-2">
+                {FACE_PRESETS.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => void selectPresetFace(preset)}
+                    className={`tiktok-avatar-chip shrink-0 ${selectedFaceId === preset.id ? "is-selected" : ""} ${
+                      faceLoading && selectedFaceId === preset.id ? "is-loading" : ""
+                    }`}
+                    aria-label={`Use ${preset.label} avatar`}
+                    title={preset.label}
+                  >
+                    <Image src={preset.src} alt="" width={64} height={64} className="h-full w-full object-cover" unoptimized />
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`tiktok-avatar-chip shrink-0 ${selectedFaceId === "custom" ? "is-selected" : ""}`}
+                  aria-label="Upload avatar"
+                  title="Upload"
+                >
+                  {selectedFaceId === "custom" && facePreview ? (
+                    <Image src={facePreview} alt="" width={64} height={64} className="h-full w-full object-cover" unoptimized />
+                  ) : (
+                    <UploadIcon />
+                  )}
+                </button>
+              </div>
+            )}
+
+            <div className="pointer-events-none absolute inset-x-5 bottom-32 z-20 flex flex-col items-start gap-2">
+              {isConnected && overlayMessages.length === 0 && !scribe.partialTranscript && !aiThinking && (
+                <div className="tiktok-caption text-[20px] font-semibold leading-tight text-white/80">
+                  {aiEnabled && scribe.isConnected ? "Listening..." : "Type or speak to start"}
+                </div>
+              )}
+              {overlayMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`tiktok-caption max-w-[min(420px,calc(100vw-7rem))] text-[22px] font-semibold leading-tight ${
+                    msg.role === "atlas"
+                      ? "text-white"
+                      : "text-white/90"
+                  }`}
+                >
+                  <span
+                    className="tiktok-speaker mb-1 block font-mono text-[10px] uppercase tracking-[0.16em] text-white/58"
+                  >
+                    {msg.role === "atlas" ? "Atlas" : "You"}
+                  </span>
+                  {msg.text}
+                </div>
+              ))}
+              {scribe.partialTranscript && (
+                <div className="tiktok-caption max-w-[min(420px,calc(100vw-7rem))] text-[22px] font-semibold italic leading-tight text-white/75">
+                  <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.16em] text-white/60">
+                    You
+                  </span>
+                  {scribe.partialTranscript}...
+                </div>
+              )}
+              {aiThinking && (
+                <div className="tiktok-caption text-[22px] font-semibold leading-tight text-white">
+                  <span className="animate-pulse">Thinking...</span>
+                </div>
+              )}
+            </div>
+
+            <div className="absolute bottom-7 left-5 z-30 flex max-w-[calc(100%-7rem)] flex-col gap-1 text-white">
+              <span className="tiktok-caption text-[15px] font-semibold">
+                Atlas Realtime
+              </span>
+              <span className="tiktok-caption text-[12px] text-white/75">
+                {isConnected
+                  ? `${visibility === "public" ? "Public" : "Private"} · ${formatTime(sessionTime)}`
+                  : session.status === "connecting"
+                    ? "Connecting..."
+                    : "Ready to connect"}
+              </span>
+            </div>
+
+            <div className="absolute bottom-24 right-4 z-30 flex flex-col items-center gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  if (isConnected) {
+                    void disconnect();
+                  } else if (hasFace) {
+                    void connect();
+                  }
+                }}
+                disabled={!isConnected && !hasFace}
+                className={`tiktok-action-button ${isConnected ? "tiktok-action-danger" : "tiktok-action-primary"}`}
+                aria-label={isConnected ? "Disconnect" : "Connect"}
+                title={isConnected ? "Disconnect" : "Connect"}
+              >
+                {isConnected ? <StopIcon /> : <PlayIcon />}
+              </button>
+              <span className="tiktok-action-label">
+                {isConnected ? "End" : "Start"}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (isConnected) {
+                    swapInputRef.current?.click();
+                  } else {
+                    fileInputRef.current?.click();
+                  }
+                }}
+                className="tiktok-action-button tiktok-action-face overflow-hidden"
+                aria-label={isConnected ? "Swap face" : "Choose face"}
+                title={isConnected ? "Swap face" : "Choose face"}
+              >
+                {facePreview ? (
+                  <Image src={facePreview} alt="" width={64} height={64} className="h-full w-full object-cover" unoptimized />
+                ) : (
+                  <UploadIcon />
+                )}
+              </button>
+              <span className="tiktok-action-label">
+                {isConnected ? (swapping ? "Swap..." : "Swap") : "Face"}
+              </span>
+
+              <button
+                type="button"
+                onClick={downloadCurrentFace}
+                disabled={!facePreview}
+                className="tiktok-action-button tiktok-action-download"
+                aria-label="Download avatar image"
+                title="Download avatar image"
+              >
+                <DownloadIcon />
+              </button>
+              <span className="tiktok-action-label">Image</span>
+
+              {isConnected && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => scribe.isConnected ? stopListening() : startListening()}
+                    className={`tiktok-action-button ${scribe.isConnected ? "tiktok-action-live" : ""}`}
+                    aria-label={scribe.isConnected ? "Mute microphone" : "Start microphone"}
+                    title={scribe.isConnected ? "Mute microphone" : "Start microphone"}
+                  >
+                    <MicIcon muted={!scribe.isConnected} />
+                  </button>
+                  <span className="tiktok-action-label">
+                    {scribe.isConnected ? "Live" : "Mic"}
+                  </span>
+                </>
+              )}
+
+              {!isConnected && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setVisibility((value) => value === "private" ? "public" : "private")}
+                    className={`tiktok-action-button ${visibility === "public" ? "tiktok-action-live" : ""}`}
+                    aria-label="Toggle visibility"
+                    title="Toggle visibility"
+                  >
+                    {visibility === "public" ? <GlobeIcon /> : <LockIcon />}
+                  </button>
+                  <span className="tiktok-action-label">
+                    {visibility === "public" ? "Public" : "Private"}
+                  </span>
+                </>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setTiktokToolsOpen((open) => !open)}
+                className={`tiktok-action-button tiktok-action-studio ${tiktokToolsOpen ? "tiktok-action-live" : ""}`}
+                aria-label="Open avatar tools"
+                title="Avatar tools"
+              >
+                <StudioIcon />
+              </button>
+              <span className="tiktok-action-label">Tools</span>
+
+              {tiktokToolsOpen && (
+                <div className="tiktok-tools-menu absolute bottom-0 right-16 flex flex-col gap-2 p-2">
+                  {FACE_PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => {
+                        void selectPresetFace(preset);
+                        setTiktokToolsOpen(false);
+                      }}
+                      className={`tiktok-tools-item ${selectedFaceId === preset.id ? "is-selected" : ""}`}
+                      aria-label={`Use ${preset.label} avatar`}
+                      title={preset.label}
+                    >
+                      <Image src={preset.src} alt="" width={36} height={36} className="h-9 w-9 object-cover" unoptimized />
+                      <span>{preset.label}</span>
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      fileInputRef.current?.click();
+                      setTiktokToolsOpen(false);
+                    }}
+                    className={`tiktok-tools-item ${selectedFaceId === "custom" ? "is-selected" : ""}`}
+                    aria-label="Upload avatar"
+                    title="Upload avatar"
+                  >
+                    <span className="tiktok-tools-icon"><UploadIcon /></span>
+                    <span>Upload</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {isConnected && (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (chatInput.trim() && !aiThinking) {
+                    sendChat(chatInput.trim());
+                    setChatInput("");
+                  }
+                }}
+                className="absolute bottom-7 right-5 z-30 flex w-[min(320px,calc(100%-7rem))] gap-2"
+              >
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder={aiEnabled ? "Ask something..." : "Type a message..."}
+                  disabled={aiThinking}
+                  className="tiktok-composer-input min-w-0 flex-1 px-4 py-3 text-[13px] text-white placeholder-white/45 outline-none transition-all duration-200 disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={!chatInput.trim() || aiThinking}
+                  className="tiktok-send-button px-4 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white transition-all duration-200 disabled:text-white/30"
+                >
+                  Send
+                </button>
+              </form>
+            )}
+          </>
+        )}
       </div>
 
       {/* Transcript Panel */}
-      {isConnected && (
+      {isConnected && !isTiktokUi && (
         <div className="w-[300px] border-l border-border bg-panel flex flex-col">
           <div className="px-4 h-14 flex items-center border-b border-border shrink-0">
             <span className="font-mono text-[10px] tracking-[0.2em] text-muted uppercase">
@@ -613,6 +1371,7 @@ export default function DemoPage() {
       )}
 
       {/* Control Panel */}
+      {!isTiktokUi && (
       <div className="w-[320px] border-l border-border bg-panel flex flex-col panel-glow-border">
         <div className="px-6 h-14 flex items-center border-b border-border shrink-0">
           <span className="font-mono text-[11px] tracking-[0.3em] text-foreground uppercase font-semibold">
@@ -671,7 +1430,7 @@ export default function DemoPage() {
                     }
                   }}
                 >
-                  <img src={facePreview} alt="Face preview" className="w-16 h-16 object-cover border border-accent" />
+                  <Image src={facePreview} alt="Face preview" width={64} height={64} className="w-16 h-16 object-cover border border-accent" unoptimized />
                   <div className="absolute inset-0 w-16 h-16 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
                     <span className="font-mono text-[9px] tracking-[0.15em] text-foreground uppercase">
                       {isConnected ? "Swap" : "Change"}
@@ -760,6 +1519,35 @@ export default function DemoPage() {
             </div>
             <p className="font-mono text-[9px] text-[#555] mt-2">
               You bring LLM, TTS, and audio — we provide the GPU compute and WebRTC video
+            </p>
+          </div>
+
+          {/* UI format */}
+          <div className="px-6 py-5 border-b border-border">
+            <label className="block font-mono text-[10px] tracking-[0.2em] text-muted uppercase mb-3">
+              UI Format
+            </label>
+            <div className="grid grid-cols-2 border border-border">
+              {UI_FORMATS.map((format, index) => (
+                <button
+                  key={format.id}
+                  onClick={() => updateUiMode(format.id)}
+                  className={`py-2.5 font-mono text-[10px] uppercase tracking-[0.16em] transition-all duration-200 ${
+                    index % 2 === 1 ? "border-l border-border" : ""
+                  } ${
+                    index > 1 ? "border-t border-border" : ""
+                  } ${
+                    uiMode === format.id
+                      ? "bg-[#050505] text-accent shadow-[inset_0_0_20px_rgba(0,255,136,0.06),0_0_12px_rgba(0,255,136,0.1)]"
+                      : "text-[#555] hover:text-[#888]"
+                  }`}
+                >
+                  {format.label}
+                </button>
+              ))}
+            </div>
+            <p className="font-mono text-[9px] text-[#555] mt-2">
+              {UI_FORMATS.find((format) => format.id === uiMode)?.urlLabel}
             </p>
           </div>
 
@@ -977,6 +1765,7 @@ export default function DemoPage() {
           </span>
         </div>
       </div>
+      )}
     </div>
   );
 }

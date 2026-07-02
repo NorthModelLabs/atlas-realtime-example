@@ -1,9 +1,16 @@
-"use client";
+import Demo, { type UiMode } from "./demo";
 
-import dynamic from "next/dynamic";
+const UI_MODES = new Set<UiMode>(["studio", "tiktok", "teacher", "meet"]);
 
-const Demo = dynamic(() => import("./demo"), { ssr: false });
+type PageProps = {
+  searchParams?: Promise<{ ui?: string }>;
+};
 
-export default function Page() {
-  return <Demo />;
+function parseUiMode(ui?: string): UiMode {
+  return ui && UI_MODES.has(ui as UiMode) ? (ui as UiMode) : "studio";
+}
+
+export default async function Page({ searchParams }: PageProps) {
+  const params = await searchParams;
+  return <Demo initialUiMode={parseUiMode(params?.ui)} />;
 }
