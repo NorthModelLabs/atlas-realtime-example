@@ -757,6 +757,10 @@ export default function DemoPage({
 
   const isTiktokUi = uiMode === "tiktok";
   const overlayMessages = localMessages.filter((msg) => msg.role !== "system").slice(-2);
+  const tiktokOverlayMessages = scribe.partialTranscript
+    ? overlayMessages.filter((msg) => msg.role === "atlas").slice(-1)
+    : overlayMessages;
+  const showTiktokDialogue = isConnected || session.status === "connecting";
   const latestAtlasMessage = [...localMessages].reverse().find((msg) => msg.role === "atlas");
   const voiceInputActive = voiceMode === "mirror" ? mirrorInputActive : scribe.isConnected;
   const activeFormatMode: UiMode = uiMode;
@@ -1324,9 +1328,10 @@ export default function DemoPage({
               </div>
             )}
 
-            <div className="pointer-events-none absolute inset-x-5 bottom-32 z-20 flex flex-col items-start gap-2">
-              {isConnected && overlayMessages.length === 0 && !scribe.partialTranscript && !aiThinking && (
-                <div className="tiktok-caption text-[20px] font-semibold leading-tight text-white/80">
+            {showTiktokDialogue && (
+            <div className="tiktok-dialogue pointer-events-none absolute inset-x-5 z-20 flex flex-col items-start gap-2">
+              {tiktokOverlayMessages.length === 0 && !scribe.partialTranscript && !aiThinking && (
+                <div className="tiktok-caption tiktok-status-caption">
                   {voiceMode === "mirror"
                     ? mirrorInputActive
                       ? "Mirror live"
@@ -1336,13 +1341,13 @@ export default function DemoPage({
                       : "Type or speak to start"}
                 </div>
               )}
-              {overlayMessages.map((msg) => (
+              {tiktokOverlayMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`tiktok-caption max-w-[min(420px,calc(100vw-7rem))] text-[22px] font-semibold leading-tight ${
+                  className={`tiktok-caption tiktok-message ${
                     msg.role === "atlas"
-                      ? "text-white"
-                      : "text-white/90"
+                      ? "tiktok-message-atlas"
+                      : "tiktok-message-user"
                   }`}
                 >
                   <span
@@ -1354,7 +1359,7 @@ export default function DemoPage({
                 </div>
               ))}
               {scribe.partialTranscript && (
-                <div className="tiktok-caption max-w-[min(420px,calc(100vw-7rem))] text-[22px] font-semibold italic leading-tight text-white/75">
+                <div className="tiktok-caption tiktok-message tiktok-message-partial">
                   <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.16em] text-white/60">
                     You
                   </span>
@@ -1362,11 +1367,12 @@ export default function DemoPage({
                 </div>
               )}
               {aiThinking && (
-                <div className="tiktok-caption text-[22px] font-semibold leading-tight text-white">
+                <div className="tiktok-caption tiktok-status-caption">
                   <span className="animate-pulse">Thinking...</span>
                 </div>
               )}
             </div>
+            )}
 
             <div className="absolute bottom-7 left-5 z-30 flex max-w-[calc(100%-7rem)] flex-col gap-1 text-white">
               <span className="tiktok-caption text-[15px] font-semibold">

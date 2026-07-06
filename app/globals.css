@@ -250,6 +250,50 @@
     0 8px 24px rgba(0, 0, 0, 0.75);
 }
 
+.tiktok-dialogue {
+  bottom: 118px;
+  max-height: min(28vh, 230px);
+  overflow: hidden;
+  padding-right: 72px;
+}
+
+.tiktok-message,
+.tiktok-status-caption {
+  max-width: min(390px, calc(100vw - 7.5rem));
+}
+
+.tiktok-message {
+  display: -webkit-box;
+  font-size: clamp(17px, 2.8vh, 22px);
+  font-weight: 650;
+  line-height: 1.16;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+}
+
+.tiktok-message-user {
+  color: rgba(255, 255, 255, 0.88);
+  -webkit-line-clamp: 2;
+}
+
+.tiktok-message-atlas {
+  color: white;
+  -webkit-line-clamp: 3;
+}
+
+.tiktok-message-partial {
+  color: rgba(255, 255, 255, 0.74);
+  font-style: italic;
+  -webkit-line-clamp: 2;
+}
+
+.tiktok-status-caption {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.15;
+}
+
 .tiktok-speaker {
   text-shadow:
     0 1px 2px rgba(0, 0, 0, 0.95);
