@@ -204,7 +204,7 @@
 .tiktok-tools-voice {
   display: grid;
   gap: 6px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   padding: 6px;
 }
 
@@ -524,6 +524,18 @@
   width: 100%;
 }
 
+.mirror-session-settings {
+  grid-template-columns: 1fr 1fr;
+  margin: -2px auto 0;
+  max-width: 430px;
+  width: 100%;
+}
+
+.mirror-session-settings p {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
 .mirror-avatar-row,
 .mirror-main-actions {
   align-items: center;
@@ -646,7 +658,7 @@
   background: #f1f1ee;
   display: grid;
   gap: 4px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   padding: 4px;
 }
 
@@ -662,6 +674,98 @@
 .voice-mode-picker button.is-active {
   background: #111111;
   color: white;
+}
+
+.session-settings {
+  display: grid;
+  gap: 10px;
+}
+
+.session-settings label {
+  display: grid;
+  gap: 6px;
+}
+
+.session-settings span {
+  color: rgba(17, 17, 17, 0.54);
+  font-family: var(--font-geist-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.session-settings select,
+.session-static-value {
+  appearance: none;
+  background:
+    linear-gradient(45deg, transparent 50%, currentColor 50%) calc(100% - 16px) 52% / 5px 5px no-repeat,
+    linear-gradient(135deg, currentColor 50%, transparent 50%) calc(100% - 11px) 52% / 5px 5px no-repeat,
+    rgba(244, 244, 241, 0.92);
+  border: 0;
+  color: #111111;
+  font-size: 12px;
+  font-weight: 650;
+  min-height: 38px;
+  outline: none;
+  padding: 0 28px 0 12px;
+}
+
+.session-static-value {
+  align-items: center;
+  background: rgba(244, 244, 241, 0.92);
+  display: flex;
+  padding-right: 12px;
+}
+
+.session-settings select:disabled {
+  opacity: 0.45;
+}
+
+.session-settings p {
+  color: rgba(17, 17, 17, 0.48);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.session-settings select,
+.session-static-value,
+.session-settings p {
+  border-radius: 12px !important;
+}
+
+.studio-session-settings span,
+.studio-session-settings p,
+.tiktok-session-settings span,
+.tiktok-session-settings p {
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.studio-session-settings select,
+.tiktok-session-settings select,
+.tiktok-session-settings .session-static-value {
+  background:
+    linear-gradient(45deg, transparent 50%, currentColor 50%) calc(100% - 16px) 52% / 5px 5px no-repeat,
+    linear-gradient(135deg, currentColor 50%, transparent 50%) calc(100% - 11px) 52% / 5px 5px no-repeat,
+    rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.studio-session-settings .session-static-value,
+.tiktok-session-settings .session-static-value {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.tiktok-session-settings {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 10px;
+}
+
+.tiktok-session-settings,
+.tiktok-session-settings select,
+.tiktok-session-settings .session-static-value {
+  border-radius: 16px !important;
 }
 
 .global-format-picker {
@@ -1006,6 +1110,10 @@
   width: 100%;
 }
 
+.teacher-session-settings {
+  width: 100%;
+}
+
 .teacher-voice-picker,
 .teacher-voice-picker button {
   border-radius: 16px;
@@ -1104,6 +1212,40 @@
 .meet-voice-picker button.is-active {
   background: white;
   color: #202124;
+}
+
+.meet-session-settings {
+  bottom: 88px;
+  grid-template-columns: 1fr 1fr;
+  left: 50%;
+  max-width: 460px;
+  position: fixed;
+  transform: translateX(-50%);
+  width: min(460px, calc(100vw - 40px));
+  z-index: 35;
+}
+
+.meet-session-settings span,
+.meet-session-settings p {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.meet-session-settings select,
+.meet-session-settings .session-static-value {
+  background:
+    linear-gradient(45deg, transparent 50%, currentColor 50%) calc(100% - 16px) 52% / 5px 5px no-repeat,
+    linear-gradient(135deg, currentColor 50%, transparent 50%) calc(100% - 11px) 52% / 5px 5px no-repeat,
+    rgba(48, 49, 52, 0.96);
+  color: white;
+}
+
+.meet-session-settings .session-static-value {
+  background: rgba(48, 49, 52, 0.96);
+}
+
+.meet-session-settings p {
+  grid-column: 1 / -1;
+  text-align: center;
 }
 
 .meet-topbar {

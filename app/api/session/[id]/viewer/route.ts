@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { atlasHeaders, atlasSessionUrl } from "../../atlas";
 
 const ATLAS_API_URL = process.env.ATLAS_API_URL || "";
 const ATLAS_API_KEY = process.env.ATLAS_API_KEY || "";
@@ -26,10 +27,10 @@ export async function POST(
 
   try {
     const res = await fetch(
-      `${ATLAS_API_URL}/v1/realtime/session/${encodeURIComponent(id)}/viewer`,
+      atlasSessionUrl(id, "/viewer"),
       {
         method: "POST",
-        headers: { Authorization: `Bearer ${ATLAS_API_KEY}` },
+        headers: atlasHeaders(),
       },
     );
 

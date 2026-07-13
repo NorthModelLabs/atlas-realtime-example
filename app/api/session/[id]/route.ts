@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { atlasHeaders, atlasSessionUrl } from "../atlas";
 
 const ATLAS_API_URL = process.env.ATLAS_API_URL || "";
 const ATLAS_API_KEY = process.env.ATLAS_API_KEY || "";
@@ -32,8 +33,8 @@ export async function GET(
 
   try {
     const res = await fetch(
-      `${ATLAS_API_URL}/v1/realtime/session/${encodeURIComponent(sessionId)}`,
-      { headers: { Authorization: `Bearer ${ATLAS_API_KEY}` } },
+      atlasSessionUrl(sessionId),
+      { headers: atlasHeaders() },
     );
 
     const data = await res.json();
@@ -81,10 +82,10 @@ export async function PATCH(
 
   try {
     const res = await fetch(
-      `${ATLAS_API_URL}/v1/realtime/session/${encodeURIComponent(sessionId)}`,
+      atlasSessionUrl(sessionId),
       {
         method: "PATCH",
-        headers: { Authorization: `Bearer ${ATLAS_API_KEY}` },
+        headers: atlasHeaders(),
         body: upstream,
       },
     );
@@ -121,8 +122,8 @@ export async function DELETE(
 
   try {
     const res = await fetch(
-      `${ATLAS_API_URL}/v1/realtime/session/${encodeURIComponent(sessionId)}`,
-      { method: "DELETE", headers: { Authorization: `Bearer ${ATLAS_API_KEY}` } },
+      atlasSessionUrl(sessionId),
+      { method: "DELETE", headers: atlasHeaders() },
     );
 
     const data = await res.json();

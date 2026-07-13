@@ -1,20 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { atlasHeaders, atlasSessionUrl, getModelVariant, VALID_MODES, VALID_MODEL_VARIANTS } from "./atlas";
 
 const ATLAS_API_URL = process.env.ATLAS_API_URL || "";
 const ATLAS_API_KEY = process.env.ATLAS_API_KEY || "";
-const ATLAS_MODEL_VARIANT = process.env.ATLAS_MODEL_VARIANT || "";
-
-const VALID_MODES = new Set(["conversation", "passthrough"]);
-const VALID_MODEL_VARIANTS = new Set(["best", "experimental", "test", "test2", "test3", "test4", "test5"]);
-
-function atlasHeaders(contentType?: string) {
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${ATLAS_API_KEY}`,
-  };
-  if (contentType) headers["Content-Type"] = contentType;
-  if (ATLAS_MODEL_VARIANT) headers["X-Model-Variant"] = ATLAS_MODEL_VARIANT;
-  return headers;
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,13 +12,6 @@ export async function POST(req: NextRequest) {
         { status: 500 },
       );
     }
-    if (ATLAS_MODEL_VARIANT && !VALID_MODEL_VARIANTS.has(ATLAS_MODEL_VARIANT)) {
-      return NextResponse.json(
-        { error: "server_error", message: "ATLAS_MODEL_VARIANT is not valid." },
-        { status: 500 },
-      );
-    }
-
     const ct = req.headers.get("content-type") || "";
     let upstreamResp: Response;
 
@@ -38,6 +19,7 @@ export async function POST(req: NextRequest) {
       const form = await req.formData();
       const face = form.get("face");
       const mode = form.get("mode");
+      const modelVariant = getModelVariant(form.get("model_variant"));
 
       if (!face || !(face instanceof Blob)) {
         return NextResponse.json(
@@ -48,7 +30,13 @@ export async function POST(req: NextRequest) {
 
       if (mode && !VALID_MODES.has(String(mode))) {
         return NextResponse.json(
-          { error: "invalid_mode", message: "Mode must be 'conversation' or 'passthrough'." },
+          { error: "invalid_mode", message: "Mode must be 'passthrough'." },
+          { status: 400 },
+        );
+      }
+      if (modelVariant && !VALID_MODEL_VARIANTS.has(modelVariant)) {
+        return NextResponse.json(
+          { error: "invalid_model_variant", message: "Model variant is not valid." },
           { status: 400 },
         );
       }
@@ -58,9 +46,9 @@ export async function POST(req: NextRequest) {
       if (mode) upstream.append("mode", String(mode));
 
       try {
-        upstreamResp = await fetch(`${ATLAS_API_URL}/v1/realtime/session`, {
+        upstreamResp = await fetch(atlasSessionUrl(), {
           method: "POST",
-          headers: atlasHeaders(),
+          headers: atlasHeaders(modelVariant),
           body: upstream,
         });
       } catch (fetchErr) {
@@ -87,9 +75,18 @@ export async function POST(req: NextRequest) {
       }
 
       const mode = typeof body.mode === "string" ? body.mode : undefined;
+      const modelVariant = getModelVariant(
+        typeof body.model_variant === "string" ? body.model_variant : undefined,
+      );
       if (mode && !VALID_MODES.has(mode)) {
         return NextResponse.json(
-          { error: "invalid_mode", message: "Mode must be 'conversation' or 'passthrough'." },
+          { error: "invalid_mode", message: "Mode must be 'passthrough'." },
+          { status: 400 },
+        );
+      }
+      if (modelVariant && !VALID_MODEL_VARIANTS.has(modelVariant)) {
+        return NextResponse.json(
+          { error: "invalid_model_variant", message: "Model variant is not valid." },
           { status: 400 },
         );
       }
@@ -99,9 +96,9 @@ export async function POST(req: NextRequest) {
         mode: mode || undefined,
       };
       try {
-        upstreamResp = await fetch(`${ATLAS_API_URL}/v1/realtime/session`, {
+        upstreamResp = await fetch(atlasSessionUrl(), {
           method: "POST",
-          headers: atlasHeaders("application/json"),
+          headers: atlasHeaders(modelVariant, "application/json"),
           body: JSON.stringify(payload),
         });
       } catch (fetchErr) {

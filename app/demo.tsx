@@ -19,7 +19,9 @@ type ChatMsg = {
 };
 
 export type UiMode = "studio" | "tiktok" | "teacher" | "meet" | "mirror";
-export type VoiceMode = "ai" | "mirror";
+export type VoiceMode = "ai" | "openai" | "mirror";
+type SessionMode = "passthrough";
+type ModelVariant = "" | "test5" | "latest";
 
 interface ChatHistory {
   role: "user" | "assistant";
@@ -36,7 +38,16 @@ const UI_FORMATS: { id: UiMode; label: string; urlLabel: string }[] = [
 ];
 const VOICE_MODES: { id: VoiceMode; label: string; description: string }[] = [
   { id: "ai", label: "AI voice", description: "LLM + ElevenLabs speak through Atlas" },
+  { id: "openai", label: "OpenAI Live", description: "OpenAI Realtime drives the avatar voice" },
   { id: "mirror", label: "Mirror", description: "Your microphone drives the avatar directly" },
+];
+const SESSION_MODES: { id: SessionMode; label: string; description: string }[] = [
+  { id: "passthrough", label: "Passthrough", description: "App controls AI, TTS, and mirror input" },
+];
+const MODEL_VARIANTS: { id: ModelVariant; label: string; description: string }[] = [
+  { id: "", label: "Default", description: "Use env/default staging lane" },
+  { id: "test5", label: "110k vivid", description: "ckpt-110k-vivid-pasteback-20260522" },
+  { id: "latest", label: "March 12", description: "ckpt-mar12-archive-20260312" },
 ];
 
 let msgCounter = 0;
@@ -54,7 +65,7 @@ function getInitialVoiceMode(fallback: VoiceMode): VoiceMode {
   const params = new URLSearchParams(window.location.search);
   if (params.get("ui") === "mirror") return "mirror";
   const requestedVoice = params.get("voice");
-  return requestedVoice === "mirror" ? "mirror" : fallback;
+  return requestedVoice === "mirror" || requestedVoice === "openai" ? requestedVoice : fallback;
 }
 
 function MicIcon({ muted }: { muted: boolean }) {
@@ -205,6 +216,8 @@ export default function DemoPage({
   initialUiMode?: UiMode;
   initialVoiceMode?: VoiceMode;
 }) {
+  const sessionMode: SessionMode = "passthrough";
+  const [modelVariant, setModelVariant] = useState<ModelVariant>("");
   const session = useAtlasSession({
     autoEnableMic: false,
     createSession: async (face, faceUrl) => {
@@ -212,13 +225,18 @@ export default function DemoPage({
       if (face) {
         const form = new FormData();
         form.append("face", face);
-        form.append("mode", "passthrough");
+        form.append("mode", sessionMode);
+        if (modelVariant) form.append("model_variant", modelVariant);
         res = await fetch("/api/session", { method: "POST", body: form });
       } else if (faceUrl) {
         res = await fetch("/api/session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ face_url: faceUrl, mode: "passthrough" }),
+          body: JSON.stringify({
+            face_url: faceUrl,
+            mode: sessionMode,
+            model_variant: modelVariant || undefined,
+          }),
         });
       } else {
         throw new Error("No face image provided");
@@ -251,7 +269,7 @@ export default function DemoPage({
   const [aiThinking, setAiThinking] = useState(false);
   const [faceLoading, setFaceLoading] = useState(false);
 
-  const [configReady, setConfigReady] = useState<{ llm: boolean; tts: boolean } | null>(null);
+  const [configReady, setConfigReady] = useState<{ llm: boolean; tts: boolean; openaiRealtime: boolean; atlasModelVariant?: string } | null>(null);
 
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [uiMode, setUiMode] = useState<UiMode>(() => getInitialUiMode(initialUiMode));
@@ -271,7 +289,7 @@ export default function DemoPage({
     fetch("/api/config")
       .then((r) => r.json())
       .then((data) => setConfigReady(data))
-      .catch(() => setConfigReady({ llm: false, tts: false }));
+      .catch(() => setConfigReady({ llm: false, tts: false, openaiRealtime: false }));
   }, []);
 
   const updateFormatMode = useCallback((nextMode: UiMode) => {
@@ -312,7 +330,11 @@ export default function DemoPage({
         setUiMode("studio");
         url.searchParams.delete("ui");
       }
-      url.searchParams.delete("voice");
+      if (nextMode === "openai") {
+        url.searchParams.set("voice", "openai");
+      } else {
+        url.searchParams.delete("voice");
+      }
     }
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
   }, [uiMode]);
@@ -486,6 +508,12 @@ export default function DemoPage({
   const ttsSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const mirrorStreamRef = useRef<MediaStream | null>(null);
   const mirrorSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const openAiPeerRef = useRef<RTCPeerConnection | null>(null);
+  const openAiDataChannelRef = useRef<RTCDataChannel | null>(null);
+  const openAiMicStreamRef = useRef<MediaStream | null>(null);
+  const openAiRemoteSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const [openAiLiveActive, setOpenAiLiveActive] = useState(false);
+  const [openAiLiveStatus, setOpenAiLiveStatus] = useState<"idle" | "connecting" | "live" | "error">("idle");
 
   const stopMirrorInput = useCallback(() => {
     try {
@@ -527,6 +555,118 @@ export default function DemoPage({
     }
   }, [addMsg]);
 
+  const stopOpenAiLive = useCallback(() => {
+    try {
+      openAiRemoteSourceRef.current?.disconnect();
+    } catch {
+      /* best effort */
+    }
+    openAiRemoteSourceRef.current = null;
+    openAiDataChannelRef.current?.close();
+    openAiDataChannelRef.current = null;
+    openAiPeerRef.current?.close();
+    openAiPeerRef.current = null;
+    openAiMicStreamRef.current?.getTracks().forEach((track) => track.stop());
+    openAiMicStreamRef.current = null;
+    setOpenAiLiveActive(false);
+    setOpenAiLiveStatus("idle");
+  }, []);
+
+  const startOpenAiLive = useCallback(async () => {
+    if (openAiPeerRef.current || openAiLiveStatus === "connecting") return;
+    if (!configReady?.openaiRealtime) {
+      addMsg("system", "OpenAI Realtime is not configured");
+      return;
+    }
+
+    const audioCtx = audioCtxRef.current;
+    const dest = destRef.current;
+    if (!audioCtx || !dest) return;
+
+    setOpenAiLiveStatus("connecting");
+    try {
+      if (audioCtx.state === "suspended") {
+        await audioCtx.resume();
+      }
+
+      const tokenRes = await fetch("/api/openai-realtime-token");
+      const tokenData = await tokenRes.json();
+      if (!tokenRes.ok) {
+        throw new Error(tokenData?.error || "OpenAI token request failed");
+      }
+
+      const clientSecret =
+        tokenData?.client_secret?.value ||
+        tokenData?.client_secret ||
+        tokenData?.value;
+      if (!clientSecret) throw new Error("OpenAI client secret was missing");
+
+      const micStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+
+      const peer = new RTCPeerConnection();
+      const channel = peer.createDataChannel("oai-events");
+      openAiPeerRef.current = peer;
+      openAiDataChannelRef.current = channel;
+      openAiMicStreamRef.current = micStream;
+
+      micStream.getAudioTracks().forEach((track) => peer.addTrack(track, micStream));
+
+      peer.ontrack = (event) => {
+        const [remoteStream] = event.streams;
+        const stream = remoteStream || new MediaStream([event.track]);
+        try {
+          openAiRemoteSourceRef.current?.disconnect();
+        } catch {
+          /* best effort */
+        }
+        const source = audioCtx.createMediaStreamSource(stream);
+        source.connect(dest);
+        source.connect(audioCtx.destination);
+        openAiRemoteSourceRef.current = source;
+      };
+
+      channel.onopen = () => {
+        setOpenAiLiveActive(true);
+        setOpenAiLiveStatus("live");
+      };
+      channel.onclose = () => {
+        setOpenAiLiveActive(false);
+        setOpenAiLiveStatus("idle");
+      };
+
+      const offer = await peer.createOffer();
+      await peer.setLocalDescription(offer);
+      if (!offer.sdp) throw new Error("WebRTC offer was empty");
+
+      const sdpRes = await fetch("https://api.openai.com/v1/realtime/calls", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${clientSecret}`,
+          "Content-Type": "application/sdp",
+        },
+        body: offer.sdp,
+      });
+
+      if (!sdpRes.ok) {
+        throw new Error(await sdpRes.text());
+      }
+
+      const answer = await sdpRes.text();
+      await peer.setRemoteDescription({ type: "answer", sdp: answer });
+    } catch (err) {
+      console.warn("Failed to start OpenAI Realtime:", err);
+      stopOpenAiLive();
+      setOpenAiLiveStatus("error");
+      addMsg("system", "OpenAI Live could not start");
+    }
+  }, [addMsg, configReady?.openaiRealtime, openAiLiveStatus, stopOpenAiLive]);
+
   useEffect(() => {
     if (session.status !== "connected" || !session.room) return;
 
@@ -547,13 +687,14 @@ export default function DemoPage({
       ttsSourceRef.current?.stop();
       ttsSourceRef.current = null;
       stopMirrorInput();
+      stopOpenAiLive();
       try { session.room?.localParticipant.unpublishTrack(lkTrack); } catch { /* best effort */ }
       lkTrack.stop();
       audioCtx.close().catch(() => {});
       audioCtxRef.current = null;
       destRef.current = null;
     };
-  }, [session.status, session.room, stopMirrorInput]);
+  }, [session.status, session.room, stopMirrorInput, stopOpenAiLive]);
 
   const playTtsResponse = useCallback((base64Audio: string) => {
     const audioCtx = audioCtxRef.current;
@@ -583,6 +724,7 @@ export default function DemoPage({
 
   const hasFace = !!faceFile || faceUrl.trim().startsWith("https://");
   const aiEnabled = voiceMode === "ai" && configReady?.llm === true;
+  const openAiEnabled = voiceMode === "openai" && configReady?.openaiRealtime === true;
   const connect = async () => {
     if (!hasFace) return;
     setLocalMessages([]);
@@ -594,6 +736,7 @@ export default function DemoPage({
   const disconnect = async () => {
     setMeetLeaveArmed(false);
     stopMirrorInput();
+    stopOpenAiLive();
     stopListening();
     ttsSourceRef.current?.stop();
     ttsSourceRef.current = null;
@@ -670,18 +813,27 @@ export default function DemoPage({
   useEffect(() => {
     if (session.status !== "connected") {
       stopMirrorInput();
+      stopOpenAiLive();
       return;
     }
 
     if (voiceMode === "mirror") {
       stopListening();
+      stopOpenAiLive();
       ttsSourceRef.current?.stop();
       ttsSourceRef.current = null;
       void startMirrorInput();
+    } else if (voiceMode === "openai") {
+      stopListening();
+      stopMirrorInput();
+      ttsSourceRef.current?.stop();
+      ttsSourceRef.current = null;
+      if (openAiEnabled) void startOpenAiLive();
     } else {
       stopMirrorInput();
+      stopOpenAiLive();
     }
-  }, [session.status, voiceMode, startMirrorInput, stopMirrorInput, stopListening]);
+  }, [openAiEnabled, session.status, voiceMode, startMirrorInput, startOpenAiLive, stopMirrorInput, stopOpenAiLive, stopListening]);
 
   const toggleVoiceInput = useCallback(() => {
     if (voiceMode === "mirror") {
@@ -692,18 +844,44 @@ export default function DemoPage({
       }
       return;
     }
+    if (voiceMode === "openai") {
+      if (openAiLiveActive) {
+        stopOpenAiLive();
+      } else {
+        void startOpenAiLive();
+      }
+      return;
+    }
     if (scribeRef.current.isConnected) {
       stopListening();
     } else {
       void startListening();
     }
-  }, [mirrorInputActive, startListening, startMirrorInput, stopListening, stopMirrorInput, voiceMode]);
+  }, [mirrorInputActive, openAiLiveActive, startListening, startMirrorInput, startOpenAiLive, stopListening, stopMirrorInput, stopOpenAiLive, voiceMode]);
 
   sendChatRef.current = (text: string) => {
     if (!text.trim()) return;
     addMsg("user", text);
 
     if (voiceMode === "mirror") {
+      return;
+    }
+
+    if (voiceMode === "openai") {
+      const channel = openAiDataChannelRef.current;
+      if (channel?.readyState === "open") {
+        channel.send(JSON.stringify({
+          type: "conversation.item.create",
+          item: {
+            type: "message",
+            role: "user",
+            content: [{ type: "input_text", text }],
+          },
+        }));
+        channel.send(JSON.stringify({ type: "response.create" }));
+      } else {
+        addMsg("system", "OpenAI Live is not connected yet");
+      }
       return;
     }
 
@@ -762,7 +940,21 @@ export default function DemoPage({
     : overlayMessages;
   const showTiktokDialogue = isConnected || session.status === "connecting";
   const latestAtlasMessage = [...localMessages].reverse().find((msg) => msg.role === "atlas");
-  const voiceInputActive = voiceMode === "mirror" ? mirrorInputActive : scribe.isConnected;
+  const voiceInputActive = voiceMode === "mirror"
+    ? mirrorInputActive
+    : voiceMode === "openai"
+      ? openAiLiveActive
+      : scribe.isConnected;
+  const voiceControlTitle = voiceMode === "mirror"
+    ? "Mirror microphone"
+    : voiceMode === "openai"
+      ? "OpenAI Live microphone"
+      : "AI microphone";
+  const voiceStatusText = voiceMode === "mirror"
+    ? (mirrorInputActive ? "Mirror live" : "Mic")
+    : voiceMode === "openai"
+      ? (openAiLiveStatus === "connecting" ? "Connecting" : openAiLiveActive ? "Live" : "OpenAI")
+      : voiceInputActive ? "Live" : "Mic";
   const activeFormatMode: UiMode = uiMode;
   const formatPicker = (className = "") => (
     <div className={`format-picker ${className}`}>
@@ -793,6 +985,37 @@ export default function DemoPage({
           {mode.label}
         </button>
       ))}
+    </div>
+  );
+  const sessionSettings = (className = "") => (
+    <div className={`session-settings ${className}`}>
+      <label>
+        <span>Session mode</span>
+        <div className="session-static-value">Passthrough</div>
+      </label>
+      <label>
+        <span>Model</span>
+        <select
+          value={modelVariant}
+          onChange={(e) => setModelVariant(e.target.value as ModelVariant)}
+          disabled={isConnected}
+        >
+          {MODEL_VARIANTS.map((variant) => (
+            <option key={variant.id || "env"} value={variant.id}>
+              {variant.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <p>
+        {SESSION_MODES.find((mode) => mode.id === sessionMode)?.description}
+        {" · "}
+        {modelVariant
+          ? MODEL_VARIANTS.find((variant) => variant.id === modelVariant)?.description
+          : configReady?.atlasModelVariant
+            ? `Env default: ${configReady.atlasModelVariant}`
+            : "No model header"}
+      </p>
     </div>
   );
   const hiddenFaceInputs = (
@@ -894,6 +1117,7 @@ export default function DemoPage({
               </p>
             </div>
             {voiceModePicker("teacher-voice-picker")}
+            {sessionSettings("teacher-session-settings")}
             <div className="teacher-avatar-strip">
               {FACE_PRESETS.map((preset) => (
                 <button
@@ -923,7 +1147,7 @@ export default function DemoPage({
                 <DownloadIcon /> Image
               </button>
             </div>
-            {voiceMode === "ai" ? (
+            {voiceMode !== "mirror" ? (
               <form
                 className="teacher-prompt"
                 onSubmit={(e) => {
@@ -940,7 +1164,7 @@ export default function DemoPage({
                   placeholder="Ask about the board..."
                   disabled={aiThinking}
                 />
-                <button type="submit" disabled={!chatInput.trim() || aiThinking}>
+                <button type="submit" disabled={!chatInput.trim() || aiThinking || (voiceMode === "openai" && !openAiLiveActive)}>
                   Send
                 </button>
               </form>
@@ -949,10 +1173,10 @@ export default function DemoPage({
                 type="button"
                 onClick={toggleVoiceInput}
                 disabled={!isConnected}
-                className={`teacher-mirror-button ${mirrorInputActive ? "is-live" : ""}`}
+                className={`teacher-mirror-button ${voiceInputActive ? "is-live" : ""}`}
               >
-                <MicIcon muted={!mirrorInputActive} />
-                {mirrorInputActive ? "Mirror live" : isConnected ? "Start mirror" : "Call avatar first"}
+                <MicIcon muted={!voiceInputActive} />
+                {voiceInputActive ? "Mirror live" : isConnected ? "Start mirror" : "Call avatar first"}
               </button>
             )}
           </aside>
@@ -967,6 +1191,7 @@ export default function DemoPage({
         {hiddenFaceInputs}
         {formatPicker("global-format-picker meet-global-format-picker")}
         {voiceModePicker("meet-voice-picker")}
+        {sessionSettings("meet-session-settings")}
         <header className="meet-topbar">
           <div>
             <strong>{new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</strong>
@@ -1006,7 +1231,11 @@ export default function DemoPage({
                 ? mirrorInputActive
                   ? "Mirror is live. Speak normally and Atlas will carry your voice."
                   : "Start the call, then enable mirror mic."
-                : latestAtlasMessage?.text || "Ready when you are. Start the call to talk with Atlas."}
+                : voiceMode === "openai"
+                  ? openAiLiveActive
+                    ? "OpenAI Live is connected. Speak naturally."
+                    : "Start the call, then enable OpenAI Live."
+                  : latestAtlasMessage?.text || "Ready when you are. Start the call to talk with Atlas."}
             </div>
           </section>
 
@@ -1030,7 +1259,7 @@ export default function DemoPage({
             onClick={toggleVoiceInput}
             className={voiceInputActive ? "is-live" : ""}
             aria-label={voiceInputActive ? "Mute microphone" : "Start microphone"}
-            title={voiceMode === "mirror" ? "Mirror microphone" : "AI microphone"}
+            title={voiceControlTitle}
           >
             <MicIcon muted={!voiceInputActive} />
           </button>
@@ -1177,6 +1406,7 @@ export default function DemoPage({
             </div>
 
           </aside>
+          {sessionSettings("mirror-session-settings")}
         </main>
       </div>
     );
@@ -1450,12 +1680,12 @@ export default function DemoPage({
                     onClick={toggleVoiceInput}
                     className={`tiktok-action-button ${voiceInputActive ? "tiktok-action-live" : ""}`}
                     aria-label={voiceInputActive ? "Mute microphone" : "Start microphone"}
-                    title={voiceMode === "mirror" ? "Mirror microphone" : "AI microphone"}
+                    title={voiceControlTitle}
                   >
                     <MicIcon muted={!voiceInputActive} />
                   </button>
                   <span className="tiktok-action-label">
-                    {voiceMode === "mirror" ? (mirrorInputActive ? "Mirror" : "Mic") : voiceInputActive ? "Live" : "Mic"}
+                    {voiceStatusText}
                   </span>
                 </>
               )}
@@ -1502,6 +1732,7 @@ export default function DemoPage({
                       </button>
                     ))}
                   </div>
+                  {sessionSettings("tiktok-session-settings")}
                   {FACE_PRESETS.map((preset) => (
                     <button
                       key={preset.id}
@@ -1580,13 +1811,17 @@ export default function DemoPage({
               <p className="font-mono text-[10px] text-[#666] text-center mt-8">
                 {voiceMode === "mirror"
                   ? mirrorInputActive
-                    ? "Mirror is live — speak normally..."
+                    ? "Mirror is live - speak normally..."
                     : "Enable the mirror mic to speak through Atlas..."
-                  : aiEnabled
-                  ? scribe.isConnected
-                    ? "Listening — speak or type below..."
-                    : "Type a message to start..."
-                  : "Start speaking..."}
+                  : voiceMode === "openai"
+                    ? openAiLiveActive
+                      ? "OpenAI Live is listening..."
+                      : "Enable OpenAI Live to talk through Atlas..."
+                    : aiEnabled
+                      ? scribe.isConnected
+                        ? "Listening - speak or type below..."
+                        : "Type a message to start..."
+                      : "Start speaking..."}
               </p>
             )}
             {localMessages.map((msg) => (
@@ -1739,6 +1974,25 @@ export default function DemoPage({
               </p>
             </div>
           )}
+          {configReady && voiceMode === "openai" && (
+            <div className={`px-6 py-3 border-b ${configReady.openaiRealtime ? "border-[#0a3a15] bg-[#0a1a0f]" : "border-[#3a2a00] bg-[#1a1400]"}`}>
+              <div className="flex items-start gap-2">
+                <span className={`mt-0.5 shrink-0 ${configReady.openaiRealtime ? "text-accent" : "text-[#ffaa00]"}`}>
+                  {configReady.openaiRealtime ? <span className="block w-1.5 h-1.5 bg-accent mt-1" /> : <WarningIcon />}
+                </span>
+                <div>
+                  <p className={`font-mono text-[10px] tracking-[0.1em] ${configReady.openaiRealtime ? "text-accent" : "text-[#ffaa00]"}`}>
+                    {configReady.openaiRealtime ? "OpenAI Live enabled" : "OpenAI Live not configured"}
+                  </p>
+                  <p className="font-mono text-[9px] text-[#5f8f72] mt-1 leading-relaxed">
+                    {configReady.openaiRealtime
+                      ? "Realtime audio is routed into the avatar track."
+                      : <>Add <code className="text-[#aa8800]">OPENAI_API_KEY</code> to .env.local.</>}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Face Upload */}
           <div className="px-6 py-5 border-b border-border">
@@ -1839,7 +2093,7 @@ export default function DemoPage({
             <label className="block font-mono text-[10px] tracking-[0.2em] text-muted uppercase mb-3">
               Voice
             </label>
-            <div className="grid grid-cols-2 border border-border">
+            <div className="grid grid-cols-3 border border-border">
               {VOICE_MODES.map((mode, index) => (
                 <button
                   key={mode.id}
@@ -1860,6 +2114,13 @@ export default function DemoPage({
             <p className="font-mono text-[9px] text-[#555] mt-2">
               {VOICE_MODES.find((mode) => mode.id === voiceMode)?.description}
             </p>
+          </div>
+
+          <div className="px-6 py-5 border-b border-border">
+            <label className="block font-mono text-[10px] tracking-[0.2em] text-muted uppercase mb-3">
+              Session
+            </label>
+            {sessionSettings("studio-session-settings")}
           </div>
 
           {/* UI format */}
@@ -2024,7 +2285,7 @@ export default function DemoPage({
                     {voiceInputActive && (
                       <span className="flex items-center gap-1.5 font-mono text-[9px] text-accent tracking-[0.1em]">
                         <span className="w-1.5 h-1.5 bg-accent animate-pulse rounded-full" />
-                        {voiceMode === "mirror" ? "Mirror live" : "STT active"}
+                        {voiceMode === "mirror" ? "Mirror live" : voiceMode === "openai" ? "OpenAI Live" : "STT active"}
                       </span>
                     )}
                   </div>
