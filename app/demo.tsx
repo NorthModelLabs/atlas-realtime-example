@@ -4,16 +4,18 @@ import Image from "next/image";
 import { useState, useRef, useCallback, useEffect, type CSSProperties, type DragEvent, type ChangeEvent } from "react";
 import { flushSync } from "react-dom";
 import { useAtlasSession } from "@northmodellabs/atlas-react";
+import { LocalAudioTrack, Track } from "livekit-client";
 import { useScribe, CommitStrategy } from "@elevenlabs/react";
 
-const DEFAULT_FACE_URL = "/faces/default.png";
+const DEFAULT_FACE_ID = "enterprise-b1450303";
+const DEFAULT_FACE_URL = "/faces/enterprise-b1450303.jpg";
 const FACE_PRESETS = [
-  { id: "default", label: "Default", src: DEFAULT_FACE_URL },
+  { id: "default", label: "Default", src: "/faces/default.png" },
   { id: "reel-alt", label: "Reel", src: "/faces/reel-alt.png" },
   {
     id: "enterprise-b1450303",
     label: "Enterprise",
-    src: "/faces/enterprise-b1450303.jpg",
+    src: DEFAULT_FACE_URL,
   },
   { id: "jennifer", label: "Jennifer", src: "/faces/jennifer.png" },
 ];
@@ -322,12 +324,12 @@ export default function DemoPage({
       }
     },
   });
-  const { publishAudio, setMicEnabled } = session;
+  const { setMicEnabled } = session;
 
   const [sessionTime, setSessionTime] = useState(0);
   const [faceFile, setFaceFile] = useState<File | null>(null);
   const [facePreview, setFacePreview] = useState<string | null>(null);
-  const [selectedFaceId, setSelectedFaceId] = useState("default");
+  const [selectedFaceId, setSelectedFaceId] = useState(DEFAULT_FACE_ID);
   const [faceUrl, setFaceUrl] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const [chatInput, setChatInput] = useState("");
@@ -561,12 +563,15 @@ export default function DemoPage({
       .then((blob) => {
         if (faceSelectionVersionRef.current !== 0) return;
         const file = new File([blob], "default-face.jpg", { type: "image/jpeg" });
-        handleFile(file, "default");
+        handleFile(file, DEFAULT_FACE_ID);
       })
       .catch(() => {});
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const ttsPlaybackRef = useRef<{ stop: () => void } | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const audioDestRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+  const ttsSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const ttsTrackReadyRef = useRef<Promise<void> | null>(null);
 
   const stopMirrorInput = useCallback(() => {
     setMicEnabled(false);
@@ -583,14 +588,100 @@ export default function DemoPage({
     }
   }, [addMsg, setMicEnabled]);
 
-  const playTtsResponse = useCallback((base64Audio: string) => {
-    ttsPlaybackRef.current?.stop();
-    publishAudio(base64Audio)
-      .then((handle) => {
-        ttsPlaybackRef.current = handle;
+  useEffect(() => {
+    const room = session.room;
+    if (session.status !== "connected" || !room) return;
+
+    const audioCtx = new AudioContext();
+    const destination = audioCtx.createMediaStreamDestination();
+    const mediaTrack = destination.stream.getAudioTracks()[0];
+    const livekitTrack = new LocalAudioTrack(mediaTrack);
+
+    audioCtxRef.current = audioCtx;
+    audioDestRef.current = destination;
+    ttsTrackReadyRef.current = room.localParticipant
+      .publishTrack(livekitTrack, {
+        name: "tts-audio",
+        source: Track.Source.Unknown,
       })
-      .catch((err) => console.warn("TTS playback failed:", err));
-  }, [publishAudio]);
+      .then(() => undefined);
+
+    ttsTrackReadyRef.current.catch((err) => {
+      console.warn("Failed to publish persistent TTS audio track:", err);
+    });
+
+    return () => {
+      const source = ttsSourceRef.current;
+      ttsSourceRef.current = null;
+      if (source) {
+        source.onended = null;
+        try {
+          source.stop();
+        } catch {
+          /* source already stopped */
+        }
+        source.disconnect();
+      }
+      ttsTrackReadyRef.current = null;
+      try {
+        room.localParticipant.unpublishTrack(livekitTrack);
+      } catch {
+        /* room may already be disconnected */
+      }
+      livekitTrack.stop();
+      audioCtx.close().catch(() => {});
+      audioCtxRef.current = null;
+      audioDestRef.current = null;
+    };
+  }, [session.status, session.room]);
+
+  const stopTtsPlayback = useCallback(() => {
+    const source = ttsSourceRef.current;
+    ttsSourceRef.current = null;
+    if (!source) return;
+    source.onended = null;
+    try {
+      source.stop();
+    } catch {
+      /* source already stopped */
+    }
+    source.disconnect();
+  }, []);
+
+  const playTtsResponse = useCallback(async (base64Audio: string) => {
+    const audioCtx = audioCtxRef.current;
+    const destination = audioDestRef.current;
+    const trackReady = ttsTrackReadyRef.current;
+    if (!audioCtx || !destination || !trackReady) return;
+
+    stopTtsPlayback();
+
+    try {
+      await trackReady;
+      if (audioCtx.state === "suspended") await audioCtx.resume();
+
+      const binary = atob(base64Audio);
+      const bytes = new Uint8Array(binary.length);
+      for (let index = 0; index < binary.length; index += 1) {
+        bytes[index] = binary.charCodeAt(index);
+      }
+
+      const audioBuffer = await audioCtx.decodeAudioData(bytes.buffer.slice(0));
+      if (audioCtxRef.current !== audioCtx || audioDestRef.current !== destination) return;
+
+      const source = audioCtx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(destination);
+      ttsSourceRef.current = source;
+      source.onended = () => {
+        source.disconnect();
+        if (ttsSourceRef.current === source) ttsSourceRef.current = null;
+      };
+      source.start();
+    } catch (err) {
+      console.warn("TTS playback failed:", err);
+    }
+  }, [stopTtsPlayback]);
 
   const hasFace = !!faceFile || faceUrl.trim().startsWith("https://");
   const aiEnabled = voiceMode === "ai" && configReady?.llm === true;
@@ -606,8 +697,7 @@ export default function DemoPage({
     setMeetLeaveArmed(false);
     stopMirrorInput();
     stopListening();
-    ttsPlaybackRef.current?.stop();
-    ttsPlaybackRef.current = null;
+    stopTtsPlayback();
     await session.disconnect();
     addMsg("system", "Session ended");
     setSessionTime(0);
@@ -686,13 +776,12 @@ export default function DemoPage({
 
     if (voiceMode === "mirror") {
       stopListening();
-      ttsPlaybackRef.current?.stop();
-      ttsPlaybackRef.current = null;
+      stopTtsPlayback();
       void startMirrorInput();
     } else {
       stopMirrorInput();
     }
-  }, [session.status, voiceMode, startMirrorInput, stopMirrorInput, stopListening]);
+  }, [session.status, voiceMode, startMirrorInput, stopMirrorInput, stopListening, stopTtsPlayback]);
 
   const toggleVoiceInput = useCallback(() => {
     if (voiceMode === "mirror") {
@@ -744,7 +833,7 @@ export default function DemoPage({
             })
               .then((r) => (r.ok ? r.json() : null))
               .then((tts) => {
-                if (tts?.audio) playTtsResponse(tts.audio);
+                if (tts?.audio) void playTtsResponse(tts.audio);
               })
               .catch(() => {});
           }
@@ -857,6 +946,10 @@ export default function DemoPage({
                 <span className={voiceInputActive ? "is-live" : ""} />
                 {appleStatus}
                 {isConnected && <small>{formatTime(sessionTime)}</small>}
+              </div>
+              <div className="apple-identity-pill" aria-label={`John is ${appleStatus.toLowerCase()}`}>
+                <strong>John</strong>
+                <span>{appleStatus}</span>
               </div>
               {session.status === "connecting" && <div className="apple-loading-ring" aria-hidden="true" />}
             </div>

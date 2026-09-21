@@ -330,6 +330,7 @@
 .apple-ui .format-picker,
 .apple-ui .apple-avatar-card,
 .apple-ui .apple-status-pill,
+.apple-ui .apple-identity-pill,
 .apple-ui .apple-settings-panel,
 .apple-ui .apple-settings-list {
   border-radius: 22px !important;
@@ -466,6 +467,31 @@
   font-variant-numeric: tabular-nums;
 }
 
+.apple-identity-pill {
+  align-items: center;
+  background: rgba(18, 18, 20, 0.7);
+  backdrop-filter: blur(22px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  gap: 8px;
+  padding: 8px 11px;
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  z-index: 3;
+}
+
+.apple-identity-pill strong {
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.apple-identity-pill span {
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 11px;
+}
+
 .apple-loading-ring {
   animation: apple-spin 900ms linear infinite;
   border: 2px solid rgba(255, 255, 255, 0.18);
@@ -481,7 +507,8 @@
 }
 
 .apple-caption {
-  min-height: 52px;
+  height: 38px;
+  min-height: 38px;
   text-align: center;
   width: min(100%, 440px);
 }
@@ -497,12 +524,12 @@
 
 .apple-caption p {
   color: rgba(255, 255, 255, 0.9);
-  display: -webkit-box;
+  display: block;
   font-size: 15px;
   line-height: 1.35;
   overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .apple-controls-wrap {
@@ -3443,6 +3470,15 @@ textarea::-webkit-scrollbar-thumb,
 }
 
 @media (max-width: 920px) {
+  .teacher-ui {
+    height: 100dvh;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .meet-participant-grid {
     align-content: center;
     gap: 10px;
@@ -3501,10 +3537,12 @@ textarea::-webkit-scrollbar-thumb,
   .teacher-shell {
     display: flex;
     flex-direction: column;
+    flex: none;
     gap: 16px;
     height: auto;
+    min-height: auto;
     overflow: visible;
-    padding: 0 12px 40px;
+    padding: 0 12px max(48px, calc(env(safe-area-inset-bottom) + 28px));
   }
 
   .teacher-canvas {
@@ -3529,6 +3567,7 @@ textarea::-webkit-scrollbar-thumb,
 
   .teacher-avatar-panel {
     min-height: auto;
+    overflow: visible;
   }
 }
 
@@ -3743,6 +3782,7 @@ textarea::-webkit-scrollbar-thumb,
   }
 
   .apple-caption {
+    height: 30px;
     min-height: 30px;
   }
 
@@ -3752,7 +3792,6 @@ textarea::-webkit-scrollbar-thumb,
 
   .apple-caption p {
     font-size: 12px;
-    -webkit-line-clamp: 1;
   }
 
   .apple-controls-wrap {
