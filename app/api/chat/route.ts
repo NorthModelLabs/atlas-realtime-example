@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const LLM_API_KEY = process.env.LLM_API_KEY || "";
-const LLM_BASE_URL = process.env.LLM_BASE_URL || "";
-const LLM_MODEL = process.env.LLM_MODEL || "";
+const LLM_BASE_URL = process.env.LLM_BASE_URL || "https://api.openai.com/v1";
+const LLM_API_KEY = LLM_BASE_URL.includes("api.openai.com")
+  ? process.env.OPENAI_API_KEY || process.env.LLM_API_KEY || ""
+  : process.env.LLM_API_KEY || process.env.OPENAI_API_KEY || "";
+const LLM_MODEL = process.env.LLM_MODEL || "gpt-4o-mini";
 
 const SYSTEM_PROMPT =
   "You are a friendly, concise AI assistant. Keep responses short (1-3 sentences) since they will be spoken aloud via TTS.";
@@ -13,9 +15,9 @@ interface ChatMessage {
 }
 
 export async function POST(req: NextRequest) {
-  if (!LLM_API_KEY || !LLM_BASE_URL || !LLM_MODEL) {
+  if (!LLM_API_KEY) {
     return NextResponse.json(
-      { error: "not_configured", message: "LLM_API_KEY, LLM_BASE_URL, or LLM_MODEL not set." },
+      { error: "not_configured", message: "OPENAI_API_KEY or LLM_API_KEY is not set." },
       { status: 503 },
     );
   }

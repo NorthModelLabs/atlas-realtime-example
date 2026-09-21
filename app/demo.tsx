@@ -1,15 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useRef, useCallback, useEffect, type DragEvent, type ChangeEvent } from "react";
+import { useState, useRef, useCallback, useEffect, type CSSProperties, type DragEvent, type ChangeEvent } from "react";
+import { flushSync } from "react-dom";
 import { useAtlasSession } from "@northmodellabs/atlas-react";
-import { LocalAudioTrack, Track } from "livekit-client";
 import { useScribe, CommitStrategy } from "@elevenlabs/react";
 
 const DEFAULT_FACE_URL = "/faces/default.png";
 const FACE_PRESETS = [
   { id: "default", label: "Default", src: DEFAULT_FACE_URL },
   { id: "reel-alt", label: "Reel", src: "/faces/reel-alt.png" },
+  {
+    id: "enterprise-b1450303",
+    label: "Enterprise",
+    src: "/faces/enterprise-b1450303.jpg",
+  },
+  { id: "jennifer", label: "Jennifer", src: "/faces/jennifer.png" },
 ];
 
 type ChatMsg = {
@@ -18,7 +24,7 @@ type ChatMsg = {
   text: string;
 };
 
-export type UiMode = "studio" | "tiktok" | "teacher" | "meet" | "mirror";
+export type UiMode = "studio" | "apple" | "tiktok" | "teacher" | "meet" | "mirror";
 export type VoiceMode = "ai" | "mirror";
 
 interface ChatHistory {
@@ -26,17 +32,33 @@ interface ChatHistory {
   content: string;
 }
 
-const UI_MODES = new Set<UiMode>(["studio", "tiktok", "teacher", "meet", "mirror"]);
+const UI_MODES = new Set<UiMode>(["apple", "tiktok", "teacher", "meet"]);
 const UI_FORMATS: { id: UiMode; label: string; urlLabel: string }[] = [
-  { id: "studio", label: "Studio", urlLabel: "Default URL mode" },
+  { id: "apple", label: "Apple", urlLabel: "?ui=apple" },
   { id: "tiktok", label: "TikTok", urlLabel: "?ui=tiktok" },
   { id: "teacher", label: "Teach", urlLabel: "?ui=teacher" },
   { id: "meet", label: "Meet", urlLabel: "?ui=meet" },
-  { id: "mirror", label: "Mirror", urlLabel: "?ui=mirror" },
 ];
 const VOICE_MODES: { id: VoiceMode; label: string; description: string }[] = [
   { id: "ai", label: "AI voice", description: "LLM + ElevenLabs speak through Atlas" },
   { id: "mirror", label: "Mirror", description: "Your microphone drives the avatar directly" },
+];
+const TEACHER_STEPS = [
+  {
+    label: "Notice the curve",
+    eyebrow: "Shape",
+    note: "Watch how the curve changes direction as the slope moves from positive to negative.",
+  },
+  {
+    label: "Locate the flat point",
+    eyebrow: "Turning point",
+    note: "At the highlighted point the tangent is flat, so the instantaneous slope is zero.",
+  },
+  {
+    label: "Explain the derivative",
+    eyebrow: "Meaning",
+    note: "The derivative describes the slope at every point: rising, flat, then falling.",
+  },
 ];
 
 let msgCounter = 0;
@@ -45,14 +67,12 @@ function getInitialUiMode(fallback: UiMode): UiMode {
   if (typeof window === "undefined") return fallback;
   const params = new URLSearchParams(window.location.search);
   const requestedUi = params.get("ui");
-  if (!requestedUi && params.get("voice") === "mirror") return "mirror";
   return requestedUi && UI_MODES.has(requestedUi as UiMode) ? (requestedUi as UiMode) : fallback;
 }
 
 function getInitialVoiceMode(fallback: VoiceMode): VoiceMode {
   if (typeof window === "undefined") return fallback;
   const params = new URLSearchParams(window.location.search);
-  if (params.get("ui") === "mirror") return "mirror";
   const requestedVoice = params.get("voice");
   return requestedVoice === "mirror" ? "mirror" : fallback;
 }
@@ -183,6 +203,70 @@ function StudioIcon() {
   );
 }
 
+function SettingsIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+      <line x1="4" y1="7" x2="20" y2="7" />
+      <circle cx="9" cy="7" r="2" fill="currentColor" stroke="none" />
+      <line x1="4" y1="17" x2="20" y2="17" />
+      <circle cx="15" cy="17" r="2" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function CameraIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <rect x="3" y="6" width="13" height="12" rx="3" />
+      <path d="m16 10 5-3v10l-5-3" />
+    </svg>
+  );
+}
+
+function CaptionsIcon() {
+  return (
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <rect x="2.5" y="5" width="19" height="14" rx="3" />
+      <path d="M10 10.25a2.5 2.5 0 1 0 0 3.5M18 10.25a2.5 2.5 0 1 0 0 3.5" />
+    </svg>
+  );
+}
+
+function ChatIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <path d="M20 15a3 3 0 0 1-3 3H9l-5 3v-6a3 3 0 0 1-1-2.25V7a3 3 0 0 1 3-3h11a3 3 0 0 1 3 3z" />
+    </svg>
+  );
+}
+
+function PeopleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3 19a6 6 0 0 1 12 0M16 5.5a3 3 0 0 1 0 5.5M17 14a5 5 0 0 1 4 5" />
+    </svg>
+  );
+}
+
+function MoreIcon() {
+  return (
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="5" cy="12" r="1.7" />
+      <circle cx="12" cy="12" r="1.7" />
+      <circle cx="19" cy="12" r="1.7" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <path d="m6 6 12 12M18 6 6 18" />
+    </svg>
+  );
+}
+
 function LockIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -199,7 +283,7 @@ function formatTime(s: number) {
 }
 
 export default function DemoPage({
-  initialUiMode = "studio",
+  initialUiMode = "apple",
   initialVoiceMode = "ai",
 }: {
   initialUiMode?: UiMode;
@@ -238,6 +322,7 @@ export default function DemoPage({
       }
     },
   });
+  const { publishAudio, setMicEnabled } = session;
 
   const [sessionTime, setSessionTime] = useState(0);
   const [faceFile, setFaceFile] = useState<File | null>(null);
@@ -258,7 +343,11 @@ export default function DemoPage({
   const [voiceMode, setVoiceMode] = useState<VoiceMode>(() => getInitialVoiceMode(initialVoiceMode));
   const [copied, setCopied] = useState(false);
   const [tiktokToolsOpen, setTiktokToolsOpen] = useState(false);
+  const [appleSettingsOpen, setAppleSettingsOpen] = useState(false);
   const [meetLeaveArmed, setMeetLeaveArmed] = useState(false);
+  const [meetPanel, setMeetPanel] = useState<"chat" | "people" | "settings" | null>(null);
+  const [meetCaptions, setMeetCaptions] = useState(true);
+  const [teacherStep, setTeacherStep] = useState(0);
   const [mirrorInputActive, setMirrorInputActive] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -274,48 +363,42 @@ export default function DemoPage({
       .catch(() => setConfigReady({ llm: false, tts: false }));
   }, []);
 
-  const updateFormatMode = useCallback((nextMode: UiMode) => {
-    if (nextMode === "mirror") {
-      setUiMode("mirror");
-      setVoiceMode("mirror");
-      setTiktokToolsOpen(false);
-      const url = new URL(window.location.href);
-      url.searchParams.set("ui", "mirror");
-      url.searchParams.delete("voice");
-      window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
-      return;
-    }
-
-    setVoiceMode("ai");
-    setUiMode(nextMode);
-    setTiktokToolsOpen(false);
-    const url = new URL(window.location.href);
-    url.searchParams.delete("voice");
-    if (nextMode === "studio") {
-      url.searchParams.delete("ui");
+  const runModeTransition = useCallback((update: () => void) => {
+    const doc = document as Document & {
+      startViewTransition?: (callback: () => void) => void;
+    };
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (doc.startViewTransition && !reduceMotion) {
+      doc.startViewTransition(() => flushSync(update));
     } else {
-      url.searchParams.set("ui", nextMode);
+      update();
     }
-    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
   }, []);
+
+  const updateFormatMode = useCallback((nextMode: UiMode) => {
+    runModeTransition(() => {
+      setVoiceMode("ai");
+      setUiMode(nextMode);
+      setTiktokToolsOpen(false);
+      setAppleSettingsOpen(false);
+      setMeetPanel(null);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("voice");
+      url.searchParams.set("ui", nextMode);
+      window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+    });
+  }, [runModeTransition]);
 
   const updateVoiceMode = useCallback((nextMode: VoiceMode) => {
     setVoiceMode(nextMode);
     const url = new URL(window.location.href);
     if (nextMode === "mirror") {
-      setUiMode("mirror");
-      setTiktokToolsOpen(false);
-      url.searchParams.set("ui", "mirror");
-      url.searchParams.delete("voice");
+      url.searchParams.set("voice", "mirror");
     } else {
-      if (uiMode === "mirror") {
-        setUiMode("studio");
-        url.searchParams.delete("ui");
-      }
       url.searchParams.delete("voice");
     }
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
-  }, [uiMode]);
+  }, []);
 
   useEffect(() => {
     setTiktokToolsOpen(false);
@@ -324,6 +407,8 @@ export default function DemoPage({
 
   useEffect(() => {
     setMeetLeaveArmed(false);
+    setAppleSettingsOpen(false);
+    setMeetPanel(null);
   }, [uiMode]);
 
   const addMsg = useCallback((role: ChatMsg["role"], text: string) => {
@@ -481,105 +566,31 @@ export default function DemoPage({
       .catch(() => {});
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const destRef = useRef<MediaStreamAudioDestinationNode | null>(null);
-  const ttsSourceRef = useRef<AudioBufferSourceNode | null>(null);
-  const mirrorStreamRef = useRef<MediaStream | null>(null);
-  const mirrorSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const ttsPlaybackRef = useRef<{ stop: () => void } | null>(null);
 
   const stopMirrorInput = useCallback(() => {
-    try {
-      mirrorSourceRef.current?.disconnect();
-    } catch {
-      /* best effort */
-    }
-    mirrorSourceRef.current = null;
-    mirrorStreamRef.current?.getTracks().forEach((track) => track.stop());
-    mirrorStreamRef.current = null;
+    setMicEnabled(false);
     setMirrorInputActive(false);
-  }, []);
+  }, [setMicEnabled]);
 
   const startMirrorInput = useCallback(async () => {
-    if (mirrorSourceRef.current) return;
-    const audioCtx = audioCtxRef.current;
-    const dest = destRef.current;
-    if (!audioCtx || !dest) return;
-
     try {
-      if (audioCtx.state === "suspended") {
-        await audioCtx.resume();
-      }
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-      });
-      const source = audioCtx.createMediaStreamSource(stream);
-      source.connect(dest);
-      mirrorStreamRef.current = stream;
-      mirrorSourceRef.current = source;
+      setMicEnabled(true);
       setMirrorInputActive(true);
     } catch (err) {
       console.warn("Failed to start mirror microphone:", err);
       addMsg("system", "Mirror microphone could not start");
     }
-  }, [addMsg]);
-
-  useEffect(() => {
-    if (session.status !== "connected" || !session.room) return;
-
-    const audioCtx = new AudioContext();
-    const dest = audioCtx.createMediaStreamDestination();
-    const mediaTrack = dest.stream.getAudioTracks()[0];
-    const lkTrack = new LocalAudioTrack(mediaTrack);
-
-    audioCtxRef.current = audioCtx;
-    destRef.current = dest;
-
-    session.room.localParticipant.publishTrack(lkTrack, {
-      name: "tts-audio",
-      source: Track.Source.Unknown,
-    }).catch((err) => console.warn("Failed to publish audio track:", err));
-
-    return () => {
-      ttsSourceRef.current?.stop();
-      ttsSourceRef.current = null;
-      stopMirrorInput();
-      try { session.room?.localParticipant.unpublishTrack(lkTrack); } catch { /* best effort */ }
-      lkTrack.stop();
-      audioCtx.close().catch(() => {});
-      audioCtxRef.current = null;
-      destRef.current = null;
-    };
-  }, [session.status, session.room, stopMirrorInput]);
+  }, [addMsg, setMicEnabled]);
 
   const playTtsResponse = useCallback((base64Audio: string) => {
-    const audioCtx = audioCtxRef.current;
-    const dest = destRef.current;
-    if (!audioCtx || !dest) return;
-
-    ttsSourceRef.current?.stop();
-
-    const binary = atob(base64Audio);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-
-    audioCtx.decodeAudioData(bytes.buffer.slice(0))
-      .then((audioBuffer) => {
-        const source = audioCtx.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(dest);
-        ttsSourceRef.current = source;
-        source.onended = () => {
-          source.disconnect();
-          ttsSourceRef.current = null;
-        };
-        source.start();
+    ttsPlaybackRef.current?.stop();
+    publishAudio(base64Audio)
+      .then((handle) => {
+        ttsPlaybackRef.current = handle;
       })
       .catch((err) => console.warn("TTS playback failed:", err));
-  }, []);
+  }, [publishAudio]);
 
   const hasFace = !!faceFile || faceUrl.trim().startsWith("https://");
   const aiEnabled = voiceMode === "ai" && configReady?.llm === true;
@@ -595,8 +606,8 @@ export default function DemoPage({
     setMeetLeaveArmed(false);
     stopMirrorInput();
     stopListening();
-    ttsSourceRef.current?.stop();
-    ttsSourceRef.current = null;
+    ttsPlaybackRef.current?.stop();
+    ttsPlaybackRef.current = null;
     await session.disconnect();
     addMsg("system", "Session ended");
     setSessionTime(0);
@@ -675,8 +686,8 @@ export default function DemoPage({
 
     if (voiceMode === "mirror") {
       stopListening();
-      ttsSourceRef.current?.stop();
-      ttsSourceRef.current = null;
+      ttsPlaybackRef.current?.stop();
+      ttsPlaybackRef.current = null;
       void startMirrorInput();
     } else {
       stopMirrorInput();
@@ -764,36 +775,29 @@ export default function DemoPage({
   const latestAtlasMessage = [...localMessages].reverse().find((msg) => msg.role === "atlas");
   const voiceInputActive = voiceMode === "mirror" ? mirrorInputActive : scribe.isConnected;
   const activeFormatMode: UiMode = uiMode;
+  const activeFormatIndex = Math.max(0, UI_FORMATS.findIndex((format) => format.id === activeFormatMode));
   const formatPicker = (className = "") => (
-    <div className={`format-picker ${className}`}>
+    <nav
+      className={`format-picker ${className}`}
+      aria-label="Demo mode"
+      style={{
+        "--format-count": UI_FORMATS.length,
+        "--format-index": activeFormatIndex,
+      } as CSSProperties}
+    >
       {UI_FORMATS.map((format) => (
         <button
           key={format.id}
           type="button"
           onClick={() => updateFormatMode(format.id)}
           className={activeFormatMode === format.id ? "is-active" : ""}
-          aria-label={format.id === "mirror" ? "Switch to mirror voice mode" : `Switch to ${format.label} UI`}
+          aria-label={`Switch to ${format.label} UI`}
+          aria-current={activeFormatMode === format.id ? "page" : undefined}
         >
           {format.label}
         </button>
       ))}
-    </div>
-  );
-  const voiceModePicker = (className = "") => (
-    <div className={`voice-mode-picker ${className}`}>
-      {VOICE_MODES.map((mode) => (
-        <button
-          key={mode.id}
-          type="button"
-          onClick={() => updateVoiceMode(mode.id)}
-          className={voiceMode === mode.id ? "is-active" : ""}
-          aria-label={`Use ${mode.label}`}
-          title={mode.description}
-        >
-          {mode.label}
-        </button>
-      ))}
-    </div>
+    </nav>
   );
   const hiddenFaceInputs = (
     <>
@@ -811,28 +815,203 @@ export default function DemoPage({
     </>
   );
 
+  if (uiMode === "apple") {
+    const appleStatus = session.status === "connecting"
+      ? "Connecting"
+      : isConnected
+        ? voiceInputActive
+          ? "Listening"
+          : "Connected"
+        : "Ready";
+    const appleCaption = scribe.partialTranscript
+      ? `${scribe.partialTranscript}…`
+      : aiThinking
+        ? "Thinking…"
+        : latestAtlasMessage?.text || (isConnected ? "Say something." : "Ready when you are.");
+
+    return (
+      <div className="apple-ui h-screen w-screen overflow-hidden text-white">
+        {hiddenFaceInputs}
+        {formatPicker("global-format-picker apple-format-picker")}
+
+        <main className="apple-shell">
+          <section className="apple-stage" aria-label="Atlas avatar">
+            <div className={`apple-avatar-card ${isConnected ? "is-connected" : ""}`}>
+              <div
+                ref={session.videoRef}
+                className="apple-video"
+                style={{ display: isConnected ? "flex" : "none" }}
+              />
+              {!isConnected && (
+                <div className="apple-face-preview">
+                  {facePreview ? (
+                    <Image src={facePreview} alt="Selected avatar" width={640} height={640} priority unoptimized />
+                  ) : (
+                    <button type="button" onClick={() => fileInputRef.current?.click()} aria-label="Upload avatar">
+                      <UploadIcon />
+                    </button>
+                  )}
+                </div>
+              )}
+              <div className="apple-status-pill" aria-live="polite">
+                <span className={voiceInputActive ? "is-live" : ""} />
+                {appleStatus}
+                {isConnected && <small>{formatTime(sessionTime)}</small>}
+              </div>
+              {session.status === "connecting" && <div className="apple-loading-ring" aria-hidden="true" />}
+            </div>
+
+            <div className="apple-caption" aria-live="polite">
+              <strong>Atlas</strong>
+              <p>{appleCaption}</p>
+            </div>
+          </section>
+
+          <div className="apple-controls-wrap">
+            {appleSettingsOpen && (
+              <aside className="apple-settings-panel" aria-label="Avatar settings">
+                <header>
+                  <div>
+                    <strong>Settings</strong>
+                    <span>{configReady?.llm && configReady?.tts ? "AI voice ready" : "Voice setup needed"}</span>
+                  </div>
+                  <button type="button" onClick={() => setAppleSettingsOpen(false)} aria-label="Close settings">Done</button>
+                </header>
+
+                <div className="apple-settings-section">
+                  <span>Avatar</span>
+                  <div className="apple-avatar-options">
+                    {FACE_PRESETS.map((preset) => (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => void selectPresetFace(preset)}
+                        className={selectedFaceId === preset.id ? "is-selected" : ""}
+                        aria-label={`Use ${preset.label} avatar`}
+                        title={preset.label}
+                      >
+                        <Image src={preset.src} alt="" width={72} height={72} unoptimized />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="apple-settings-list">
+                  <button type="button" onClick={() => setVisibility((value) => value === "private" ? "public" : "private")}>
+                    <span>{visibility === "public" ? <GlobeIcon /> : <LockIcon />} Visibility</span>
+                    <strong>{visibility === "public" ? "Public" : "Private"}</strong>
+                  </button>
+                  <button type="button" onClick={downloadCurrentFace} disabled={!facePreview}>
+                    <span><DownloadIcon /> Avatar image</span>
+                    <strong>Save</strong>
+                  </button>
+                  {isConnected && (
+                    <button type="button" className="is-danger" onClick={() => void disconnect()}>
+                      <span><StopIcon /> Session</span>
+                      <strong>End</strong>
+                    </button>
+                  )}
+                </div>
+              </aside>
+            )}
+
+            <nav className="apple-dock" aria-label="Avatar controls">
+              <button
+                type="button"
+                className="apple-control apple-upload-control"
+                onClick={() => (isConnected ? swapInputRef.current?.click() : fileInputRef.current?.click())}
+                aria-label="Upload avatar"
+                title="Upload avatar"
+              >
+                <span>{facePreview ? <Image src={facePreview} alt="" width={54} height={54} unoptimized /> : <UploadIcon />}</span>
+                <small>Upload</small>
+              </button>
+
+              <button
+                type="button"
+                className={`apple-control apple-control-primary ${voiceInputActive ? "is-live" : ""}`}
+                onClick={() => {
+                  if (!isConnected) {
+                    if (hasFace) void connect();
+                    return;
+                  }
+                  toggleVoiceInput();
+                }}
+                disabled={!isConnected && !hasFace}
+                aria-label={!isConnected ? "Start avatar" : voiceInputActive ? "Mute microphone" : "Start microphone"}
+              >
+                <span>{!isConnected ? <PlayIcon /> : <MicIcon muted={!voiceInputActive} />}</span>
+                <small>{!isConnected ? "Start" : voiceInputActive ? "Mute" : "Talk"}</small>
+              </button>
+
+              <button
+                type="button"
+                className={`apple-control ${appleSettingsOpen ? "is-active" : ""}`}
+                onClick={() => setAppleSettingsOpen((open) => !open)}
+                aria-label="Open settings"
+                aria-expanded={appleSettingsOpen}
+              >
+                <span><SettingsIcon /></span>
+                <small>Settings</small>
+              </button>
+            </nav>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   if (uiMode === "teacher") {
     return (
       <div className="teacher-ui min-h-screen w-screen bg-[#edf1f5] text-[#111827]">
         {hiddenFaceInputs}
         {formatPicker("global-format-picker")}
         <header className="teacher-topbar">
-          <div>
+          <div className="teacher-heading">
+            <span>Interactive lesson · Calculus</span>
             <h1>Visual calculus</h1>
+            <p>See how a changing slope becomes a derivative.</p>
+          </div>
+          <div className="teacher-progress" aria-label={`Lesson step ${teacherStep + 1} of ${TEACHER_STEPS.length}`}>
+            <div>
+              {TEACHER_STEPS.map((step, index) => (
+                <span key={step.label} className={index <= teacherStep ? "is-complete" : ""} />
+              ))}
+            </div>
+            <strong>{teacherStep + 1} / {TEACHER_STEPS.length}</strong>
           </div>
         </header>
 
         <main className="teacher-shell">
           <section className="teacher-board">
-            <div className="teacher-canvas">
+            <div className="teacher-board-toolbar">
+              <div>
+                <span>Lesson 03</span>
+                <strong>Understanding turning points</strong>
+              </div>
+              <div className="teacher-board-tools">
+                <span className="teacher-board-status"><i /> Interactive board</span>
+                <button
+                  type="button"
+                  className="teacher-board-upload"
+                  onClick={() => (isConnected ? swapInputRef.current?.click() : fileInputRef.current?.click())}
+                  aria-label="Upload avatar"
+                  title="Upload avatar"
+                >
+                  <UploadIcon />
+                  <span>Upload</span>
+                </button>
+              </div>
+            </div>
+            <div className={`teacher-canvas is-step-${teacherStep + 1}`}>
               <div className="teacher-axis teacher-axis-x" />
               <div className="teacher-axis teacher-axis-y" />
               <span className="teacher-axis-label teacher-axis-label-x">x</span>
               <span className="teacher-axis-label teacher-axis-label-y">y</span>
               <svg className="teacher-curve" viewBox="0 0 720 420" aria-hidden="true">
                 <path d="M38 318 C160 188 226 355 338 214 C424 104 486 92 590 145 C642 170 668 202 694 238" />
-                <circle cx="338" cy="214" r="6" />
-                <circle cx="590" cy="145" r="6" />
+                <circle className="teacher-point teacher-point-one" cx="338" cy="214" r="6" />
+                <circle className="teacher-point teacher-point-two" cx="590" cy="145" r="6" />
               </svg>
               <div className="teacher-equation teacher-equation-main">
                 <span aria-label="f of x equals x squared minus 4 x plus 3">
@@ -844,20 +1023,26 @@ export default function DemoPage({
                   derivative: f&apos;(x) = 2x - 4
                 </span>
               </div>
+              <div key={teacherStep} className="teacher-focus-card">
+                <span>{TEACHER_STEPS[teacherStep].eyebrow}</span>
+                <strong>{TEACHER_STEPS[teacherStep].label}</strong>
+                <p>{TEACHER_STEPS[teacherStep].note}</p>
+              </div>
             </div>
-            <div className="teacher-problem-row">
-              <div className="is-active">
-                <span>Step 1</span>
-                Notice the curve
-              </div>
-              <div>
-                <span>Step 2</span>
-                Locate the flat point
-              </div>
-              <div>
-                <span>Step 3</span>
-                Explain the derivative
-              </div>
+            <div className="teacher-problem-row" aria-label="Lesson steps">
+              {TEACHER_STEPS.map((step, index) => (
+                <button
+                  key={step.label}
+                  type="button"
+                  className={teacherStep === index ? "is-active" : ""}
+                  onClick={() => setTeacherStep(index)}
+                  aria-pressed={teacherStep === index}
+                >
+                  <span>0{index + 1}</span>
+                  <strong>{step.label}</strong>
+                  <i aria-hidden="true">→</i>
+                </button>
+              ))}
             </div>
           </section>
 
@@ -881,19 +1066,14 @@ export default function DemoPage({
               )}
             </div>
             <div className="teacher-avatar-copy">
-              <span>{voiceMode === "mirror" ? "Mirror voice" : isConnected ? "Live tutor" : "Tutor preview"}</span>
-              <h2>{voiceMode === "mirror" ? "Speak through Atlas" : "Ask Atlas"}</h2>
+              <span>{isConnected ? "Live tutor" : "Tutor preview"}</span>
+              <h2>Ask Atlas</h2>
               <p>
-                {voiceMode === "mirror"
-                  ? mirrorInputActive
-                    ? "Your microphone is driving the avatar directly."
-                    : "Call the avatar, then allow mic access to mirror your voice."
-                  : isConnected
-                    ? latestAtlasMessage?.text || "Ask about any step on the board."
-                    : "Start a short guided explanation, or ask a question about the graph."}
+                {isConnected
+                  ? latestAtlasMessage?.text || `Let’s work through step ${teacherStep + 1}: ${TEACHER_STEPS[teacherStep].label.toLowerCase()}.`
+                  : "Start a short guided explanation, or ask a question about the graph."}
               </p>
             </div>
-            {voiceModePicker("teacher-voice-picker")}
             <div className="teacher-avatar-strip">
               {FACE_PRESETS.map((preset) => (
                 <button
@@ -906,8 +1086,15 @@ export default function DemoPage({
                   <Image src={preset.src} alt="" width={96} height={96} unoptimized />
                 </button>
               ))}
-              <button type="button" onClick={() => fileInputRef.current?.click()} aria-label="Upload avatar">
+              <button
+                type="button"
+                className="teacher-upload-control"
+                onClick={() => (isConnected ? swapInputRef.current?.click() : fileInputRef.current?.click())}
+                aria-label="Upload avatar"
+                title="Upload avatar"
+              >
                 <UploadIcon />
+                <span>Upload</span>
               </button>
             </div>
             <div className="teacher-actions">
@@ -923,38 +1110,26 @@ export default function DemoPage({
                 <DownloadIcon /> Image
               </button>
             </div>
-            {voiceMode === "ai" ? (
-              <form
-                className="teacher-prompt"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (chatInput.trim() && !aiThinking) {
-                    sendChat(chatInput.trim());
-                    setChatInput("");
-                  }
-                }}
-              >
-                <input
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Ask about the board..."
-                  disabled={aiThinking}
-                />
-                <button type="submit" disabled={!chatInput.trim() || aiThinking}>
-                  Send
-                </button>
-              </form>
-            ) : (
-              <button
-                type="button"
-                onClick={toggleVoiceInput}
-                disabled={!isConnected}
-                className={`teacher-mirror-button ${mirrorInputActive ? "is-live" : ""}`}
-              >
-                <MicIcon muted={!mirrorInputActive} />
-                {mirrorInputActive ? "Mirror live" : isConnected ? "Start mirror" : "Call avatar first"}
+            <form
+              className="teacher-prompt"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (chatInput.trim() && isConnected && !aiThinking) {
+                  sendChat(chatInput.trim());
+                  setChatInput("");
+                }
+              }}
+            >
+              <input
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder={isConnected ? "Ask about the board..." : "Call Atlas to ask a question"}
+                disabled={!isConnected || aiThinking}
+              />
+              <button type="submit" disabled={!isConnected || !chatInput.trim() || aiThinking}>
+                Send
               </button>
-            )}
+            </form>
           </aside>
         </main>
       </div>
@@ -962,25 +1137,46 @@ export default function DemoPage({
   }
 
   if (uiMode === "meet") {
+    const meetMessages = localMessages.filter((message) => message.role !== "system");
+    const meetPanelTitle = meetPanel === "chat" ? "In-call messages" : meetPanel === "people" ? "People" : "Call settings";
     return (
-      <div className="meet-ui h-screen w-screen overflow-hidden bg-[#202124] text-white">
+      <div className="meet-ui mode-shell h-screen w-screen overflow-hidden bg-[#202124] text-white">
         {hiddenFaceInputs}
         {formatPicker("global-format-picker meet-global-format-picker")}
-        {voiceModePicker("meet-voice-picker")}
         <header className="meet-topbar">
-          <div>
-            <strong>{new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</strong>
-            <span>atlas-demo</span>
-            <span className="meet-info-dot">i</span>
+          <div className="meet-brand">
+            <span className="meet-brand-mark" aria-hidden="true"><CameraIcon /></span>
+            <div>
+              <strong>Atlas conversation</strong>
+              <span>{new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} · atlas-demo</span>
+            </div>
           </div>
-          <div className="meet-room-pill">
-            <span>{selectedFaceId.slice(0, 1).toUpperCase()}</span>
-            <strong>1</strong>
+          <div className="meet-header-actions">
+            <button
+              type="button"
+              className={meetPanel === "chat" ? "meet-header-icon is-active" : "meet-header-icon"}
+              onClick={() => setMeetPanel((panel) => panel === "chat" ? null : "chat")}
+              aria-label="Open chat"
+              aria-expanded={meetPanel === "chat"}
+            >
+              <ChatIcon />
+            </button>
+            <button
+              type="button"
+              className={meetPanel === "people" ? "meet-room-pill is-active" : "meet-room-pill"}
+              onClick={() => setMeetPanel((panel) => panel === "people" ? null : "people")}
+              aria-label="Show people"
+              aria-expanded={meetPanel === "people"}
+            >
+              <PeopleIcon />
+              <strong>{isConnected ? 2 : 1}</strong>
+            </button>
           </div>
         </header>
 
-        <main className="meet-stage">
-          <section className="meet-main-tile">
+        <main className={`meet-stage ${meetPanel ? "has-panel" : ""}`}>
+          <section className="meet-participant-grid" aria-label="Call participants">
+          <article className="meet-main-tile" aria-label="Atlas video tile">
             <div
               ref={session.videoRef}
               className="meet-video"
@@ -997,91 +1193,248 @@ export default function DemoPage({
                 )}
               </div>
             )}
+            <button
+              type="button"
+              className="meet-avatar-upload"
+              onClick={() => (isConnected ? swapInputRef.current?.click() : fileInputRef.current?.click())}
+              aria-label="Upload avatar"
+              title="Upload avatar"
+            >
+              <UploadIcon />
+              <span>Upload</span>
+            </button>
+            <div className="meet-call-state" aria-live="polite">
+              <span className={voiceInputActive ? "is-live" : ""} />
+              {session.status === "connecting" ? "Joining…" : isConnected ? "Connected" : "Preview"}
+            </div>
             <div className="meet-avatar-status">
-              <strong>Atlas Realtime</strong>
-              <span>{isConnected ? `${formatTime(sessionTime)} · connected` : "Waiting in lobby"}</span>
+              <strong>Atlas</strong>
+              <span>{isConnected ? `${formatTime(sessionTime)} · AI assistant` : "Ready to join"}</span>
             </div>
-            <div className="meet-floating-caption">
-              {voiceMode === "mirror"
-                ? mirrorInputActive
-                  ? "Mirror is live. Speak normally and Atlas will carry your voice."
-                  : "Start the call, then enable mirror mic."
-                : latestAtlasMessage?.text || "Ready when you are. Start the call to talk with Atlas."}
+            {meetCaptions && (
+              <div className="meet-floating-caption" aria-live="polite">
+                <strong>Atlas</strong>
+                <span>
+                  {scribe.partialTranscript
+                    ? `${scribe.partialTranscript}…`
+                    : aiThinking
+                      ? "Thinking…"
+                      : latestAtlasMessage?.text || (isConnected ? "Listening — say something." : "Join when you’re ready.")}
+                </span>
+              </div>
+            )}
+          </article>
+
+          <article className="meet-user-tile" aria-label="Your camera tile">
+            <div className="meet-user-avatar" aria-hidden="true">
+              <PeopleIcon />
             </div>
+            <div className="meet-user-camera-state">
+              <CameraIcon />
+              <span>Camera off</span>
+            </div>
+            <strong>You</strong>
+            <span className="meet-user-host">Host</span>
+          </article>
           </section>
 
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="meet-self-chip"
-            aria-label="Choose avatar"
-            title="Choose avatar"
-          >
-            {facePreview ? <Image src={facePreview} alt="" width={80} height={80} unoptimized /> : <UploadIcon />}
-          </button>
+          {meetPanel && (
+            <aside className="meet-side-panel" aria-label={meetPanelTitle}>
+              <header>
+                <div>
+                  <strong>{meetPanelTitle}</strong>
+                  <span>{meetPanel === "chat" ? "Messages are visible during this call" : meetPanel === "people" ? `${isConnected ? 2 : 1} in this call` : "Personalize your meeting"}</span>
+                </div>
+                <button type="button" onClick={() => setMeetPanel(null)} aria-label="Close panel"><CloseIcon /></button>
+              </header>
+
+              {meetPanel === "chat" && (
+                <div className="meet-chat-panel">
+                  <div className="meet-chat-messages">
+                    {meetMessages.length === 0 && (
+                      <div className="meet-panel-empty">
+                        <ChatIcon />
+                        <strong>No messages yet</strong>
+                        <span>Your conversation with Atlas appears here.</span>
+                      </div>
+                    )}
+                    {meetMessages.map((message) => (
+                      <div key={message.id} className={`meet-chat-message is-${message.role}`}>
+                        <strong>{message.role === "atlas" ? "Atlas" : "You"}</strong>
+                        <p>{message.text}</p>
+                      </div>
+                    ))}
+                    {aiThinking && <div className="meet-chat-thinking">Atlas is thinking…</div>}
+                  </div>
+                  <form
+                    className="meet-chat-compose"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      if (chatInput.trim() && isConnected && !aiThinking) {
+                        sendChat(chatInput.trim());
+                        setChatInput("");
+                      }
+                    }}
+                  >
+                    <input
+                      value={chatInput}
+                      onChange={(event) => setChatInput(event.target.value)}
+                      placeholder={isConnected ? "Message Atlas" : "Join to send a message"}
+                      disabled={!isConnected || aiThinking}
+                      aria-label="Message Atlas"
+                    />
+                    <button type="submit" disabled={!isConnected || !chatInput.trim() || aiThinking} aria-label="Send message">
+                      <span>↑</span>
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {meetPanel === "people" && (
+                <div className="meet-people-panel">
+                  <span className="meet-panel-label">In this call</span>
+                  {isConnected && (
+                    <div className="meet-person-row">
+                      <span className="meet-person-avatar">
+                        {facePreview ? <Image src={facePreview} alt="" width={44} height={44} unoptimized /> : "A"}
+                      </span>
+                      <span><strong>Atlas</strong><small>AI assistant</small></span>
+                      <span className="meet-person-live">Live</span>
+                    </div>
+                  )}
+                  <div className="meet-person-row">
+                    <span className="meet-person-avatar is-you">Y</span>
+                    <span><strong>You</strong><small>Meeting host</small></span>
+                    <MicIcon muted={!voiceInputActive} />
+                  </div>
+                </div>
+              )}
+
+              {meetPanel === "settings" && (
+                <div className="meet-settings-panel">
+                  <div className="meet-settings-group">
+                    <span className="meet-panel-label">Avatar</span>
+                    <div className="meet-avatar-options">
+                      {FACE_PRESETS.map((preset) => (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          onClick={() => void selectPresetFace(preset)}
+                          className={selectedFaceId === preset.id ? "is-selected" : ""}
+                          aria-label={`Use ${preset.label} avatar`}
+                          title={preset.label}
+                        >
+                          <Image src={preset.src} alt="" width={64} height={64} unoptimized />
+                        </button>
+                      ))}
+                      <button type="button" onClick={() => fileInputRef.current?.click()} aria-label="Upload avatar"><UploadIcon /></button>
+                    </div>
+                  </div>
+                  <button type="button" className="meet-settings-row" onClick={() => setVisibility((value) => value === "private" ? "public" : "private")}>
+                    <span>{visibility === "public" ? <GlobeIcon /> : <LockIcon />} Meeting visibility</span>
+                    <strong>{visibility === "public" ? "Public" : "Private"}</strong>
+                  </button>
+                  <button type="button" className="meet-settings-row" onClick={downloadCurrentFace} disabled={!facePreview}>
+                    <span><DownloadIcon /> Avatar image</span>
+                    <strong>Save</strong>
+                  </button>
+                  <div className="meet-ai-ready">
+                    <span className={configReady?.llm && configReady?.tts ? "is-ready" : ""} />
+                    {configReady?.llm && configReady?.tts ? "AI voice is ready" : "AI voice needs setup"}
+                  </div>
+                </div>
+              )}
+            </aside>
+          )}
         </main>
 
-        <div className="meet-bottom-bar">
-          <button type="button" aria-label="More call actions" title="More">
-            ...
-          </button>
-          <button
-            type="button"
-            onClick={toggleVoiceInput}
-            className={voiceInputActive ? "is-live" : ""}
-            aria-label={voiceInputActive ? "Mute microphone" : "Start microphone"}
-            title={voiceMode === "mirror" ? "Mirror microphone" : "AI microphone"}
-          >
-            <MicIcon muted={!voiceInputActive} />
-          </button>
-          <button
-            type="button"
-            aria-label="Avatar video"
-            title="Avatar video"
-          >
-            <VolumeIcon />
-          </button>
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            aria-label="Change avatar"
-            title="Change avatar"
-          >
-            {facePreview ? <Image src={facePreview} alt="" width={64} height={64} unoptimized /> : <UploadIcon />}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (!isConnected) {
-                if (hasFace) void connect();
-                return;
-              }
-              if (meetLeaveArmed) {
-                void disconnect();
-              } else {
-                armMeetLeave();
-              }
-            }}
-            disabled={!isConnected && !hasFace}
-            className={isConnected ? `is-danger ${meetLeaveArmed ? "is-armed" : ""}` : "is-call"}
-            aria-label={isConnected ? (meetLeaveArmed ? "Confirm leave call" : "Arm leave call") : "Join call"}
-            title={isConnected ? (meetLeaveArmed ? "Click again to leave" : "Click once more to leave") : "Join call"}
-          >
-            {isConnected ? <StopIcon /> : <PlayIcon />}
-          </button>
-          <button type="button" onClick={downloadCurrentFace} disabled={!facePreview} aria-label="Download image">
-            <DownloadIcon />
-          </button>
-        </div>
+        <footer className="meet-footer">
+          <div className="meet-footer-meta">
+            <strong>{new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</strong>
+            <span>atlas-demo</span>
+          </div>
 
-        <div className="meet-corner-controls">
-          <button type="button" aria-label="Open chat" title="Chat">
-            <CopyIcon />
-          </button>
-          <button type="button" onClick={() => setVisibility((value) => value === "private" ? "public" : "private")} aria-label="Toggle visibility" title="Visibility">
-            {visibility === "public" ? <GlobeIcon /> : <LockIcon />}
-          </button>
-        </div>
+          <nav className="meet-bottom-bar" aria-label="Call controls">
+            <button
+              type="button"
+              onClick={toggleVoiceInput}
+              disabled={!isConnected}
+              className={voiceInputActive ? "is-live" : ""}
+              aria-label={voiceInputActive ? "Mute microphone" : "Start microphone"}
+            >
+              <MicIcon muted={!voiceInputActive} /><span className="meet-tooltip">{voiceInputActive ? "Mute" : "Unmute"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => (isConnected ? swapInputRef.current?.click() : fileInputRef.current?.click())}
+              aria-label="Upload avatar"
+            >
+              <UploadIcon /><span className="meet-tooltip">Upload avatar</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMeetCaptions((visible) => !visible)}
+              className={meetCaptions ? "is-active" : ""}
+              aria-label={meetCaptions ? "Turn off captions" : "Turn on captions"}
+              aria-pressed={meetCaptions}
+            >
+              <CaptionsIcon /><span className="meet-tooltip">Captions</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMeetPanel((panel) => panel === "settings" ? null : "settings")}
+              className={meetPanel === "settings" ? "is-active" : ""}
+              aria-label="More call actions"
+              aria-expanded={meetPanel === "settings"}
+            >
+              <MoreIcon /><span className="meet-tooltip">More options</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!isConnected) {
+                  if (hasFace) void connect();
+                  return;
+                }
+                if (meetLeaveArmed) {
+                  void disconnect();
+                } else {
+                  armMeetLeave();
+                }
+              }}
+              disabled={!isConnected && !hasFace}
+              className={isConnected ? `is-danger ${meetLeaveArmed ? "is-armed" : ""}` : "is-call"}
+              aria-label={isConnected ? (meetLeaveArmed ? "Confirm leave call" : "Leave call") : "Join call"}
+            >
+              {isConnected ? <StopIcon /> : <PlayIcon />}
+              <span className="meet-tooltip">{isConnected ? (meetLeaveArmed ? "Click again to leave" : "Leave call") : "Join call"}</span>
+            </button>
+          </nav>
+
+          <div className="meet-corner-controls">
+            <button
+              type="button"
+              onClick={() => setMeetPanel((panel) => panel === "people" ? null : "people")}
+              className={meetPanel === "people" ? "is-active" : ""}
+              aria-label="Show people"
+              aria-expanded={meetPanel === "people"}
+            ><PeopleIcon /></button>
+            <button
+              type="button"
+              onClick={() => setMeetPanel((panel) => panel === "chat" ? null : "chat")}
+              className={meetPanel === "chat" ? "is-active" : ""}
+              aria-label="Open chat"
+              aria-expanded={meetPanel === "chat"}
+            ><ChatIcon /></button>
+            <button
+              type="button"
+              onClick={() => setVisibility((value) => value === "private" ? "public" : "private")}
+              className={visibility === "public" ? "is-active" : ""}
+              aria-label="Toggle meeting visibility"
+              title={visibility === "public" ? "Public meeting" : "Private meeting"}
+            >{visibility === "public" ? <GlobeIcon /> : <LockIcon />}</button>
+          </div>
+        </footer>
 
       </div>
     );
@@ -1418,8 +1771,8 @@ export default function DemoPage({
                   }
                 }}
                 className="tiktok-action-button tiktok-action-face overflow-hidden"
-                aria-label={isConnected ? "Swap face" : "Choose face"}
-                title={isConnected ? "Swap face" : "Choose face"}
+                aria-label="Upload avatar"
+                title="Upload avatar"
               >
                 {facePreview ? (
                   <Image src={facePreview} alt="" width={64} height={64} className="h-full w-full object-cover" unoptimized />
@@ -1427,8 +1780,8 @@ export default function DemoPage({
                   <UploadIcon />
                 )}
               </button>
-              <span className="tiktok-action-label">
-                {isConnected ? (swapping ? "Swap..." : "Swap") : "Face"}
+              <span className="tiktok-action-label tiktok-upload-label">
+                {swapping ? "Upload…" : "Upload"}
               </span>
 
               <button
@@ -1709,7 +2062,7 @@ export default function DemoPage({
                           : "TTS not configured"}
                     </p>
                     <p className="font-mono text-[9px] text-[#886600] mt-1 leading-relaxed">
-                      Add {!configReady.llm && <code className="text-[#aa8800]">LLM_API_KEY</code>}
+                      Add {!configReady.llm && <code className="text-[#aa8800]">OPENAI_API_KEY</code>}
                       {!configReady.llm && !configReady.tts && " and "}
                       {!configReady.tts && <code className="text-[#aa8800]">ELEVENLABS_API_KEY</code>}
                       {" "}to .env.local to enable AI responses

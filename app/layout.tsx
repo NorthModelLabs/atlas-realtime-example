@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Atlas Realtime — Example App",
   description: "Interactive realtime avatar demo powered by North Model Labs",
+  icons: {
+    icon: "/nml-mark.svg",
+    shortcut: "/nml-mark.svg",
+    apple: "/nml-mark.svg",
+  },
 };
 
 export default function RootLayout({

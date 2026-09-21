@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="North Model Labs">
+  <path fill="#08090a" d="M32 2 57 13v22c0 13.5-7.8 20.4-25 27C14.8 55.4 7 48.5 7 35V13L32 2Z"/>
+  <g fill="none" stroke="#fff" stroke-linecap="square" stroke-linejoin="miter">
+    <path stroke-width="7" d="M32 14v36M16.4 23l31.2 18M47.6 23 16.4 41"/>
+    <path stroke-width="4.5" d="m32 14-5 5m5-5 5 5m-5 31-5-5m5 5 5-5M16.4 23l7 .7m-7-.7 2.9 6.4M47.6 23l-7 .7m7-.7-2.9 6.4M16.4 41l7-.7m-7 .7 2.9-6.4M47.6 41l-7-.7m7 .7-2.9-6.4"/>
+  </g>
+  <path fill="#fff" d="m12 32 3-3 3 3-3 3-3-3Zm34 0 3-3 3 3-3 3-3-3Z"/>
+</svg>

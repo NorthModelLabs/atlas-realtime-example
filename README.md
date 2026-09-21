@@ -521,7 +521,8 @@ Browser  →  /api/session (Next.js)  →  /v1/realtime/session (Atlas API)
 |----------|----------|-------------|
 | `ATLAS_API_KEY` | Yes | Your Atlas API key (`ak_...`) |
 | `ATLAS_API_URL` | Yes | Atlas API base URL (`https://api.atlasv1.com`) |
-| `LLM_API_KEY` | No | OpenAI / Helicone key — enables AI chat |
+| `OPENAI_API_KEY` | No | Recommended OpenAI API key — enables AI chat |
+| `LLM_API_KEY` | No | Compatibility key for OpenAI-compatible providers such as Helicone |
 | `LLM_BASE_URL` | No | LLM endpoint (`https://api.openai.com/v1`) |
 | `LLM_MODEL` | No | Model name (`gpt-4o-mini`) |
 | `ELEVENLABS_API_KEY` | No | ElevenLabs key — enables TTS voice + STT speech input |
@@ -540,7 +541,7 @@ Without the optional keys, the app still runs — avatar connects and lip-syncs 
 
 ## Deploy
 
-Deploy to Vercel (or any Node.js host). Set `ATLAS_API_KEY` and `ATLAS_API_URL` as environment variables. Optionally add the LLM and ElevenLabs keys for AI chat.
+Deploy to Vercel (or any Node.js host). Set `ATLAS_API_KEY` and `ATLAS_API_URL` as environment variables. Add `OPENAI_API_KEY` for AI chat and the ElevenLabs variables for speech input/output. `LLM_API_KEY` remains supported for OpenAI-compatible providers.
 
 ## License
 
