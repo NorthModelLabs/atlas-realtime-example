@@ -1,9 +1,11 @@
+import { creationGuard } from "@/app/lib/demo-access";
 import { NextRequest, NextResponse } from "next/server";
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || "";
 const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || "";
 
 export async function POST(req: NextRequest) {
+  const denied = creationGuard(req); if (denied) return denied;
   if (!ELEVENLABS_API_KEY || !ELEVENLABS_VOICE_ID) {
     return NextResponse.json({ audio: null });
   }

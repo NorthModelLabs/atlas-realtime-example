@@ -1,3 +1,4 @@
+import { accessGuard } from "@/app/lib/demo-access";
 import { NextRequest, NextResponse } from "next/server";
 
 const ATLAS_API_URL = process.env.ATLAS_API_URL || "";
@@ -11,7 +12,7 @@ function validateSessionId(id: string): string | null {
 }
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   if (!ATLAS_API_KEY || !ATLAS_API_URL) {
@@ -22,6 +23,7 @@ export async function GET(
   }
 
   const { id } = await params;
+  const denied = accessGuard(req, "session", id); if (denied) return denied;
   const sessionId = validateSessionId(id);
   if (!sessionId) {
     return NextResponse.json(
@@ -58,6 +60,7 @@ export async function PATCH(
   }
 
   const { id } = await params;
+  const denied = accessGuard(req, "session", id); if (denied) return denied;
   const sessionId = validateSessionId(id);
   if (!sessionId) {
     return NextResponse.json(
@@ -100,7 +103,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   if (!ATLAS_API_KEY || !ATLAS_API_URL) {
@@ -111,6 +114,7 @@ export async function DELETE(
   }
 
   const { id } = await params;
+  const denied = accessGuard(req, "session", id); if (denied) return denied;
   const sessionId = validateSessionId(id);
   if (!sessionId) {
     return NextResponse.json(

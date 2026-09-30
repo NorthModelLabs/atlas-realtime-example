@@ -1,3 +1,4 @@
+import { creationGuard, grant } from "@/app/lib/demo-access";
 import { NextRequest, NextResponse } from "next/server";
 
 const ATLAS_API_URL = process.env.ATLAS_API_URL || "";
@@ -17,6 +18,7 @@ function atlasHeaders(contentType?: string) {
 }
 
 export async function POST(req: NextRequest) {
+  const denied = creationGuard(req); if (denied) return denied;
   try {
     if (!ATLAS_API_KEY || !ATLAS_API_URL) {
       return NextResponse.json(
@@ -123,7 +125,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(data, { status: upstreamResp.status });
+    const response = NextResponse.json(data, { status: upstreamResp.status });
+    return upstreamResp.ok && typeof data.session_id === "string" ? grant(response, "session", data.session_id) : response;
   } catch (err) {
     console.error("[POST /api/session] UNHANDLED:", err);
     return NextResponse.json(

@@ -709,9 +709,20 @@ export default function DemoPage({
     window.setTimeout(() => setMeetLeaveArmed(false), 2200);
   };
 
-  const viewerUrl = session.sessionId
-    ? `${typeof window !== "undefined" ? window.location.origin : ""}/watch/${session.sessionId}`
-    : "";
+  const [viewerLink, setViewerLink] = useState({ sessionId: "", path: "" });
+  useEffect(() => {
+    const id = session.sessionId;
+    if (!id) return;
+    let cancelled = false;
+    fetch(`/api/session/${id}/share`).then(async response => {
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!cancelled && typeof data.path === "string") setViewerLink({ sessionId: id, path: data.path });
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [session.sessionId]);
+  const viewerUrl = viewerLink.sessionId === session.sessionId && viewerLink.path
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}${viewerLink.path}` : "";
 
   const copyShareLink = useCallback(async () => {
     if (!viewerUrl) return;

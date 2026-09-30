@@ -1,3 +1,5 @@
+import { valid } from "@/app/lib/demo-capability.mjs";
+import { creationGuard, accessGuard } from "@/app/lib/demo-access";
 import { NextResponse } from "next/server";
 
 const ATLAS_API_URL = process.env.ATLAS_API_URL || "";
@@ -6,7 +8,7 @@ const ATLAS_API_KEY = process.env.ATLAS_API_KEY || "";
 const SESSION_ID_RE = /^ses_[a-f0-9]{20}$/;
 
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   if (!ATLAS_API_KEY || !ATLAS_API_URL) {
@@ -17,6 +19,10 @@ export async function POST(
   }
 
   const { id } = await params;
+  const originDenied = creationGuard(req); if (originDenied) return originDenied;
+  if (!valid(req.headers.get("X-Demo-Viewer-Capability"), "viewer", id, process.env.DEMO_ACCESS_SECRET || "")) {
+    const denied = accessGuard(req, "session", id); if (denied) return denied;
+  }
   if (!SESSION_ID_RE.test(id)) {
     return NextResponse.json(
       { error: "invalid_session_id", message: "Session ID format is invalid." },
