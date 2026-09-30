@@ -445,6 +445,19 @@ export default function DemoPage({
     return () => clearInterval(interval);
   }, [session.status]);
 
+  // Format changes replace the video container while the LiveKit track stays live.
+  useEffect(() => {
+    const container = session.videoRef.current;
+    if (!container || session.status !== "connected" || !session.room) return;
+    for (const participant of session.room.remoteParticipants.values()) {
+      if (participant.identity !== "avatar_worker") continue;
+      for (const publication of participant.videoTrackPublications.values()) {
+        const element = publication.track?.attachedElements.find(el => el.dataset.atlasLkVideo === "true");
+        if (element && element.parentElement !== container) container.appendChild(element);
+      }
+    }
+  }, [uiMode, session.status, session.room, session.videoRef]);
+
   const isConnected = session.status === "connected";
   const isDisconnected = session.status === "idle" || session.status === "disconnected";
 
@@ -657,8 +670,9 @@ export default function DemoPage({
     stopTtsPlayback();
 
     try {
-      await trackReady;
+      // Web Audio must run before LiveKit can finish publishing its audio track.
       if (audioCtx.state === "suspended") await audioCtx.resume();
+      await trackReady;
 
       const binary = atob(base64Audio);
       const bytes = new Uint8Array(binary.length);
