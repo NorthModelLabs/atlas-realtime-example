@@ -1,0 +1,32 @@
+[
+  {
+    "model": "gpt-realtime-2.1",
+    "trial": 1,
+    "vad_silence_ms": 500,
+    "speech_stop_event_after_input_s": 0.665,
+    "speech_end_to_first_audio_s": 1.506,
+    "status": "completed",
+    "transcript": "Hello from Atlas\u2014it\u2019s lovely to meet you.",
+    "complete_after_speech_s": 1.808
+  },
+  {
+    "model": "gpt-realtime-2.1",
+    "trial": 2,
+    "vad_silence_ms": 500,
+    "speech_stop_event_after_input_s": 0.733,
+    "speech_end_to_first_audio_s": 1.303,
+    "status": "completed",
+    "transcript": "Hello from Atlas\u2014warm greetings from my side to yours.",
+    "complete_after_speech_s": 2.149
+  },
+  {
+    "model": "gpt-realtime-2.1",
+    "trial": 3,
+    "vad_silence_ms": 500,
+    "speech_stop_event_after_input_s": 0.664,
+    "speech_end_to_first_audio_s": 1.385,
+    "status": "completed",
+    "transcript": "Hello from Atlas, sending a warm, bright greeting your way!",
+    "complete_after_speech_s": 2.089
+  }
+]

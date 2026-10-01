@@ -1,0 +1,68 @@
+[
+  {
+    "model": "gpt-realtime-2.1",
+    "trial": 1,
+    "mode": "paced PCM input, explicit commit; excludes VAD",
+    "connection_s": 1.988,
+    "status": "completed",
+    "first_audio_s": 0.597,
+    "complete_s": 1.098,
+    "transcript": "Hello from Atlas\u2014hope you\u2019re having a great day!",
+    "audio_bytes": 160800
+  },
+  {
+    "model": "gpt-realtime-2.1",
+    "trial": 2,
+    "mode": "paced PCM input, explicit commit; excludes VAD",
+    "connection_s": 1.391,
+    "status": "completed",
+    "first_audio_s": 0.69,
+    "complete_s": 1.297,
+    "transcript": "Hello from Atlas\u2014sending a bright, cheerful wave your way!",
+    "audio_bytes": 208800
+  },
+  {
+    "model": "gpt-realtime-2.1",
+    "trial": 3,
+    "mode": "paced PCM input, explicit commit; excludes VAD",
+    "connection_s": 1.415,
+    "status": "completed",
+    "first_audio_s": 0.944,
+    "complete_s": 1.747,
+    "transcript": "Hello from Atlas\u2014sending you a bright, friendly wave wherever you are!",
+    "audio_bytes": 268800
+  },
+  {
+    "model": "gpt-realtime",
+    "trial": 1,
+    "mode": "paced PCM input, explicit commit; excludes VAD",
+    "connection_s": 0.396,
+    "status": "completed",
+    "first_audio_s": 0.348,
+    "complete_s": 0.713,
+    "transcript": "Hello from Atlas!",
+    "audio_bytes": 103200
+  },
+  {
+    "model": "gpt-realtime",
+    "trial": 2,
+    "mode": "paced PCM input, explicit commit; excludes VAD",
+    "connection_s": 0.407,
+    "status": "completed",
+    "first_audio_s": 0.784,
+    "complete_s": 1.207,
+    "transcript": "Hello from Atlas!",
+    "audio_bytes": 112800
+  },
+  {
+    "model": "gpt-realtime",
+    "trial": 3,
+    "mode": "paced PCM input, explicit commit; excludes VAD",
+    "connection_s": 0.322,
+    "status": "completed",
+    "first_audio_s": 0.61,
+    "complete_s": 1.019,
+    "transcript": "Hello from Atlas!",
+    "audio_bytes": 122400
+  }
+]

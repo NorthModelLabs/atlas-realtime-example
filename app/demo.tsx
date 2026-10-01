@@ -5,7 +5,7 @@ import { useState, useRef, useCallback, useEffect, type CSSProperties, type Drag
 import { flushSync } from "react-dom";
 import { useAtlasSession } from "@northmodellabs/atlas-react";
 import { LocalAudioTrack, Track } from "livekit-client";
-import { useScribe, CommitStrategy } from "@elevenlabs/react";
+import { useRealtimeVoice } from "@/app/lib/use-realtime-voice";
 
 const DEFAULT_FACE_ID = "enterprise-b1450303";
 const DEFAULT_FACE_URL = "/faces/enterprise-b1450303.jpg";
@@ -29,11 +29,6 @@ type ChatMsg = {
 export type UiMode = "studio" | "apple" | "tiktok" | "teacher" | "meet" | "mirror";
 export type VoiceMode = "ai" | "mirror";
 
-interface ChatHistory {
-  role: "user" | "assistant";
-  content: string;
-}
-
 const UI_MODES = new Set<UiMode>(["apple", "tiktok", "teacher", "meet"]);
 const UI_FORMATS: { id: UiMode; label: string; urlLabel: string }[] = [
   { id: "apple", label: "Apple", urlLabel: "?ui=apple" },
@@ -42,7 +37,7 @@ const UI_FORMATS: { id: UiMode; label: string; urlLabel: string }[] = [
   { id: "meet", label: "Meet", urlLabel: "?ui=meet" },
 ];
 const VOICE_MODES: { id: VoiceMode; label: string; description: string }[] = [
-  { id: "ai", label: "AI voice", description: "LLM + ElevenLabs speak through Atlas" },
+  { id: "ai", label: "AI voice", description: "OpenAI Realtime speaks through Atlas" },
   { id: "mirror", label: "Mirror", description: "Your microphone drives the avatar directly" },
 ];
 const TEACHER_STEPS = [
@@ -355,7 +350,6 @@ export default function DemoPage({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const swapInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const chatHistoryRef = useRef<ChatHistory[]>([]);
   const faceSelectionVersionRef = useRef(0);
 
   useEffect(() => {
@@ -583,7 +577,6 @@ export default function DemoPage({
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const audioDestRef = useRef<MediaStreamAudioDestinationNode | null>(null);
-  const ttsSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const ttsTrackReadyRef = useRef<Promise<void> | null>(null);
 
   const stopMirrorInput = useCallback(() => {
@@ -624,17 +617,6 @@ export default function DemoPage({
     });
 
     return () => {
-      const source = ttsSourceRef.current;
-      ttsSourceRef.current = null;
-      if (source) {
-        source.onended = null;
-        try {
-          source.stop();
-        } catch {
-          /* source already stopped */
-        }
-        source.disconnect();
-      }
       ttsTrackReadyRef.current = null;
       try {
         room.localParticipant.unpublishTrack(livekitTrack);
@@ -648,54 +630,21 @@ export default function DemoPage({
     };
   }, [session.status, session.room]);
 
-  const stopTtsPlayback = useCallback(() => {
-    const source = ttsSourceRef.current;
-    ttsSourceRef.current = null;
-    if (!source) return;
-    source.onended = null;
-    try {
-      source.stop();
-    } catch {
-      /* source already stopped */
-    }
-    source.disconnect();
-  }, []);
-
-  const playTtsResponse = useCallback(async (base64Audio: string) => {
-    const audioCtx = audioCtxRef.current;
+  const voiceOutput = useCallback(async () => {
+    const context = audioCtxRef.current;
     const destination = audioDestRef.current;
-    const trackReady = ttsTrackReadyRef.current;
-    if (!audioCtx || !destination || !trackReady) return;
-
-    stopTtsPlayback();
-
-    try {
-      // Web Audio must run before LiveKit can finish publishing its audio track.
-      if (audioCtx.state === "suspended") await audioCtx.resume();
-      await trackReady;
-
-      const binary = atob(base64Audio);
-      const bytes = new Uint8Array(binary.length);
-      for (let index = 0; index < binary.length; index += 1) {
-        bytes[index] = binary.charCodeAt(index);
-      }
-
-      const audioBuffer = await audioCtx.decodeAudioData(bytes.buffer.slice(0));
-      if (audioCtxRef.current !== audioCtx || audioDestRef.current !== destination) return;
-
-      const source = audioCtx.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(destination);
-      ttsSourceRef.current = source;
-      source.onended = () => {
-        source.disconnect();
-        if (ttsSourceRef.current === source) ttsSourceRef.current = null;
-      };
-      source.start();
-    } catch (err) {
-      console.warn("TTS playback failed:", err);
-    }
-  }, [stopTtsPlayback]);
+    const ready = ttsTrackReadyRef.current;
+    if (!context || !destination || !ready) throw new Error("Avatar audio is not ready");
+    await context.resume(); await ready;
+    return { context, destination };
+  }, []);
+  const voice = useRealtimeVoice({
+    sessionId: session.sessionId, output: voiceOutput,
+    user: text => addMsg("user", text), assistant: text => addMsg("atlas", text),
+    thinking: setAiThinking, error: text => addMsg("system", text),
+  });
+  const stopListening = voice.stop;
+  const startListening = voice.start;
 
   const hasFace = !!faceFile || faceUrl.trim().startsWith("https://");
   const aiEnabled = voiceMode === "ai" && configReady?.llm === true;
@@ -703,7 +652,6 @@ export default function DemoPage({
     if (!hasFace) return;
     setLocalMessages([]);
     setSessionTime(0);
-    chatHistoryRef.current = [];
     await session.connect(faceFile, faceUrl.trim() || null);
   };
 
@@ -711,11 +659,9 @@ export default function DemoPage({
     setMeetLeaveArmed(false);
     stopMirrorInput();
     stopListening();
-    stopTtsPlayback();
     await session.disconnect();
     addMsg("system", "Session ended");
     setSessionTime(0);
-    chatHistoryRef.current = [];
   };
 
   const armMeetLeave = () => {
@@ -755,44 +701,6 @@ export default function DemoPage({
     sendChatRef.current?.(text);
   }, []);
 
-  const scribe = useScribe({
-    modelId: "scribe_v2_realtime",
-    commitStrategy: CommitStrategy.VAD,
-    vadSilenceThresholdSecs: 0.8,
-    languageCode: "en",
-    onCommittedTranscript: (data) => {
-      if (voiceMode !== "ai") return;
-      if (data.text.trim()) sendChatRef.current?.(data.text.trim());
-    },
-  });
-
-  const scribeRef = useRef(scribe);
-  scribeRef.current = scribe;
-
-  const startListening = useCallback(async () => {
-    const s = scribeRef.current;
-    if (s.isConnected || !aiEnabled || voiceMode !== "ai") return;
-    try {
-      const res = await fetch("/api/scribe-token");
-      const { token } = await res.json();
-      if (!token) return;
-      await s.connect({
-        token,
-        microphone: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-      });
-    } catch (err) {
-      console.warn("Failed to start ElevenLabs STT:", err);
-    }
-  }, [aiEnabled, voiceMode]);
-
-  const stopListening = useCallback(() => {
-    scribeRef.current.disconnect();
-  }, []);
-
   useEffect(() => {
     if (session.status !== "connected") {
       stopMirrorInput();
@@ -801,12 +709,11 @@ export default function DemoPage({
 
     if (voiceMode === "mirror") {
       stopListening();
-      stopTtsPlayback();
       void startMirrorInput();
     } else {
       stopMirrorInput();
     }
-  }, [session.status, voiceMode, startMirrorInput, stopMirrorInput, stopListening, stopTtsPlayback]);
+  }, [session.status, voiceMode, startMirrorInput, stopMirrorInput, stopListening]);
 
   const toggleVoiceInput = useCallback(() => {
     if (voiceMode === "mirror") {
@@ -817,59 +724,15 @@ export default function DemoPage({
       }
       return;
     }
-    if (scribeRef.current.isConnected) {
-      stopListening();
-    } else {
-      void startListening();
-    }
-  }, [mirrorInputActive, startListening, startMirrorInput, stopListening, stopMirrorInput, voiceMode]);
+    voice.toggleMicrophone();
+  }, [mirrorInputActive, startMirrorInput, stopMirrorInput, voiceMode, voice.toggleMicrophone]);
 
   sendChatRef.current = (text: string) => {
     if (!text.trim()) return;
     addMsg("user", text);
-
-    if (voiceMode === "mirror") {
-      return;
-    }
-
-    if (aiEnabled) {
-      setAiThinking(true);
-      chatHistoryRef.current.push({ role: "user", content: text });
-
-      fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, history: chatHistoryRef.current.slice(0, -1) }),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("AI request failed");
-          return res.json();
-        })
-        .then((data) => {
-          setAiThinking(false);
-          if (data.text) {
-            addMsg("atlas", data.text);
-            chatHistoryRef.current.push({ role: "assistant", content: data.text });
-
-            fetch("/api/tts", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ text: data.text }),
-            })
-              .then((r) => (r.ok ? r.json() : null))
-              .then((tts) => {
-                if (tts?.audio) void playTtsResponse(tts.audio);
-              })
-              .catch(() => {});
-          }
-        })
-        .catch(() => {
-          addMsg("system", "Failed to reach AI");
-          setAiThinking(false);
-        });
-    } else {
-      session.sendChat(text);
-    }
+    if (voiceMode === "mirror") return;
+    if (aiEnabled) voice.sendText(text);
+    else session.sendChat(text);
   };
 
   // Auto-start listening when connected + AI enabled
@@ -882,12 +745,12 @@ export default function DemoPage({
 
   const isTiktokUi = uiMode === "tiktok";
   const overlayMessages = localMessages.filter((msg) => msg.role !== "system").slice(-2);
-  const tiktokOverlayMessages = scribe.partialTranscript
+  const tiktokOverlayMessages = voice.partialTranscript
     ? overlayMessages.filter((msg) => msg.role === "atlas").slice(-1)
     : overlayMessages;
   const showTiktokDialogue = isConnected || session.status === "connecting";
   const latestAtlasMessage = [...localMessages].reverse().find((msg) => msg.role === "atlas");
-  const voiceInputActive = voiceMode === "mirror" ? mirrorInputActive : scribe.isConnected;
+  const voiceInputActive = voiceMode === "mirror" ? mirrorInputActive : voice.isListening;
   const activeFormatMode: UiMode = uiMode;
   const activeFormatIndex = Math.max(0, UI_FORMATS.findIndex((format) => format.id === activeFormatMode));
   const formatPicker = (className = "") => (
@@ -937,8 +800,8 @@ export default function DemoPage({
           ? "Listening"
           : "Connected"
         : "Ready";
-    const appleCaption = scribe.partialTranscript
-      ? `${scribe.partialTranscript}…`
+    const appleCaption = voice.partialTranscript
+      ? `${voice.partialTranscript}…`
       : aiThinking
         ? "Thinking…"
         : latestAtlasMessage?.text || (isConnected ? "Say something." : "Ready when you are.");
@@ -1333,8 +1196,8 @@ export default function DemoPage({
               <div className="meet-floating-caption" aria-live="polite">
                 <strong>Atlas</strong>
                 <span>
-                  {scribe.partialTranscript
-                    ? `${scribe.partialTranscript}…`
+                  {voice.partialTranscript
+                    ? `${voice.partialTranscript}…`
                     : aiThinking
                       ? "Thinking…"
                       : latestAtlasMessage?.text || (isConnected ? "Listening — say something." : "Join when you’re ready.")}
@@ -1801,13 +1664,13 @@ export default function DemoPage({
 
             {showTiktokDialogue && (
             <div className="tiktok-dialogue pointer-events-none absolute inset-x-5 z-20 flex flex-col items-start gap-2">
-              {tiktokOverlayMessages.length === 0 && !scribe.partialTranscript && !aiThinking && (
+              {tiktokOverlayMessages.length === 0 && !voice.partialTranscript && !aiThinking && (
                 <div className="tiktok-caption tiktok-status-caption">
                   {voiceMode === "mirror"
                     ? mirrorInputActive
                       ? "Mirror live"
                       : "Tap mic to mirror"
-                    : aiEnabled && scribe.isConnected
+                    : aiEnabled && voice.isListening
                       ? "Listening..."
                       : "Type or speak to start"}
                 </div>
@@ -1829,12 +1692,12 @@ export default function DemoPage({
                   {msg.text}
                 </div>
               ))}
-              {scribe.partialTranscript && (
+              {voice.partialTranscript && (
                 <div className="tiktok-caption tiktok-message tiktok-message-partial">
                   <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.16em] text-white/60">
                     You
                   </span>
-                  {scribe.partialTranscript}...
+                  {voice.partialTranscript}...
                 </div>
               )}
               {aiThinking && (
@@ -2054,7 +1917,7 @@ export default function DemoPage({
                     ? "Mirror is live — speak normally..."
                     : "Enable the mirror mic to speak through Atlas..."
                   : aiEnabled
-                  ? scribe.isConnected
+                  ? voice.isListening
                     ? "Listening — speak or type below..."
                     : "Type a message to start..."
                   : "Start speaking..."}
@@ -2087,13 +1950,13 @@ export default function DemoPage({
                 )}
               </div>
             ))}
-            {scribe.partialTranscript && (
+            {voice.partialTranscript && (
               <div className="flex flex-col items-end">
                 <span className="font-mono text-[9px] tracking-[0.15em] text-[#888] uppercase mb-1">
                   You
                 </span>
                 <div className="px-3 py-2 bg-[#151515] border border-[#333] text-[#666] text-[12px] italic">
-                  {scribe.partialTranscript}...
+                  {voice.partialTranscript}...
                 </div>
               </div>
             )}
@@ -2174,16 +2037,13 @@ export default function DemoPage({
                   <div>
                     <p className="font-mono text-[10px] text-[#ffaa00] tracking-[0.1em]">
                       {!configReady.llm && !configReady.tts
-                        ? "LLM + TTS not configured"
+                        ? "Voice is unavailable"
                         : !configReady.llm
-                          ? "LLM not configured"
-                          : "TTS not configured"}
+                          ? "Voice is unavailable"
+                          : "Voice is unavailable"}
                     </p>
                     <p className="font-mono text-[9px] text-[#886600] mt-1 leading-relaxed">
-                      Add {!configReady.llm && <code className="text-[#aa8800]">OPENAI_API_KEY</code>}
-                      {!configReady.llm && !configReady.tts && " and "}
-                      {!configReady.tts && <code className="text-[#aa8800]">ELEVENLABS_API_KEY</code>}
-                      {" "}to .env.local to enable AI responses
+                      Voice is temporarily unavailable. Please try again later.
                     </p>
                   </div>
                 </div>
@@ -2191,7 +2051,7 @@ export default function DemoPage({
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-accent" />
                   <p className="font-mono text-[10px] text-accent tracking-[0.1em]">
-                    LLM + TTS enabled
+                    OpenAI Realtime voice enabled
                   </p>
                 </div>
               )}

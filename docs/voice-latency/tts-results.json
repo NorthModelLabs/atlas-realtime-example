@@ -1,0 +1,53 @@
+{
+  "text": "Hello from Atlas! I can help you explore real-time avatars and answer your questions.",
+  "trials": [
+    {
+      "provider": "eleven-current",
+      "trial": 1,
+      "status": 200,
+      "first_960_bytes_s": 0.36,
+      "complete_s": 0.385,
+      "bytes": 80710
+    },
+    {
+      "provider": "openai-stream",
+      "trial": 1,
+      "status": 200,
+      "first_960_bytes_s": 1.674,
+      "complete_s": 2.611,
+      "bytes": 307200
+    },
+    {
+      "provider": "openai-stream",
+      "trial": 2,
+      "status": 200,
+      "first_960_bytes_s": 1.666,
+      "complete_s": 2.732,
+      "bytes": 348000
+    },
+    {
+      "provider": "eleven-current",
+      "trial": 2,
+      "status": 200,
+      "first_960_bytes_s": 0.258,
+      "complete_s": 0.282,
+      "bytes": 84889
+    },
+    {
+      "provider": "eleven-current",
+      "trial": 3,
+      "status": 200,
+      "first_960_bytes_s": 0.249,
+      "complete_s": 0.257,
+      "bytes": 80710
+    },
+    {
+      "provider": "openai-stream",
+      "trial": 3,
+      "status": 200,
+      "first_960_bytes_s": 0.547,
+      "complete_s": 1.31,
+      "bytes": 357600
+    }
+  ]
+}
