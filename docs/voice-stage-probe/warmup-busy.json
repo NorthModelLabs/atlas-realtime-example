@@ -1,0 +1,42 @@
+[
+  {
+    "worker": "avatar-pasteback-main-security-2",
+    "active_workers": 0,
+    "busy": false,
+    "warmup_enabled": true,
+    "warmup_age_ms": 468979894,
+    "warmup_has_error": false
+  },
+  {
+    "worker": "avatar-pasteback-main-security-3",
+    "active_workers": 0,
+    "busy": false,
+    "warmup_enabled": true,
+    "warmup_age_ms": null,
+    "warmup_has_error": true
+  },
+  {
+    "worker": "avatar-pasteback-main-security-4",
+    "active_workers": 0,
+    "busy": false,
+    "warmup_enabled": true,
+    "warmup_age_ms": null,
+    "warmup_has_error": true
+  },
+  {
+    "worker": "avatar-pasteback-main-security-5",
+    "active_workers": 0,
+    "busy": false,
+    "warmup_enabled": true,
+    "warmup_age_ms": null,
+    "warmup_has_error": true
+  },
+  {
+    "worker": "avatar-pasteback-main-security-9",
+    "active_workers": 0,
+    "busy": false,
+    "warmup_enabled": true,
+    "warmup_age_ms": null,
+    "warmup_has_error": true
+  }
+]
