@@ -99,3 +99,30 @@ The model is simulated, not calibrated to production throughput: its observed re
 Any next transport prototype needs authenticated driver-to-agent forwarding (not direct impersonation of the GPU receiver's expected agent), bounded buffering across the whole path, ordered segment completion, interruption/flush semantics, and prevention of simultaneous media-track and PCM forwarding. A production CPU deployment image read found multiple agent deployments; the relevant live session routing/source baseline must be verified before an implementation. No agent, browser transport, model, flag, deployment, or account change was made by these experiments.
 
 At 05:18:27 UTC, public demo, dashboard, and API health returned 200. All ten main-security GPU workers were ready on the original three image hashes; dashboard configuration and public demo alias were unchanged (`ahead-production-health.json`). The target remains open, and the user's resolved visual concern is excluded from further changes.
+
+
+### CPU agent source check and prototype boundary
+
+Read-only AST metadata checks on one ready replica each of `agent-worker` and `agent-worker-launch-25` found `_run_passthrough` and no `register_byte_stream_handler` calls. This is evidence about those two files, not proof that no imported module can register a handler. Their source hashes and image pins are recorded in `ahead-agent-metadata.json`.
+
+The launch-25 source hash `de7a5c2528fc42c2295d8f9701cda1962cfa36e60c87f2bec5268b06f6fb633f` exactly matches local Git revision `b677d6f3c5c05658752f8f65c213314a0ed165f7`, path `apps/realtime-agent/agent_worker.py`. The default agent's source hash `e3ef40adac282b7331d73c42b4b8c49dcd272f7d3780e488ac8bb75144137175` did not match the nine available Git file revisions or nine isolated local worktree copies checked. The dirty root source matches neither and must not be used as a deployment baseline. No production source was exported and no files in the shared root checkout were changed.
+
+The matched local source forwards subscribed media tracks to the GPU via `DataStreamAudioOutput`. It deliberately avoids flushing on ordinary track end because a playback-end marker can make the GPU participant leave. A PCM prototype must not treat every provider response as a room-ending stream. It must preserve the legitimate agent sender, use an explicit owned driver identity, reject viewers and concurrent forwarding sources, support cancellation without stale queued audio, and limit buffered audio across sender/receiver boundaries. Begin as an isolated opt-in transport with the current media path as the unchanged default. Do not select or replace a production agent pool until owned-session routing and that pool's complete source baseline are established.
+
+
+### Speech-only onset comparison
+
+CPU build `0dcd20b9-d9ed-4b51-aa9b-e89048a82096` completed SUCCESS at 05:25:58 UTC. The same unchanged runner and synthetic model were tested without the earlier 800-ms leading silence; input starts immediately after the four completed warmups and render-queue drain. Four counterbalanced cases produced:
+
+| Input | First returned speech | Largest intra-speech gap | Speech preservation |
+| --- | --- | --- | --- |
+| Paced 40 ms, before | 1661.3 ms | 372.6 ms | All 100 frames, ordered |
+| Ahead 100 ms, first | 545.0 ms | 368.4 ms | All 100 frames, ordered |
+| Ahead 100 ms, second | 531.7 ms | 452.9 ms | All 100 frames, ordered |
+| Paced 40 ms, after | 1657.6 ms | 372.5 ms | All 100 frames, ordered |
+
+This is approximately 1.11–1.13 seconds earlier onset in a speech-only fixture. Input queues remained at or below 1.28 seconds; no speech samples were missing, duplicated or reordered. Faster delivery still blocked at the runner and did not eliminate synthetic playback gaps. The browser/provider/VAD/network and real model are excluded. In particular, this starts speech immediately after warmup: it does not demonstrate behavior when a long-lived avatar is already producing idle animation between conversational turns. That idle-to-speech case, bounded transport buffering, interruption and a real-model rehearsal are required before any live experiment. Do not add the provider-only numbers to this simulated result and label the sum measured end-to-end latency.
+
+Reproduction: substitute `runner-ahead-onset-probe.py` for `/probe/runner_probe.py` in the same isolated CPU configuration. Numerical results: `runner-ahead-onset.json`. The wrapper, immutable image and public face remain identical. These results justify investigating an isolated speech-only PCM transport; they do not approve promotion or a model/configuration replacement.
+
+Final 05:26:43 UTC verification again found demo, dashboard and API health HTTP 200, ten ready main-security GPU workers on the original image hashes, and unchanged dashboard snapshot/public demo alias. Both new CPU builds are terminal SUCCESS. No staging GPU was allocated, no user session was started, and no production configuration, model or customer data was changed in these experiments.
