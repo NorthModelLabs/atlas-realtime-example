@@ -1,5 +1,7 @@
 # Runtime/source review
 
+**Superseded by [INCIDENT.md](INCIDENT.md):** PR #1 merged, but the disabled Git-deployment setting did not prevent a temporary legacy rollout. The legacy deployment was restored and its Git link disconnected. The old apply procedure is retired; do not execute it.
+
 Reviewed PR base `8f0436c` → head `f35b6e1`, plus two coordinated local cleanups: remove the duplicated teacher-mode error alert; allow CommonJS imports specifically in archived `docs/**/*.cjs` scripts so lint checks retained evidence without altering its contents. These cleanups are not committed or public at this review point. `review-receipt.json` binds validation to the runtime/test/config file bytes, so a documentation-only commit can preserve that receipt while any later runtime change invalidates it.
 
 ## Review findings
