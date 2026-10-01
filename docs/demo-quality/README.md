@@ -36,3 +36,5 @@ The screenshot-heavy observation reported 24 dropped frames in 27 seconds; a sep
 Local origin/ownership boundary tests passed using synthetic credentials and zero real provider calls. Six capability/caption tests, TypeScript, focused lint and candidate production build passed. Test sessions were deleted individually; no user session was stopped.
 
 Still open: reproduce intermittent cut-off and longer post-speech mouth motion under representative real microphone/network conditions; distinguish unintended VAD interruption, returned playback, GPU pacing and natural idle animation. No GPU tuning, model replacement, account migration, existing-key change, or UI freeze workaround was deployed.
+
+Public acceptance after promotion also passed: a fresh owned session displayed the spoken math question and correct English answer. All ten main-security pods remained ready on the original digests. Public and preview test sessions were cleaned up individually. Runtime source is unchanged by these final documentation commits.
