@@ -1,0 +1,27 @@
+{
+  "fps_equiv": {
+    "samples": 63,
+    "median": 25.765,
+    "min": 25.217,
+    "max": 26.23
+  },
+  "inference_ms": {
+    "samples": 126,
+    "median": 1242.0,
+    "min": 1220,
+    "max": 1269
+  },
+  "render_q": {
+    "samples": 190,
+    "median": 9.0,
+    "min": 0,
+    "max": 11
+  },
+  "queue_delay_ms": {
+    "samples": 127,
+    "median": 1144,
+    "min": 0,
+    "max": 1219
+  },
+  "error_lines": 0
+}

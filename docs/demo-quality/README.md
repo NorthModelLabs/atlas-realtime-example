@@ -22,3 +22,17 @@ A public test recorded successful spoken input and audible output, plus browser 
 Six focused capability/caption tests pass, including delayed input completion and stale interrupted output. TypeScript and the initial production build pass. Protected preview and final candidate acceptance remain required before promotion. Existing public deployment is the rollback target dpl_iLh3eTfxsdSYdr1NEJdhDCYNMqhw.
 
 Parent-site repository repair is separate: a clean clone now lives at Desktop/nmlabs.ai; the complete original directory with eight uncommitted changes is preserved at Desktop/nmlabs.ai-backup-20260930. No parent-site deployment occurred.
+
+## Verified release and visual follow-up
+
+Published demo-only runtime `7a6aae2451273c898ac51419c682113d73cccbc4`, deployment `dpl_BmQfZxuWAiUhSk4DNm5Vt1xpKGxp` (`demo-atlas-57wdbjxk5-north-model-labs.vercel.app`). The public alias and exact favicon bytes were verified after promotion; dashboard aliases/settings matched the pre-promotion snapshot. The previous deployment above remains the rollback target.
+
+Protected preview: spoken “What is two plus two? Please answer in one short sentence.” produced the correct user caption and “Two plus two equals four.” An English follow-up asking to multiply the result by three produced twelve. Interrupting a longer story with “Stop the story. Say only: Ready for your next question.” switched to that response without a browser error. The exact production candidate separately passed spoken captions and a typed contextual follow-up with audible returned audio, 512×512 video, and zero JavaScript errors. The test initially expected numeric `12`; this assertion was corrected to also accept the observed spelled-out `twelve`.
+
+Timestamped screenshots and returned audio observations in the spoken preview showed mouth closed by approximately 0.9 seconds after the last audio above RMS 0.005, and closed at approximately 2.6, 5.4 and 6.5 seconds after. This short run did not reproduce persistent post-speech mouth motion. One reviewed frame was 0.29 seconds *before* audio ended and correctly had an open mouth. Do not mistake response text completion for returned speech completion.
+
+The screenshot-heavy observation reported 24 dropped frames in 27 seconds; a separate 15-second exact-candidate observation with no screenshots delivered 375 frames with three dropped frames. Capture overhead can affect these measurements. The correlated owned GPU session had median 25.765 FPS (minimum 25.217), no error lines, and median render queue nine. This differs from the slower aggregate sample and does not establish a universal GPU bottleneck or prove the user's intermittent cut-off is fixed.
+
+Local origin/ownership boundary tests passed using synthetic credentials and zero real provider calls. Six capability/caption tests, TypeScript, focused lint and candidate production build passed. Test sessions were deleted individually; no user session was stopped.
+
+Still open: reproduce intermittent cut-off and longer post-speech mouth motion under representative real microphone/network conditions; distinguish unintended VAD interruption, returned playback, GPU pacing and natural idle animation. No GPU tuning, model replacement, account migration, existing-key change, or UI freeze workaround was deployed.
