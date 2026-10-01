@@ -1,0 +1,23 @@
+{
+  "javascript_errors": [],
+  "completed_responses": 4,
+  "provider_errors": 0,
+  "requests": [
+    {
+      "path": "/api/config",
+      "status": 200
+    },
+    {
+      "path": "/api/session",
+      "status": 200
+    },
+    {
+      "path": "/api/session/owned-session/share",
+      "status": 200
+    },
+    {
+      "path": "/api/session/owned-session/voice",
+      "status": 200
+    }
+  ]
+}

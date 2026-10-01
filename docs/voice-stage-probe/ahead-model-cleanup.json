@@ -1,0 +1,8 @@
+{
+  "instance_id": "849963834647004345",
+  "status_before_delete": "TERMINATED",
+  "delete_operation": "operation-1790836595516-65cc1a3206515-6d4ffe5d-8b15cc37",
+  "instance_absent": true,
+  "boot_disk_absent": true,
+  "observed_at": "2026-10-01T06:36:41.156511+00:00"
+}

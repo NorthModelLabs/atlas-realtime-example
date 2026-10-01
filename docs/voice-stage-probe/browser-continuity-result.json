@@ -1,0 +1,132 @@
+{
+  "scope": "owned instrumented preview, synthetic microphone fixture, actual provider and public Atlas path; small sample, not user network",
+  "turns": [
+    {
+      "turn": 1,
+      "provider_ms": 1616,
+      "bridge_ms": 17,
+      "atlas_ms": 2343,
+      "e2e_ms": 3976
+    },
+    {
+      "turn": 2,
+      "provider_ms": 1456,
+      "bridge_ms": 20,
+      "atlas_ms": 2143,
+      "e2e_ms": 3619
+    },
+    {
+      "turn": 3,
+      "provider_ms": 1438,
+      "bridge_ms": 37,
+      "atlas_ms": 2120,
+      "e2e_ms": 3595
+    },
+    {
+      "turn": 4,
+      "provider_ms": 1495,
+      "bridge_ms": 23,
+      "atlas_ms": 2100,
+      "e2e_ms": 3618
+    }
+  ],
+  "warm_turn_median_e2e_ms": 3618,
+  "transport": {
+    "provider_rtc:audio": {
+      "packetsReceived_delta": 4547,
+      "packetsLost_delta": 3,
+      "concealedSamples_delta": 18326,
+      "silentConcealedSamples_delta": 10440,
+      "concealmentEvents_delta": 9,
+      "totalSamplesReceived_delta": 4368480,
+      "mean_jitter_buffer_ms": 199.4,
+      "max_jitter_ms": 19.0,
+      "interruption_increments": [
+        {
+          "since_first_s": 1.06,
+          "field": "concealmentEvents",
+          "increment": 2
+        },
+        {
+          "since_first_s": 5.06,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 15.06,
+          "field": "concealmentEvents",
+          "increment": 3
+        },
+        {
+          "since_first_s": 40.06,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 79.06,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 82.06,
+          "field": "concealmentEvents",
+          "increment": 1
+        }
+      ]
+    },
+    "atlas_return_audio_rtc:audio": {
+      "packetsReceived_delta": 1695,
+      "packetsLost_delta": 1,
+      "concealedSamples_delta": 12980,
+      "silentConcealedSamples_delta": 0,
+      "concealmentEvents_delta": 3,
+      "totalSamplesReceived_delta": 4367520,
+      "mean_jitter_buffer_ms": 175.6,
+      "max_jitter_ms": 39.0,
+      "interruption_increments": [
+        {
+          "since_first_s": 15.0,
+          "field": "concealmentEvents",
+          "increment": 3
+        }
+      ]
+    },
+    "atlas_return_video_rtc:video": {
+      "packetsReceived_delta": 5230,
+      "packetsLost_delta": 6,
+      "framesDecoded_delta": 2261,
+      "framesDropped_delta": 0,
+      "freezeCount_delta": 2,
+      "totalFreezesDuration_delta": 0.444,
+      "mean_jitter_buffer_ms": 32.7,
+      "max_jitter_ms": 33.0,
+      "interruption_increments": [
+        {
+          "since_first_s": 15.0,
+          "field": "freezeCount",
+          "increment": 1
+        },
+        {
+          "since_first_s": 15.0,
+          "field": "totalFreezesDuration",
+          "increment": 0.198
+        },
+        {
+          "since_first_s": 79.0,
+          "field": "freezeCount",
+          "increment": 1
+        },
+        {
+          "since_first_s": 79.0,
+          "field": "totalFreezesDuration",
+          "increment": 0.246
+        }
+      ]
+    },
+    "atlas_outgoing_rtc:audio": {
+      "packetsSent_delta": 918,
+      "interruption_increments": []
+    }
+  },
+  "provider_errors": 0
+}
