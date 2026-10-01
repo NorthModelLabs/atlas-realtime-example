@@ -1,0 +1,20 @@
+{
+  "reviewed_frames": 15,
+  "turns": 5,
+  "late_reopening": {
+    "turn": 2,
+    "appears_closed_ms": 844,
+    "appears_open_again_ms": 1452
+  },
+  "other_prolonged_tail": {
+    "turn": 4,
+    "slightly_open_ms": 863,
+    "closed_ms": 1467
+  },
+  "accepted_fix": false,
+  "limits": [
+    "RMS transition rather than verified last phoneme",
+    "Sparse screenshots",
+    "Browser envelope is not model input"
+  ]
+}

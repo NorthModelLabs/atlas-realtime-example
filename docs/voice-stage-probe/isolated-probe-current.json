@@ -1,0 +1,52 @@
+{
+  "at": "2026-10-01T03:14:14.149238+00:00",
+  "status": "TERMINATED",
+  "instance_id": "5752044785369117268",
+  "serial_next": 0,
+  "phases": [
+    {
+      "dashboard_worker_phase": "model-image-ready"
+    },
+    {
+      "dashboard_worker_phase": "sidecar-image-ready"
+    },
+    {
+      "dashboard_worker_phase": "images-ready"
+    },
+    {
+      "dashboard_worker_phase": "model-egress-denied"
+    },
+    {
+      "dashboard_worker_phase": "model-healthy"
+    },
+    {
+      "dashboard_worker_phase": "failed-bounded-local-benchmark"
+    },
+    {
+      "failure_type": "AssertionError"
+    }
+  ],
+  "results": [
+    {
+      "frames_requested": 32,
+      "trial": 0,
+      "first_frame_ms": 3364.3,
+      "total_ms": 4234.6,
+      "frames": 32,
+      "shape": [
+        1024,
+        1024,
+        3
+      ]
+    }
+  ],
+  "verified_stopped_at": "2026-10-01T03:14:31Z",
+  "project": "atlas-stg-isolated-20260831",
+  "zone": "us-central1-a",
+  "name": "atlas-stg-voice-latency-20260930",
+  "benchmark_complete": false,
+  "cleanup": {
+    "gpu_running": false,
+    "disk_retained_for_owned_probe_followup": true
+  }
+}

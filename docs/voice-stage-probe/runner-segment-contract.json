@@ -1,0 +1,141 @@
+{
+  "build_id": "36a63ed4-0130-4ff1-98d6-3355e5160bc2",
+  "build_status": "SUCCESS",
+  "records": [
+    {
+      "kind": "SEGMENT_METADATA",
+      "data": {
+        "versions": {
+          "livekit": "1.1.5",
+          "livekit-agents": "1.5.2"
+        },
+        "segment_lifecycle": false,
+        "silence_gate": false,
+        "tail_flush": false
+      }
+    },
+    {
+      "kind": "SEGMENT_RESULT",
+      "data": {
+        "case": "natural_end",
+        "frames": 10,
+        "speech_preserved": true,
+        "returned_frames": 10,
+        "markers": 1,
+        "iterator_alive": true,
+        "elapsed_ms": 1220.0,
+        "calls": [
+          {
+            "requested_frames": 10,
+            "output_frames": 10,
+            "duration_ms": 791.3
+          },
+          {
+            "requested_frames": null,
+            "output_frames": 32,
+            "duration_ms": 1604.4
+          }
+        ]
+      }
+    },
+    {
+      "kind": "SEGMENT_RESULT",
+      "data": {
+        "case": "natural_end",
+        "frames": 50,
+        "speech_preserved": true,
+        "returned_frames": 50,
+        "markers": 1,
+        "iterator_alive": true,
+        "elapsed_ms": 2763.2,
+        "calls": [
+          {
+            "requested_frames": null,
+            "output_frames": 32,
+            "duration_ms": 1606.8
+          },
+          {
+            "requested_frames": 32,
+            "output_frames": 32,
+            "duration_ms": 1624.2
+          },
+          {
+            "requested_frames": 18,
+            "output_frames": 18,
+            "duration_ms": 1103.9
+          }
+        ]
+      }
+    },
+    {
+      "kind": "SEGMENT_RESULT",
+      "data": {
+        "case": "natural_end",
+        "frames": 100,
+        "speech_preserved": true,
+        "returned_frames": 100,
+        "markers": 1,
+        "iterator_alive": true,
+        "elapsed_ms": 5386.3,
+        "calls": [
+          {
+            "requested_frames": null,
+            "output_frames": 32,
+            "duration_ms": 1593.1
+          },
+          {
+            "requested_frames": 32,
+            "output_frames": 32,
+            "duration_ms": 1595.1
+          },
+          {
+            "requested_frames": 32,
+            "output_frames": 32,
+            "duration_ms": 1597.3
+          },
+          {
+            "requested_frames": 32,
+            "output_frames": 32,
+            "duration_ms": 1606.8
+          },
+          {
+            "requested_frames": 4,
+            "output_frames": 4,
+            "duration_ms": 551.4
+          }
+        ]
+      }
+    },
+    {
+      "kind": "SEGMENT_RESULT",
+      "data": {
+        "case": "interruption",
+        "replacement_preserved": true,
+        "no_old_audio_after_replacement": true,
+        "iterator_alive": true,
+        "returned_ids": [
+          4000,
+          4001,
+          5000,
+          5001,
+          5002,
+          5003,
+          5004,
+          5005,
+          5006,
+          5007,
+          5008,
+          5009
+        ]
+      }
+    },
+    {
+      "kind": "SEGMENT_COMPLETE",
+      "data": {
+        "cases": 4,
+        "source_verified": true,
+        "scope": "exact runner and SDK; simulated model; no LiveKit network/AvatarRunner media publishing"
+      }
+    }
+  ]
+}

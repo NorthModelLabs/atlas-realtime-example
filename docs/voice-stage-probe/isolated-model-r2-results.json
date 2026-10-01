@@ -1,0 +1,234 @@
+{
+  "status": "TERMINATED",
+  "instance_id": "5752044785369117268",
+  "serial_next": 320161,
+  "phases": [
+    {
+      "dashboard_worker_phase": "one-l4-ready"
+    },
+    {
+      "dashboard_worker_phase": "private-google-proxy-ready"
+    },
+    {
+      "dashboard_worker_phase": "model-image-ready"
+    },
+    {
+      "dashboard_worker_phase": "fixture-image-ready"
+    },
+    {
+      "dashboard_worker_phase": "images-ready"
+    },
+    {
+      "dashboard_worker_phase": "model-egress-denied"
+    },
+    {
+      "dashboard_worker_phase": "model-healthy"
+    },
+    {
+      "dashboard_worker_phase": "voice-benchmark-complete"
+    }
+  ],
+  "results": [
+    {
+      "frames_requested": 32,
+      "trial": 0,
+      "first_frame_ms": 3443.2,
+      "total_ms": 4333.6,
+      "frames": 32,
+      "shape": [
+        1024,
+        1024,
+        3
+      ],
+      "end_seen": true,
+      "frame_count_matches_request": true,
+      "frame_milestones_ms": {
+        "1": 3443.2,
+        "8": 3457.4,
+        "16": 3745.2,
+        "32": 4333.1
+      }
+    },
+    {
+      "frames_requested": 32,
+      "trial": 1,
+      "first_frame_ms": 6524.1,
+      "total_ms": 7413.7,
+      "frames": 32,
+      "shape": [
+        1024,
+        1024,
+        3
+      ],
+      "end_seen": true,
+      "frame_count_matches_request": true,
+      "frame_milestones_ms": {
+        "1": 6524.2,
+        "8": 6534.9,
+        "16": 6813.6,
+        "32": 7408.3
+      }
+    },
+    {
+      "frames_requested": 32,
+      "trial": 2,
+      "first_frame_ms": 2229.6,
+      "total_ms": 3112.5,
+      "frames": 32,
+      "shape": [
+        1024,
+        1024,
+        3
+      ],
+      "end_seen": true,
+      "frame_count_matches_request": true,
+      "frame_milestones_ms": {
+        "1": 2229.6,
+        "8": 2240.2,
+        "16": 2518.1,
+        "32": 3111.8
+      }
+    },
+    {
+      "frames_requested": 32,
+      "trial": 3,
+      "first_frame_ms": 401.6,
+      "total_ms": 1291.9,
+      "frames": 32,
+      "shape": [
+        1024,
+        1024,
+        3
+      ],
+      "end_seen": true,
+      "frame_count_matches_request": true,
+      "frame_milestones_ms": {
+        "1": 401.6,
+        "8": 412.1,
+        "16": 689.7,
+        "32": 1289.9
+      }
+    },
+    {
+      "frames_requested": 8,
+      "trial": 0,
+      "first_frame_ms": 406.2,
+      "total_ms": 1300.9,
+      "frames": 32,
+      "shape": [
+        1024,
+        1024,
+        3
+      ],
+      "end_seen": true,
+      "frame_count_matches_request": false,
+      "frame_milestones_ms": {
+        "1": 406.2,
+        "8": 417.4,
+        "16": 693.3,
+        "32": 1297.6
+      }
+    },
+    {
+      "frames_requested": 8,
+      "trial": 1,
+      "first_frame_ms": 407.0,
+      "total_ms": 1298.4,
+      "frames": 32,
+      "shape": [
+        1024,
+        1024,
+        3
+      ],
+      "end_seen": true,
+      "frame_count_matches_request": false,
+      "frame_milestones_ms": {
+        "1": 407.0,
+        "8": 417.5,
+        "16": 694.6,
+        "32": 1296.2
+      }
+    },
+    {
+      "frames_requested": 8,
+      "trial": 2,
+      "first_frame_ms": 405.3,
+      "total_ms": 1297.9,
+      "frames": 32,
+      "shape": [
+        1024,
+        1024,
+        3
+      ],
+      "end_seen": true,
+      "frame_count_matches_request": false,
+      "frame_milestones_ms": {
+        "1": 405.3,
+        "8": 415.8,
+        "16": 694.7,
+        "32": 1295.8
+      }
+    },
+    {
+      "frames_requested": 16,
+      "trial": 0,
+      "first_frame_ms": 404.2,
+      "total_ms": 1299.2,
+      "frames": 32,
+      "shape": [
+        1024,
+        1024,
+        3
+      ],
+      "end_seen": true,
+      "frame_count_matches_request": false,
+      "frame_milestones_ms": {
+        "1": 404.2,
+        "8": 414.4,
+        "16": 694.6,
+        "32": 1297.2
+      }
+    },
+    {
+      "frames_requested": 16,
+      "trial": 1,
+      "first_frame_ms": 407.1,
+      "total_ms": 1301.5,
+      "frames": 32,
+      "shape": [
+        1024,
+        1024,
+        3
+      ],
+      "end_seen": true,
+      "frame_count_matches_request": false,
+      "frame_milestones_ms": {
+        "1": 407.1,
+        "8": 417.4,
+        "16": 695.2,
+        "32": 1299.1
+      }
+    },
+    {
+      "frames_requested": 16,
+      "trial": 2,
+      "first_frame_ms": 404.9,
+      "total_ms": 1302.8,
+      "frames": 32,
+      "shape": [
+        1024,
+        1024,
+        3
+      ],
+      "end_seen": true,
+      "frame_count_matches_request": false,
+      "frame_milestones_ms": {
+        "1": 404.9,
+        "8": 415.2,
+        "16": 694.5,
+        "32": 1300.4
+      }
+    }
+  ],
+  "at": "2026-10-01T03:26:15.663409+00:00"
+}

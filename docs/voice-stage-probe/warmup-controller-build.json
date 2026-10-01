@@ -1,0 +1,18 @@
+{
+  "finishTime": "2026-10-01T02:46:04.796327Z",
+  "id": "1776406b-6360-432f-9b84-e5f9135510fc",
+  "results": {
+    "images": [
+      {
+        "artifactRegistryPackage": "projects/atlas-stg-isolated-20260831/locations/us-central1/repositories/atlas-stg-runtime/packages/voice-warmup-controller/versions/sha256:7236e4d3214079381380859b3c6099b5d719f68b129c73086e3e88e63b333004",
+        "digest": "sha256:7236e4d3214079381380859b3c6099b5d719f68b129c73086e3e88e63b333004",
+        "name": "us-central1-docker.pkg.dev/atlas-stg-isolated-20260831/atlas-stg-runtime/voice-warmup-controller:20260930-bc4c6088",
+        "pushTiming": {
+          "endTime": "2026-10-01T02:46:05.038293067Z",
+          "startTime": "2026-10-01T02:46:01.588478351Z"
+        }
+      }
+    ]
+  },
+  "status": "SUCCESS"
+}

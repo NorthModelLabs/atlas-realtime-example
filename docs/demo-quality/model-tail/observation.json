@@ -1,0 +1,256 @@
+{
+  "observed_at": "2026-10-01T08:08:22.901403+00:00",
+  "instance_id": "7651429016155698141",
+  "status": "TERMINATED",
+  "serial_next": 858700,
+  "phases": [
+    {
+      "dashboard_worker_phase": "one-l4-ready"
+    },
+    {
+      "dashboard_worker_phase": "private-google-proxy-ready"
+    },
+    {
+      "dashboard_worker_phase": "model-image-ready"
+    },
+    {
+      "dashboard_worker_phase": "fixture-image-ready"
+    },
+    {
+      "dashboard_worker_phase": "controller-image-ready"
+    },
+    {
+      "dashboard_worker_phase": "images-ready"
+    },
+    {
+      "dashboard_worker_phase": "model-egress-denied"
+    },
+    {
+      "dashboard_worker_phase": "model-healthy"
+    },
+    {
+      "dashboard_worker_phase": "mouth-tail-complete"
+    }
+  ],
+  "results": [
+    {
+      "trial": 0,
+      "leading_frames": 32,
+      "frames": 224,
+      "last_voiced_frame": 126,
+      "selected_frames": 10,
+      "paired_audio_exact": true
+    },
+    {
+      "trial": 1,
+      "leading_frames": 40,
+      "frames": 224,
+      "last_voiced_frame": 134,
+      "selected_frames": 10,
+      "paired_audio_exact": true
+    },
+    {
+      "trial": 2,
+      "leading_frames": 48,
+      "frames": 256,
+      "last_voiced_frame": 142,
+      "selected_frames": 10,
+      "paired_audio_exact": true
+    }
+  ],
+  "frames": [
+    {
+      "trial": 0,
+      "audio_frame": 126,
+      "after_last_voiced_frame_ms": 0,
+      "paired_audio_rms": 157.447,
+      "file": "trial-0-frame-126.jpg"
+    },
+    {
+      "trial": 0,
+      "audio_frame": 128,
+      "after_last_voiced_frame_ms": 80,
+      "paired_audio_rms": 8.916,
+      "file": "trial-0-frame-128.jpg"
+    },
+    {
+      "trial": 0,
+      "audio_frame": 131,
+      "after_last_voiced_frame_ms": 200,
+      "paired_audio_rms": 1.079,
+      "file": "trial-0-frame-131.jpg"
+    },
+    {
+      "trial": 0,
+      "audio_frame": 136,
+      "after_last_voiced_frame_ms": 400,
+      "paired_audio_rms": 0.0,
+      "file": "trial-0-frame-136.jpg"
+    },
+    {
+      "trial": 0,
+      "audio_frame": 141,
+      "after_last_voiced_frame_ms": 600,
+      "paired_audio_rms": 0.0,
+      "file": "trial-0-frame-141.jpg"
+    },
+    {
+      "trial": 0,
+      "audio_frame": 146,
+      "after_last_voiced_frame_ms": 800,
+      "paired_audio_rms": 0.0,
+      "file": "trial-0-frame-146.jpg"
+    },
+    {
+      "trial": 0,
+      "audio_frame": 151,
+      "after_last_voiced_frame_ms": 1000,
+      "paired_audio_rms": 0.0,
+      "file": "trial-0-frame-151.jpg"
+    },
+    {
+      "trial": 0,
+      "audio_frame": 158,
+      "after_last_voiced_frame_ms": 1280,
+      "paired_audio_rms": 0.0,
+      "file": "trial-0-frame-158.jpg"
+    },
+    {
+      "trial": 0,
+      "audio_frame": 166,
+      "after_last_voiced_frame_ms": 1600,
+      "paired_audio_rms": 0.0,
+      "file": "trial-0-frame-166.jpg"
+    },
+    {
+      "trial": 0,
+      "audio_frame": 176,
+      "after_last_voiced_frame_ms": 2000,
+      "paired_audio_rms": 0.0,
+      "file": "trial-0-frame-176.jpg"
+    },
+    {
+      "trial": 1,
+      "audio_frame": 134,
+      "after_last_voiced_frame_ms": 0,
+      "paired_audio_rms": 157.447,
+      "file": "trial-1-frame-134.jpg"
+    },
+    {
+      "trial": 1,
+      "audio_frame": 136,
+      "after_last_voiced_frame_ms": 80,
+      "paired_audio_rms": 8.916,
+      "file": "trial-1-frame-136.jpg"
+    },
+    {
+      "trial": 1,
+      "audio_frame": 139,
+      "after_last_voiced_frame_ms": 200,
+      "paired_audio_rms": 1.079,
+      "file": "trial-1-frame-139.jpg"
+    },
+    {
+      "trial": 1,
+      "audio_frame": 144,
+      "after_last_voiced_frame_ms": 400,
+      "paired_audio_rms": 0.0,
+      "file": "trial-1-frame-144.jpg"
+    },
+    {
+      "trial": 1,
+      "audio_frame": 149,
+      "after_last_voiced_frame_ms": 600,
+      "paired_audio_rms": 0.0,
+      "file": "trial-1-frame-149.jpg"
+    },
+    {
+      "trial": 1,
+      "audio_frame": 166,
+      "after_last_voiced_frame_ms": 1280,
+      "paired_audio_rms": 0.0,
+      "file": "trial-1-frame-166.jpg"
+    },
+    {
+      "trial": 1,
+      "audio_frame": 174,
+      "after_last_voiced_frame_ms": 1600,
+      "paired_audio_rms": 0.0,
+      "file": "trial-1-frame-174.jpg"
+    },
+    {
+      "trial": 1,
+      "audio_frame": 184,
+      "after_last_voiced_frame_ms": 2000,
+      "paired_audio_rms": 0.0,
+      "file": "trial-1-frame-184.jpg"
+    },
+    {
+      "trial": 2,
+      "audio_frame": 142,
+      "after_last_voiced_frame_ms": 0,
+      "paired_audio_rms": 157.447,
+      "file": "trial-2-frame-142.jpg"
+    },
+    {
+      "trial": 2,
+      "audio_frame": 144,
+      "after_last_voiced_frame_ms": 80,
+      "paired_audio_rms": 8.916,
+      "file": "trial-2-frame-144.jpg"
+    },
+    {
+      "trial": 2,
+      "audio_frame": 147,
+      "after_last_voiced_frame_ms": 200,
+      "paired_audio_rms": 1.079,
+      "file": "trial-2-frame-147.jpg"
+    },
+    {
+      "trial": 2,
+      "audio_frame": 152,
+      "after_last_voiced_frame_ms": 400,
+      "paired_audio_rms": 0.0,
+      "file": "trial-2-frame-152.jpg"
+    },
+    {
+      "trial": 2,
+      "audio_frame": 162,
+      "after_last_voiced_frame_ms": 800,
+      "paired_audio_rms": 0.0,
+      "file": "trial-2-frame-162.jpg"
+    },
+    {
+      "trial": 2,
+      "audio_frame": 167,
+      "after_last_voiced_frame_ms": 1000,
+      "paired_audio_rms": 0.0,
+      "file": "trial-2-frame-167.jpg"
+    },
+    {
+      "trial": 2,
+      "audio_frame": 174,
+      "after_last_voiced_frame_ms": 1280,
+      "paired_audio_rms": 0.0,
+      "file": "trial-2-frame-174.jpg"
+    },
+    {
+      "trial": 2,
+      "audio_frame": 182,
+      "after_last_voiced_frame_ms": 1600,
+      "paired_audio_rms": 0.0,
+      "file": "trial-2-frame-182.jpg"
+    },
+    {
+      "trial": 2,
+      "audio_frame": 192,
+      "after_last_voiced_frame_ms": 2000,
+      "paired_audio_rms": 0.0,
+      "file": "trial-2-frame-192.jpg"
+    }
+  ],
+  "complete": {
+    "passed": true,
+    "scope": "Exact model and runner digests; real spoken fixture followed by zeros; raw generated frames paired with exact input audio before LiveKit/browser; no playback pacing or latency benchmark"
+  }
+}

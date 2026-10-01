@@ -1,0 +1,134 @@
+{
+  "scope": "Retained owned synthetic browser run; no current production health claim.",
+  "origin_epoch_ms": 1790883356401,
+  "gaps_over_150ms": [
+    {
+      "capture_s": 9.025,
+      "display_gap_ms": 200,
+      "receive_gap_ms": 259.9,
+      "rtp_timestamp_gap_ms": 200.0,
+      "presented_frames_increment": 1,
+      "decode_processing_ms": 1.5,
+      "scheduler_max_delay_ms": 7,
+      "scheduler_longest_task_ms": 0,
+      "scheduler_all_visible_running": true,
+      "counter_windows": {
+        "atlas_return_video_rtc": {
+          "window_start_s": 7.976,
+          "window_end_s": 9.975,
+          "packetsLost": 0,
+          "nackCount": 0,
+          "framesDropped": 0,
+          "freezeCount": 1,
+          "totalFreezesDuration": 0.195
+        },
+        "atlas_return_audio_rtc": {
+          "window_start_s": 7.976,
+          "window_end_s": 9.975,
+          "packetsLost": 0,
+          "concealmentEvents": 1,
+          "concealedSamples": 4551,
+          "silentConcealedSamples": 0
+        },
+        "provider_rtc": {
+          "window_start_s": 8.046,
+          "window_end_s": 9.047,
+          "packetsLost": 0,
+          "concealmentEvents": 0,
+          "concealedSamples": 0,
+          "silentConcealedSamples": 0
+        }
+      },
+      "evidence": "received-frame gap without measured main-thread stall"
+    },
+    {
+      "capture_s": 48.641,
+      "display_gap_ms": 183.3,
+      "receive_gap_ms": 247.3,
+      "rtp_timestamp_gap_ms": 200.0,
+      "presented_frames_increment": 1,
+      "decode_processing_ms": 2.1,
+      "scheduler_max_delay_ms": 8,
+      "scheduler_longest_task_ms": 0,
+      "scheduler_all_visible_running": true,
+      "counter_windows": {
+        "atlas_return_video_rtc": {
+          "window_start_s": 47.975,
+          "window_end_s": 48.975,
+          "packetsLost": 0,
+          "nackCount": 0,
+          "retransmittedPacketsReceived": 0,
+          "framesDropped": 0,
+          "freezeCount": 1,
+          "totalFreezesDuration": 0.198
+        },
+        "atlas_return_audio_rtc": {
+          "window_start_s": 47.975,
+          "window_end_s": 48.974,
+          "packetsLost": 0,
+          "concealmentEvents": 1,
+          "concealedSamples": 967,
+          "silentConcealedSamples": 0
+        },
+        "provider_rtc": {
+          "window_start_s": 48.047,
+          "window_end_s": 49.048,
+          "packetsLost": 0,
+          "concealmentEvents": 1,
+          "concealedSamples": 1560,
+          "silentConcealedSamples": 0
+        }
+      },
+      "evidence": "received-frame gap without measured main-thread stall"
+    },
+    {
+      "capture_s": 115.318,
+      "display_gap_ms": 949.9,
+      "receive_gap_ms": 950.1,
+      "rtp_timestamp_gap_ms": 960.0,
+      "presented_frames_increment": 24,
+      "decode_processing_ms": 0.8,
+      "scheduler_max_delay_ms": 903,
+      "scheduler_longest_task_ms": 939,
+      "scheduler_all_visible_running": true,
+      "counter_windows": {
+        "atlas_return_video_rtc": {
+          "window_start_s": 113.976,
+          "window_end_s": 115.975,
+          "packetsLost": 0,
+          "nackCount": 2,
+          "retransmittedPacketsReceived": 0,
+          "framesDropped": 0,
+          "freezeCount": 0,
+          "totalFreezesDuration": 0.0
+        },
+        "atlas_return_audio_rtc": {
+          "window_start_s": 113.976,
+          "window_end_s": 115.975,
+          "packetsLost": 0,
+          "concealmentEvents": 0,
+          "concealedSamples": 0,
+          "silentConcealedSamples": 0
+        },
+        "provider_rtc": {
+          "window_start_s": 114.049,
+          "window_end_s": 116.046,
+          "packetsLost": 0,
+          "concealmentEvents": 0,
+          "concealedSamples": 0,
+          "silentConcealedSamples": 0
+        }
+      },
+      "evidence": "callback gap coincides with main-thread long task and skipped callbacks"
+    }
+  ],
+  "provider_error_count": 0,
+  "limits": [
+    "One-second RTC counters localize increments to windows, not exact packets.",
+    "Receive timestamps cannot distinguish sender/model delay from transit/SFU delay.",
+    "A video gap and concealment do not prove a missing spoken word.",
+    "No packet loss increment does not exclude delayed packets.",
+    "RTP media timestamp gaps do not themselves prove discarded model frames."
+  ],
+  "source_sha256": "743923cceee7bfea900b5814c33e3f64af5a1cc6ea1f6f9e6e2b7275bfeb68fc"
+}

@@ -1,0 +1,136 @@
+{
+  "scope": "Owned protected-preview session using the existing synthetic conversation fixture and actual returned media. Three completed response tails. Screenshot capture can perturb playback; not a measurement of the user's connection.",
+  "observations": {
+    "mouth": "Visually reviewed samples show slight mouth opening at 292ms after quiet on turn 2, and at 363ms and 614ms on turn 3. Closed by the sampled 543ms (turn 2) and 1117ms (turn 3), and closed in selected later frames through about 6.5 seconds. No persistent speaking-like opening demonstrated in the later selected frames.",
+    "audio_end_definition": "Last returned-audio analyser transition below RMS 0.001 after activity above 0.005; 20ms polling, not sample-exact physical speaker output.",
+    "video_freeze_seconds": 0.288,
+    "video_freeze_events": 1,
+    "decoded_frames": 1675,
+    "dropped_decoded_frames": 0,
+    "root_cause": "Not established. Do not label the cause model failure, network loss, or UI scheduling based only on these observations."
+  },
+  "scheduler": {
+    "samples": 67,
+    "max_delay_ms": 14,
+    "max_long_task_ms": 0,
+    "hidden_samples": 0,
+    "suspended_samples": 0,
+    "stalls": []
+  },
+  "transport": {
+    "provider_rtc:audio": {
+      "insertedSamplesForDeceleration_delta": 480,
+      "removedSamplesForAcceleration_delta": 0,
+      "packetsReceived_delta": 3334,
+      "packetsLost_delta": 17,
+      "concealedSamples_delta": 27930,
+      "silentConcealedSamples_delta": 15480,
+      "concealmentEvents_delta": 13,
+      "totalSamplesReceived_delta": 3216000,
+      "mean_jitter_buffer_ms": 153.5,
+      "jitterBufferTargetDelay_mean_ms": 138.5,
+      "jitterBufferMinimumDelay_mean_ms": 138.5,
+      "max_jitter_ms": 29.0,
+      "interruption_increments": [
+        {
+          "since_first_s": 3.06,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 4.06,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 26.06,
+          "field": "concealmentEvents",
+          "increment": 2
+        },
+        {
+          "since_first_s": 37.06,
+          "field": "concealmentEvents",
+          "increment": 5
+        },
+        {
+          "since_first_s": 40.06,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 50.06,
+          "field": "concealmentEvents",
+          "increment": 2
+        },
+        {
+          "since_first_s": 68.06,
+          "field": "concealmentEvents",
+          "increment": 1
+        }
+      ]
+    },
+    "atlas_return_audio_rtc:audio": {
+      "insertedSamplesForDeceleration_delta": 350,
+      "removedSamplesForAcceleration_delta": 786,
+      "packetsReceived_delta": 1499,
+      "packetsLost_delta": 0,
+      "concealedSamples_delta": 3566,
+      "silentConcealedSamples_delta": 0,
+      "concealmentEvents_delta": 3,
+      "totalSamplesReceived_delta": 3264480,
+      "mean_jitter_buffer_ms": 128.3,
+      "jitterBufferTargetDelay_mean_ms": 121.3,
+      "jitterBufferMinimumDelay_mean_ms": 121.3,
+      "max_jitter_ms": 29.0,
+      "interruption_increments": [
+        {
+          "since_first_s": 2.0,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 4.0,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 40.01,
+          "field": "concealmentEvents",
+          "increment": 1
+        }
+      ]
+    },
+    "atlas_return_video_rtc:video": {
+      "packetsReceived_delta": 4052,
+      "packetsLost_delta": 1,
+      "framesDecoded_delta": 1675,
+      "framesDropped_delta": 0,
+      "freezeCount_delta": 1,
+      "totalFreezesDuration_delta": 0.288,
+      "mean_jitter_buffer_ms": 63.2,
+      "jitterBufferTargetDelay_mean_ms": 77.0,
+      "jitterBufferMinimumDelay_mean_ms": 77.0,
+      "max_jitter_ms": 32.0,
+      "interruption_increments": [
+        {
+          "since_first_s": 68.0,
+          "field": "freezeCount",
+          "increment": 1
+        },
+        {
+          "since_first_s": 68.0,
+          "field": "totalFreezesDuration",
+          "increment": 0.288
+        }
+      ]
+    },
+    "atlas_outgoing_rtc:audio": {
+      "packetsSent_delta": 712,
+      "interruption_increments": []
+    }
+  },
+  "cleanup": {
+    "owned_session_delete_http_status": 200
+  },
+  "runtime_changes": false
+}

@@ -1,0 +1,34 @@
+{
+  "host": "https://demo-atlas-ikaswcl3g-north-model-labs.vercel.app",
+  "started": 1790816704970,
+  "voiceRequests": [
+    {
+      "status": 200,
+      "at": 1790816709540
+    }
+  ],
+  "errors": [],
+  "returnedAudio": [
+    {
+      "at": 1790816717250,
+      "rms": 0.009726561346182485
+    },
+    {
+      "at": 1790816718016,
+      "rms": 0.12270636207226221
+    }
+  ],
+  "dom": "Apple\nTikTok\nTeach\nMeet\nListening\n00:29\nJohn\nListening\nAtlas\n\nHello from Atlas.\n\nUpload\nMute\nSettings",
+  "video": [
+    {
+      "width": 512,
+      "height": 512,
+      "frames": 700
+    }
+  ],
+  "sessions": [
+    "ses_f6ae4f0e4b6040499b1a"
+  ],
+  "mutePassed": true,
+  "unmutePassed": true
+}

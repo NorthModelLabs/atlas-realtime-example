@@ -1,0 +1,131 @@
+{
+  "frame_time_ms": 1790878655851,
+  "window_ms": 2500,
+  "events": [
+    {
+      "type": "turn_latency",
+      "stage": "gpu_batch_done",
+      "ts": 1790878654029,
+      "batch_id": "lk_c13d9b22cecf_b29",
+      "inference_ms": 1278,
+      "frames": 32,
+      "audio_chunks": 32,
+      "audio_q": 12,
+      "render_q": 8
+    },
+    {
+      "type": "turn_latency",
+      "stage": "gpu_render_batch_timing",
+      "ts": 1790878654029,
+      "batch_id": "lk_c13d9b22cecf_b29",
+      "inference_ms": 1278,
+      "frames": 32,
+      "warmup": false,
+      "render_q": 8,
+      "session_id": "lk_c13d9b22cecf",
+      "audio_chunks": 32
+    },
+    {
+      "type": "turn_latency",
+      "stage": "gpu_batch_submitted",
+      "ts": 1790878654052,
+      "batch_id": "lk_c13d9b22cecf_b30",
+      "audio_q": 0,
+      "render_q": 8
+    },
+    {
+      "type": "turn_latency",
+      "stage": "gpu_batch_done",
+      "ts": 1790878655324,
+      "batch_id": "lk_c13d9b22cecf_b30",
+      "inference_ms": 1271,
+      "frames": 32,
+      "audio_chunks": 32,
+      "audio_q": 12,
+      "render_q": 8
+    },
+    {
+      "type": "turn_latency",
+      "stage": "gpu_render_batch_timing",
+      "ts": 1790878655324,
+      "batch_id": "lk_c13d9b22cecf_b30",
+      "inference_ms": 1271,
+      "frames": 32,
+      "warmup": false,
+      "render_q": 8,
+      "session_id": "lk_c13d9b22cecf",
+      "audio_chunks": 32
+    },
+    {
+      "type": "turn_latency",
+      "stage": "gpu_batch_submitted",
+      "ts": 1790878655351,
+      "batch_id": "lk_c13d9b22cecf_b31",
+      "audio_q": 0,
+      "render_q": 7
+    },
+    {
+      "type": "turn_latency",
+      "stage": "gpu_batch_done",
+      "ts": 1790878656641,
+      "batch_id": "lk_c13d9b22cecf_b31",
+      "inference_ms": 1289,
+      "frames": 32,
+      "audio_chunks": 32,
+      "audio_q": 12,
+      "render_q": 8
+    },
+    {
+      "type": "turn_latency",
+      "stage": "gpu_render_batch_timing",
+      "ts": 1790878656641,
+      "batch_id": "lk_c13d9b22cecf_b31",
+      "inference_ms": 1289,
+      "frames": 32,
+      "warmup": false,
+      "render_q": 8,
+      "session_id": "lk_c13d9b22cecf",
+      "audio_chunks": 32
+    },
+    {
+      "type": "turn_latency",
+      "stage": "gpu_batch_submitted",
+      "ts": 1790878656644,
+      "batch_id": "lk_c13d9b22cecf_b32",
+      "audio_q": 0,
+      "render_q": 8
+    },
+    {
+      "type": "turn_latency",
+      "stage": "gpu_batch_done",
+      "ts": 1790878657920,
+      "batch_id": "lk_c13d9b22cecf_b32",
+      "inference_ms": 1275,
+      "frames": 32,
+      "audio_chunks": 32,
+      "audio_q": 12,
+      "render_q": 8
+    },
+    {
+      "type": "turn_latency",
+      "stage": "gpu_render_batch_timing",
+      "ts": 1790878657920,
+      "batch_id": "lk_c13d9b22cecf_b32",
+      "inference_ms": 1275,
+      "frames": 32,
+      "warmup": false,
+      "render_q": 8,
+      "session_id": "lk_c13d9b22cecf",
+      "audio_chunks": 32
+    },
+    {
+      "type": "turn_latency",
+      "stage": "gpu_batch_submitted",
+      "ts": 1790878657952,
+      "batch_id": "lk_c13d9b22cecf_b33",
+      "audio_q": 0,
+      "render_q": 7
+    }
+  ],
+  "caveat": "Clock correlation only; no captured model-input PCM or per-frame mouth gate"
+}

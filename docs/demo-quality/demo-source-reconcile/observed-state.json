@@ -1,0 +1,389 @@
+{
+  "observed_at": "2026-10-01T19:50:59.665848+00:00",
+  "public_alias": {
+    "alias": "demo.northmodellabs.com",
+    "deploymentId": "dpl_4Gn3kBtiXyzeTusyp8y1b5imU3Ff",
+    "projectId": "prj_0njKCW2u69Y6Swzav2keV1dNzv85"
+  },
+  "projects": {
+    "demo-atlas": {
+      "id": "prj_0njKCW2u69Y6Swzav2keV1dNzv85",
+      "name": "demo-atlas",
+      "framework": "nextjs",
+      "rootDirectory": null,
+      "buildCommand": "npm run build -- --webpack",
+      "installCommand": "npm ci",
+      "commandForIgnoringBuildStep": null,
+      "gitProviderOptions": {
+        "createDeployments": "enabled"
+      },
+      "autoAssignCustomDomains": true,
+      "domains": [
+        {
+          "name": "demo.northmodellabs.com",
+          "gitBranch": null,
+          "redirect": null,
+          "verified": true
+        },
+        {
+          "name": "demo-atlas-eight.vercel.app",
+          "gitBranch": null,
+          "redirect": null,
+          "verified": true
+        }
+      ],
+      "env_keys": [
+        {
+          "key": "OPENAI_API_KEY",
+          "target": [
+            "preview",
+            "production"
+          ],
+          "type": "encrypted",
+          "gitBranch": null
+        },
+        {
+          "key": "LLM_BASE_URL",
+          "target": [
+            "preview",
+            "production"
+          ],
+          "type": "encrypted",
+          "gitBranch": null
+        },
+        {
+          "key": "ELEVENLABS_VOICE_ID",
+          "target": [
+            "preview",
+            "production"
+          ],
+          "type": "encrypted",
+          "gitBranch": null
+        },
+        {
+          "key": "ATLAS_MODEL_VARIANT",
+          "target": [
+            "preview",
+            "production"
+          ],
+          "type": "encrypted",
+          "gitBranch": null
+        },
+        {
+          "key": "LLM_MODEL",
+          "target": [
+            "preview",
+            "production"
+          ],
+          "type": "encrypted",
+          "gitBranch": null
+        },
+        {
+          "key": "ELEVENLABS_API_KEY",
+          "target": [
+            "preview",
+            "production"
+          ],
+          "type": "encrypted",
+          "gitBranch": null
+        },
+        {
+          "key": "DEMO_ACCESS_SECRET",
+          "target": [
+            "preview",
+            "production"
+          ],
+          "type": "encrypted",
+          "gitBranch": null
+        },
+        {
+          "key": "DEMO_PUBLIC_ORIGIN",
+          "target": [
+            "preview",
+            "production"
+          ],
+          "type": "encrypted",
+          "gitBranch": null
+        },
+        {
+          "key": "ATLAS_API_URL",
+          "target": [
+            "preview",
+            "production"
+          ],
+          "type": "encrypted",
+          "gitBranch": null
+        },
+        {
+          "key": "ATLAS_API_KEY",
+          "target": [
+            "preview",
+            "production"
+          ],
+          "type": "encrypted",
+          "gitBranch": null
+        }
+      ],
+      "link": null,
+      "production_target": {
+        "id": "dpl_7CQ53P2EFj6BjX56qvVajJA2LXAb",
+        "url": "demo-atlas-cizf66fnc-north-model-labs.vercel.app",
+        "readyState": "READY",
+        "commit": "0a46733690550f69dd5083d820f53ba6aa030e64"
+      },
+      "recent_deployments": [
+        {
+          "uid": "dpl_2wZ8ak2tPBVonu8emC9SsrUSR8Cv",
+          "state": "READY",
+          "target": null,
+          "source": "cli",
+          "commit": "25d3476477aae07da0ce2d12a1f9dec52d0a2247"
+        },
+        {
+          "uid": "dpl_C3hjBnppvMsBs3CvcYHpjbRozy98",
+          "state": "READY",
+          "target": null,
+          "source": "cli",
+          "commit": "2f3780b26437eb68ac107e56b030de7e0029636f"
+        },
+        {
+          "uid": "dpl_DiBgSVQofJ9dodK9zrNdSNQt1AUg",
+          "state": "READY",
+          "target": null,
+          "source": "cli",
+          "commit": "ad57e936a2d3f1bf5eb01433460c812f5fa6f3e8"
+        },
+        {
+          "uid": "dpl_4LtUQMcH16Dut7BtEHp899jt6NLB",
+          "state": "READY",
+          "target": null,
+          "source": "cli",
+          "commit": "4334f9c4a3cd5d6cc73fce15bb7aece24256902a"
+        },
+        {
+          "uid": "dpl_4Gn3kBtiXyzeTusyp8y1b5imU3Ff",
+          "state": "READY",
+          "target": "production",
+          "source": "cli",
+          "commit": "d618f07a59c7e9a4e6dba575f3ec1297043b96cb"
+        },
+        {
+          "uid": "dpl_133NPnHbwCaVZ8KAmGgPH77im7Hc",
+          "state": "READY",
+          "target": "production",
+          "source": "cli",
+          "commit": "4a5bd78b5e0fb04f985f8a078cf6be121f053467"
+        },
+        {
+          "uid": "dpl_7fNMrbvvQq4fFpMUYTn8MKZmqBtw",
+          "state": "READY",
+          "target": null,
+          "source": "cli",
+          "commit": "e38ca06fb6b4d58deb8907b9d13b3b0a6013f791"
+        },
+        {
+          "uid": "dpl_AxUKRPsGGiQAUxJnD1HrqusKohwo",
+          "state": "READY",
+          "target": null,
+          "source": "cli",
+          "commit": "e38ca06fb6b4d58deb8907b9d13b3b0a6013f791"
+        }
+      ]
+    },
+    "atlas-realtime-example": {
+      "id": "prj_5AupKllwth1bTY6NpUInysY6M7Fu",
+      "name": "atlas-realtime-example",
+      "framework": "nextjs",
+      "rootDirectory": null,
+      "buildCommand": null,
+      "installCommand": null,
+      "commandForIgnoringBuildStep": null,
+      "gitProviderOptions": {
+        "createDeployments": "enabled"
+      },
+      "autoAssignCustomDomains": true,
+      "domains": [
+        {
+          "name": "atlas-realtime-example.vercel.app",
+          "gitBranch": null,
+          "redirect": null,
+          "verified": true
+        }
+      ],
+      "env_keys": [
+        {
+          "key": "OPENAI_API_KEY",
+          "target": [
+            "production"
+          ],
+          "type": "sensitive",
+          "gitBranch": null
+        },
+        {
+          "key": "ATLAS_API_KEY",
+          "target": [
+            "production",
+            "preview"
+          ],
+          "type": "sensitive",
+          "gitBranch": null
+        },
+        {
+          "key": "ATLAS_API_URL",
+          "target": [
+            "production",
+            "preview"
+          ],
+          "type": "sensitive",
+          "gitBranch": null
+        },
+        {
+          "key": "LLM_API_KEY",
+          "target": [
+            "production",
+            "preview"
+          ],
+          "type": "sensitive",
+          "gitBranch": null
+        },
+        {
+          "key": "LLM_BASE_URL",
+          "target": [
+            "production",
+            "preview"
+          ],
+          "type": "sensitive",
+          "gitBranch": null
+        },
+        {
+          "key": "LLM_MODEL",
+          "target": [
+            "production",
+            "preview"
+          ],
+          "type": "sensitive",
+          "gitBranch": null
+        },
+        {
+          "key": "ELEVENLABS_API_KEY",
+          "target": [
+            "production",
+            "preview"
+          ],
+          "type": "sensitive",
+          "gitBranch": null
+        },
+        {
+          "key": "ELEVENLABS_VOICE_ID",
+          "target": [
+            "production",
+            "preview"
+          ],
+          "type": "sensitive",
+          "gitBranch": null
+        },
+        {
+          "key": "ATLAS_MODEL_VARIANT",
+          "target": [
+            "production",
+            "preview"
+          ],
+          "type": "sensitive",
+          "gitBranch": null
+        }
+      ],
+      "link": {
+        "type": "github",
+        "org": "NorthModelLabs",
+        "repo": "atlas-realtime-example",
+        "repoId": 1201480016,
+        "productionBranch": "main",
+        "deployHooks": []
+      },
+      "production_target": {
+        "id": "dpl_HGxTHqaWCXg4HAUsBUorrFC85f3p",
+        "url": "atlas-realtime-example-iq5qrhs9c-north-model-labs.vercel.app",
+        "readyState": "READY",
+        "commit": "8f0436c06ec212aaff02a742463443c1ecd3d54f"
+      },
+      "recent_deployments": [
+        {
+          "uid": "dpl_6hhmpoPN2YbJNBp3rUYikKLF9XtD",
+          "state": "READY",
+          "target": null,
+          "source": "git",
+          "commit": "f35b6e1c055f71aa79c0a530ccb1cc78358466ea"
+        },
+        {
+          "uid": "dpl_2M5wd41kFf1Rgc5J8UqAjHb8BAZe",
+          "state": "READY",
+          "target": null,
+          "source": "git",
+          "commit": "093439b25476cf1ced143a1e57179cc84acb8d8e"
+        },
+        {
+          "uid": "dpl_47aDnyyzF7MfuZPgsqrNoSXD4CY5",
+          "state": "READY",
+          "target": null,
+          "source": "git",
+          "commit": "74552661d36e208eed85c11afa112ea2a39bdb53"
+        },
+        {
+          "uid": "dpl_BiQnpTiVbnjrtJgZL9517iTpeBLW",
+          "state": "READY",
+          "target": null,
+          "source": "git",
+          "commit": "9434cde281ce04a6f633c980a166ef9577114035"
+        },
+        {
+          "uid": "dpl_Bn2M4D156gMnwpWGzbv1TSqpEfPD",
+          "state": "READY",
+          "target": null,
+          "source": "git",
+          "commit": "4be58327f63e138d40de474d102b2af43beee140"
+        },
+        {
+          "uid": "dpl_G1qrbDEdU3pVz7SV9rRR51mM6Tcp",
+          "state": "READY",
+          "target": null,
+          "source": "git",
+          "commit": "e6a36bd10d5fdcdbd6353fb4b9245575edf4703f"
+        },
+        {
+          "uid": "dpl_DbtE75mYBamvN16uL4WkLPeBuyLd",
+          "state": "READY",
+          "target": null,
+          "source": "git",
+          "commit": "fee9eb303e596882d0a832b0535df36b2cbb50bc"
+        },
+        {
+          "uid": "dpl_HCPWFWAk5xizMtJtykCe6oKcjCRx",
+          "state": "READY",
+          "target": null,
+          "source": "git",
+          "commit": "51d6a26a537090637b372b09085d772a53726129"
+        }
+      ]
+    }
+  },
+  "github": {
+    "repo": "NorthModelLabs/atlas-realtime-example",
+    "pr": 1,
+    "state": "OPEN",
+    "draft": true,
+    "base": "main",
+    "base_sha": "8f0436c06ec212aaff02a742463443c1ecd3d54f",
+    "head": "fix/restore-apple-demo-20260930",
+    "head_sha": "f35b6e1c055f71aa79c0a530ccb1cc78358466ea",
+    "mergeable": true,
+    "check": "SUCCESS on legacy atlas-realtime-example",
+    "changed_files": 834,
+    "additions": 150300,
+    "deletions": 572
+  },
+  "runtime_diff_from_public": [
+    "app/demo.tsx",
+    "app/lib/voice-diagnostics.ts"
+  ],
+  "mutations_performed": []
+}

@@ -1,0 +1,115 @@
+{
+  "observed_at": "2026-10-01T02:16:20.708686+00:00",
+  "workers": [
+    {
+      "worker": "avatar-pasteback-main-security-0",
+      "ready": true,
+      "warmup": {
+        "enabled": true,
+        "startup_complete": null,
+        "inflight": false,
+        "last_ok_elapsed_ms": 1373,
+        "last_ok_age_ms": 21964
+      }
+    },
+    {
+      "worker": "avatar-pasteback-main-security-1",
+      "ready": true,
+      "warmup": {
+        "enabled": true,
+        "startup_complete": null,
+        "inflight": false,
+        "last_ok_elapsed_ms": 1306,
+        "last_ok_age_ms": 36583
+      }
+    },
+    {
+      "worker": "avatar-pasteback-main-security-2",
+      "ready": true,
+      "warmup": {
+        "enabled": true,
+        "startup_complete": null,
+        "inflight": false,
+        "last_ok_elapsed_ms": 1347,
+        "last_ok_age_ms": 468928854
+      }
+    },
+    {
+      "worker": "avatar-pasteback-main-security-3",
+      "ready": true,
+      "warmup": {
+        "enabled": true,
+        "startup_complete": null,
+        "inflight": false,
+        "last_ok_elapsed_ms": null,
+        "last_ok_age_ms": null
+      }
+    },
+    {
+      "worker": "avatar-pasteback-main-security-4",
+      "ready": true,
+      "warmup": {
+        "enabled": true,
+        "startup_complete": null,
+        "inflight": false,
+        "last_ok_elapsed_ms": null,
+        "last_ok_age_ms": null
+      }
+    },
+    {
+      "worker": "avatar-pasteback-main-security-5",
+      "ready": true,
+      "warmup": {
+        "enabled": true,
+        "startup_complete": null,
+        "inflight": false,
+        "last_ok_elapsed_ms": null,
+        "last_ok_age_ms": null
+      }
+    },
+    {
+      "worker": "avatar-pasteback-main-security-6",
+      "ready": true,
+      "warmup": {
+        "enabled": true,
+        "startup_complete": null,
+        "inflight": false,
+        "last_ok_elapsed_ms": 1366,
+        "last_ok_age_ms": 29963
+      }
+    },
+    {
+      "worker": "avatar-pasteback-main-security-7",
+      "ready": true,
+      "warmup": {
+        "enabled": true,
+        "startup_complete": null,
+        "inflight": false,
+        "last_ok_elapsed_ms": 1298,
+        "last_ok_age_ms": 116
+      }
+    },
+    {
+      "worker": "avatar-pasteback-main-security-8",
+      "ready": true,
+      "warmup": {
+        "enabled": true,
+        "startup_complete": null,
+        "inflight": false,
+        "last_ok_elapsed_ms": 1372,
+        "last_ok_age_ms": 4818
+      }
+    },
+    {
+      "worker": "avatar-pasteback-main-security-9",
+      "ready": true,
+      "warmup": {
+        "enabled": true,
+        "startup_complete": null,
+        "inflight": false,
+        "last_ok_elapsed_ms": null,
+        "last_ok_age_ms": null
+      }
+    }
+  ]
+}

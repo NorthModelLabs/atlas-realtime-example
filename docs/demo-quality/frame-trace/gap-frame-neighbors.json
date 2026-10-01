@@ -1,0 +1,368 @@
+[
+  {
+    "since_start_s": 1.781,
+    "sequence": [
+      {
+        "offset_ms": -233,
+        "capture_delta_ms": null,
+        "rtp_delta_ms": 79.0,
+        "receive_delta_ms": 82.3,
+        "display_delta_ms": 83.3,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": -151,
+        "capture_delta_ms": null,
+        "rtp_delta_ms": 80.0,
+        "receive_delta_ms": 75.6,
+        "display_delta_ms": 83.4,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 0,
+        "capture_delta_ms": null,
+        "rtp_delta_ms": 80.0,
+        "receive_delta_ms": 145.0,
+        "display_delta_ms": 150,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 16,
+        "capture_delta_ms": null,
+        "rtp_delta_ms": 80.0,
+        "receive_delta_ms": 18.1,
+        "display_delta_ms": 16.6,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 100,
+        "capture_delta_ms": null,
+        "rtp_delta_ms": 80.0,
+        "receive_delta_ms": 77.5,
+        "display_delta_ms": 83.4,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 133,
+        "capture_delta_ms": null,
+        "rtp_delta_ms": 41.0,
+        "receive_delta_ms": 42.0,
+        "display_delta_ms": 33.3,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 183,
+        "capture_delta_ms": null,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 40.9,
+        "display_delta_ms": 33.4,
+        "frames_delta": 1
+      }
+    ]
+  },
+  {
+    "since_start_s": 9.647,
+    "sequence": [
+      {
+        "offset_ms": -133,
+        "capture_delta_ms": 37.9,
+        "rtp_delta_ms": 38.0,
+        "receive_delta_ms": 38.3,
+        "display_delta_ms": 50,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": -100,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 38.3,
+        "display_delta_ms": 33.3,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 0,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 131.1,
+        "display_delta_ms": 100.1,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 16,
+        "capture_delta_ms": 80.0,
+        "rtp_delta_ms": 80.0,
+        "receive_delta_ms": 0.1,
+        "display_delta_ms": 16.6,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 66,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 31.2,
+        "display_delta_ms": 50,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 116,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 39.6,
+        "display_delta_ms": 33.3,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 166,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 39.0,
+        "display_delta_ms": 50,
+        "frames_delta": 1
+      }
+    ]
+  },
+  {
+    "since_start_s": 33.995,
+    "sequence": [
+      {
+        "offset_ms": -166,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 0.1,
+        "display_delta_ms": 33.4,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": -117,
+        "capture_delta_ms": 41.0,
+        "rtp_delta_ms": 41.0,
+        "receive_delta_ms": 57.4,
+        "display_delta_ms": 33.3,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 0,
+        "capture_delta_ms": 120.0,
+        "rtp_delta_ms": 120.0,
+        "receive_delta_ms": 176.1,
+        "display_delta_ms": 133.3,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 50,
+        "capture_delta_ms": 39.0,
+        "rtp_delta_ms": 39.0,
+        "receive_delta_ms": 0.1,
+        "display_delta_ms": 33.4,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 100,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 0.2,
+        "display_delta_ms": 50,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 117,
+        "capture_delta_ms": 40.1,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 38.1,
+        "display_delta_ms": 33.3,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 166,
+        "capture_delta_ms": 39.9,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 38.2,
+        "display_delta_ms": 33.4,
+        "frames_delta": 1
+      }
+    ]
+  },
+  {
+    "since_start_s": 74.126,
+    "sequence": [
+      {
+        "offset_ms": -151,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 41.4,
+        "display_delta_ms": 33.4,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": -101,
+        "capture_delta_ms": 44.0,
+        "rtp_delta_ms": 44.0,
+        "receive_delta_ms": 47.3,
+        "display_delta_ms": 33.3,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 0,
+        "capture_delta_ms": 37.0,
+        "rtp_delta_ms": 37.0,
+        "receive_delta_ms": 167.3,
+        "display_delta_ms": 116.7,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 66,
+        "capture_delta_ms": 159.0,
+        "rtp_delta_ms": 159.0,
+        "receive_delta_ms": 74.7,
+        "display_delta_ms": 66.7,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 116,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 3.7,
+        "display_delta_ms": 49.9,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 166,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 24.5,
+        "display_delta_ms": 50.1,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 216,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 39.2,
+        "display_delta_ms": 33.2,
+        "frames_delta": 1
+      }
+    ]
+  },
+  {
+    "since_start_s": 87.26,
+    "sequence": [
+      {
+        "offset_ms": -185,
+        "capture_delta_ms": 40.1,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 45.9,
+        "display_delta_ms": 50,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": -168,
+        "capture_delta_ms": 39.9,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 35.0,
+        "display_delta_ms": 33.4,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 0,
+        "capture_delta_ms": 160.0,
+        "rtp_delta_ms": 160.0,
+        "receive_delta_ms": 236.7,
+        "display_delta_ms": 166.6,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 48,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 1.6,
+        "display_delta_ms": 33.3,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 97,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 1.7,
+        "display_delta_ms": 50,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 114,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 42.1,
+        "display_delta_ms": 33.3,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 165,
+        "capture_delta_ms": 40.1,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 38.8,
+        "display_delta_ms": 50.1,
+        "frames_delta": 1
+      }
+    ]
+  },
+  {
+    "since_start_s": 98.891,
+    "sequence": [
+      {
+        "offset_ms": -201,
+        "capture_delta_ms": 41.0,
+        "rtp_delta_ms": 41.0,
+        "receive_delta_ms": 40.9,
+        "display_delta_ms": 33.4,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": -134,
+        "capture_delta_ms": 39.0,
+        "rtp_delta_ms": 39.0,
+        "receive_delta_ms": 37.8,
+        "display_delta_ms": 49.9,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 0,
+        "capture_delta_ms": 160.0,
+        "rtp_delta_ms": 160.0,
+        "receive_delta_ms": 220.2,
+        "display_delta_ms": 150.1,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 33,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 0.0,
+        "display_delta_ms": 33.2,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 84,
+        "capture_delta_ms": 40.0,
+        "rtp_delta_ms": 40.0,
+        "receive_delta_ms": 23.7,
+        "display_delta_ms": 50.1,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 133,
+        "capture_delta_ms": 41.0,
+        "rtp_delta_ms": 41.0,
+        "receive_delta_ms": 37.8,
+        "display_delta_ms": 33.3,
+        "frames_delta": 1
+      },
+      {
+        "offset_ms": 183,
+        "capture_delta_ms": 39.0,
+        "rtp_delta_ms": 39.0,
+        "receive_delta_ms": 39.4,
+        "display_delta_ms": 50,
+        "frames_delta": 1
+      }
+    ]
+  }
+]

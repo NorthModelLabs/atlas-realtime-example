@@ -1,0 +1,57 @@
+{
+  "stage_timings": [
+    {
+      "kind": "spoken",
+      "provider_including_vad_ms": 1763,
+      "browser_bridge_ms": 9,
+      "atlas_delivery_ms": 2181,
+      "e2e_ms": 3953
+    },
+    {
+      "kind": "typed",
+      "provider_including_vad_ms": 1329,
+      "browser_bridge_ms": 28,
+      "atlas_delivery_ms": 2160,
+      "e2e_ms": 3517
+    },
+    {
+      "kind": "typed",
+      "provider_including_vad_ms": 1098,
+      "browser_bridge_ms": 10,
+      "atlas_delivery_ms": 2178,
+      "e2e_ms": 3286
+    },
+    {
+      "kind": "typed",
+      "provider_including_vad_ms": 1151,
+      "browser_bridge_ms": 9,
+      "atlas_delivery_ms": 2179,
+      "e2e_ms": 3339
+    }
+  ],
+  "spoken_observation_transport_deltas": {
+    "provider_rtc": {
+      "packetsReceived": 3020,
+      "packetsLost": 32,
+      "concealedSamples": 44010,
+      "silentConcealedSamples": 23640,
+      "concealmentEvents": 22
+    },
+    "atlas_return_audio_rtc": {
+      "packetsReceived": 1121,
+      "packetsLost": 8,
+      "concealedSamples": 9428,
+      "silentConcealedSamples": 1560,
+      "concealmentEvents": 4
+    },
+    "atlas_return_video_rtc": {
+      "packetsReceived": 3358,
+      "packetsLost": 40,
+      "framesDecoded": 1519,
+      "framesDropped": 0,
+      "freezeCount": 1,
+      "totalFreezesDuration": 0.196
+    }
+  },
+  "note": "20ms RMS sampling, threshold 0.005 onset / 0.001 offset. Short controlled tests, not p95 or a universal user latency. Counters cover the observed connection interval, not exclusively voiced audio."
+}

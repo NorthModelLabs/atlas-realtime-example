@@ -1,0 +1,53 @@
+{
+  "results": {
+    "gpu_batch_submitted": {
+      "input_lag_ms": {
+        "samples": 64,
+        "min": 1200,
+        "median": 1312.5,
+        "max": 1599
+      },
+      "queue_delay_ms": {
+        "samples": 64,
+        "min": 0,
+        "median": 1219.0,
+        "max": 1559
+      },
+      "audio_q_ms": {
+        "samples": 64,
+        "min": 0,
+        "median": 0.0,
+        "max": 100
+      },
+      "render_q": {
+        "samples": 64,
+        "min": 0,
+        "median": 6.0,
+        "max": 8
+      }
+    },
+    "gpu_batch_done": {
+      "inference_ms": {
+        "samples": 64,
+        "min": 1291,
+        "median": 1311.5,
+        "max": 1659
+      },
+      "frames": {
+        "samples": 64,
+        "min": 32,
+        "median": 32.0,
+        "max": 32
+      }
+    },
+    "gpu_render_batch_timing": {
+      "fps_equiv": {
+        "samples": 64,
+        "min": 19.289,
+        "median": 24.3995,
+        "max": 24.787
+      }
+    }
+  },
+  "limits": "Single owned synthetic session; input_lag and queue_delay may overlap and must not be added. Does not establish all-user latency or separate every pipeline stage."
+}

@@ -1,0 +1,61 @@
+{
+  "source": "upstream-tail/events.json",
+  "tails": [
+    {
+      "tail": 1,
+      "source_quiet_at": 1790846190333,
+      "returned_quiet_at": 1790846192474,
+      "provider_server_stop_at": 1790846190726,
+      "stop_after_source_quiet_ms": 393,
+      "post_stop_150_to_800ms_windows": 5,
+      "post_stop_peak_rms": 0.00025595,
+      "post_stop_above_visual_gate_observations": 2
+    },
+    {
+      "tail": 2,
+      "source_quiet_at": 1790846207957,
+      "returned_quiet_at": 1790846210113,
+      "provider_server_stop_at": 1790846208327,
+      "stop_after_source_quiet_ms": 370,
+      "post_stop_150_to_800ms_windows": 6,
+      "post_stop_peak_rms": 0.00031216,
+      "post_stop_above_visual_gate_observations": 1
+    },
+    {
+      "tail": 3,
+      "source_quiet_at": 1790846226291,
+      "returned_quiet_at": 1790846228433,
+      "provider_server_stop_at": 1790846226509,
+      "stop_after_source_quiet_ms": 218,
+      "post_stop_150_to_800ms_windows": 5,
+      "post_stop_peak_rms": 0.00013909,
+      "post_stop_above_visual_gate_observations": 1
+    },
+    {
+      "tail": 4,
+      "source_quiet_at": 1790846245776,
+      "returned_quiet_at": 1790846247915,
+      "provider_server_stop_at": 1790846246037,
+      "stop_after_source_quiet_ms": 261,
+      "post_stop_150_to_800ms_windows": 6,
+      "post_stop_peak_rms": 0.00054474,
+      "post_stop_above_visual_gate_observations": 5
+    },
+    {
+      "tail": 5,
+      "source_quiet_at": 1790846274450,
+      "returned_quiet_at": 1790846276574,
+      "provider_server_stop_at": 1790846274647,
+      "stop_after_source_quiet_ms": 197,
+      "post_stop_150_to_800ms_windows": 6,
+      "post_stop_peak_rms": 0.00032071,
+      "post_stop_above_visual_gate_observations": 2
+    }
+  ],
+  "finding": "Low-level provider-decoded signals remain after the server drain event in all five samples.",
+  "limits": [
+    "Server drain is not client playout completion; no audio gate is justified from the server event alone.",
+    "Only sampled browser audio, not model-input PCM.",
+    "Does not yet prove the transport or provider is the root cause."
+  ]
+}

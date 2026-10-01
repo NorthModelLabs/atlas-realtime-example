@@ -4,8 +4,10 @@ import Image from "next/image";
 import { useState, useRef, useCallback, useEffect, type CSSProperties, type DragEvent, type ChangeEvent } from "react";
 import { flushSync } from "react-dom";
 import { useAtlasSession } from "@northmodellabs/atlas-react";
-import { LocalAudioTrack, Track } from "livekit-client";
-import { useScribe, CommitStrategy } from "@elevenlabs/react";
+import { LocalAudioTrack, Track, RoomEvent, type RemoteTrack } from "livekit-client";
+import { useRealtimeVoice } from "@/app/lib/use-realtime-voice";
+import { probeAudio, probeScheduler, probeStats, probeVideo } from "@/app/lib/voice-diagnostics";
+import { observeReturnedSpeech } from "@/app/lib/returned-speech";
 
 const DEFAULT_FACE_ID = "enterprise-b1450303";
 const DEFAULT_FACE_URL = "/faces/enterprise-b1450303.jpg";
@@ -29,11 +31,6 @@ type ChatMsg = {
 export type UiMode = "studio" | "apple" | "tiktok" | "teacher" | "meet" | "mirror";
 export type VoiceMode = "ai" | "mirror";
 
-interface ChatHistory {
-  role: "user" | "assistant";
-  content: string;
-}
-
 const UI_MODES = new Set<UiMode>(["apple", "tiktok", "teacher", "meet"]);
 const UI_FORMATS: { id: UiMode; label: string; urlLabel: string }[] = [
   { id: "apple", label: "Apple", urlLabel: "?ui=apple" },
@@ -42,7 +39,7 @@ const UI_FORMATS: { id: UiMode; label: string; urlLabel: string }[] = [
   { id: "meet", label: "Meet", urlLabel: "?ui=meet" },
 ];
 const VOICE_MODES: { id: VoiceMode; label: string; description: string }[] = [
-  { id: "ai", label: "AI voice", description: "LLM + ElevenLabs speak through Atlas" },
+  { id: "ai", label: "AI voice", description: "OpenAI Realtime speaks through Atlas" },
   { id: "mirror", label: "Mirror", description: "Your microphone drives the avatar directly" },
 ];
 const TEACHER_STEPS = [
@@ -336,6 +333,8 @@ export default function DemoPage({
   const [localMessages, setLocalMessages] = useState<ChatMsg[]>([]);
   const [swapping, setSwapping] = useState(false);
   const [aiThinking, setAiThinking] = useState(false);
+  const [avatarSpeaking, setAvatarSpeaking] = useState(false);
+  const [voiceError, setVoiceError] = useState("");
   const [faceLoading, setFaceLoading] = useState(false);
 
   const [configReady, setConfigReady] = useState<{ llm: boolean; tts: boolean } | null>(null);
@@ -355,7 +354,6 @@ export default function DemoPage({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const swapInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const chatHistoryRef = useRef<ChatHistory[]>([]);
   const faceSelectionVersionRef = useRef(0);
 
   useEffect(() => {
@@ -444,6 +442,19 @@ export default function DemoPage({
     const interval = setInterval(() => setSessionTime((t) => t + 1), 1000);
     return () => clearInterval(interval);
   }, [session.status]);
+
+  // Format changes replace the video container while the LiveKit track stays live.
+  useEffect(() => {
+    const container = session.videoRef.current;
+    if (!container || session.status !== "connected" || !session.room) return;
+    for (const participant of session.room.remoteParticipants.values()) {
+      if (participant.identity !== "avatar_worker") continue;
+      for (const publication of participant.videoTrackPublications.values()) {
+        const element = publication.track?.attachedElements.find(el => el.dataset.atlasLkVideo === "true");
+        if (element && element.parentElement !== container) container.appendChild(element);
+      }
+    }
+  }, [uiMode, session.status, session.room, session.videoRef]);
 
   const isConnected = session.status === "connected";
   const isDisconnected = session.status === "idle" || session.status === "disconnected";
@@ -570,7 +581,6 @@ export default function DemoPage({
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const audioDestRef = useRef<MediaStreamAudioDestinationNode | null>(null);
-  const ttsSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const ttsTrackReadyRef = useRef<Promise<void> | null>(null);
 
   const stopMirrorInput = useCallback(() => {
@@ -596,6 +606,33 @@ export default function DemoPage({
     const destination = audioCtx.createMediaStreamDestination();
     const mediaTrack = destination.stream.getAudioTracks()[0];
     const livekitTrack = new LocalAudioTrack(mediaTrack);
+    const probes = [probeScheduler(audioCtx), probeAudio(audioCtx, destination.stream, "atlas_outgoing_audio"), probeStats(() => livekitTrack.getRTCStatsReport(), "atlas_outgoing_rtc")];
+    const observed = new Set<RemoteTrack>();
+    const speechObservers = new Map<RemoteTrack, () => void>();
+    const speakingTracks = new Set<RemoteTrack>();
+    const observeReturn = (track: RemoteTrack) => {
+      if (observed.has(track)) return;
+      observed.add(track);
+      probes.push(probeStats(() => track.getRTCStatsReport(), `atlas_return_${track.kind}_rtc`));
+      if (track.kind === Track.Kind.Video) {
+        probes.push(probeVideo(() => track.attachedElements.find((element): element is HTMLVideoElement => element instanceof HTMLVideoElement)));
+      }
+      if (track.kind === Track.Kind.Audio) {
+        probes.push(probeAudio(audioCtx, new MediaStream([track.mediaStreamTrack]), "atlas_return_audio"));
+        speechObservers.set(track, observeReturnedSpeech(audioCtx, track.mediaStreamTrack, speaking => {
+          if (speaking) speakingTracks.add(track); else speakingTracks.delete(track);
+          setAvatarSpeaking(speakingTracks.size > 0);
+        }));
+      }
+    };
+    const forgetReturn = (track: RemoteTrack) => {
+      speechObservers.get(track)?.();
+      speechObservers.delete(track);
+      observed.delete(track);
+    };
+    room.remoteParticipants.forEach(participant => participant.trackPublications.forEach(publication => {if (publication.track) observeReturn(publication.track);}));
+    room.on(RoomEvent.TrackSubscribed, observeReturn);
+    room.on(RoomEvent.TrackUnsubscribed, forgetReturn);
 
     audioCtxRef.current = audioCtx;
     audioDestRef.current = destination;
@@ -611,17 +648,11 @@ export default function DemoPage({
     });
 
     return () => {
-      const source = ttsSourceRef.current;
-      ttsSourceRef.current = null;
-      if (source) {
-        source.onended = null;
-        try {
-          source.stop();
-        } catch {
-          /* source already stopped */
-        }
-        source.disconnect();
-      }
+      room.off(RoomEvent.TrackSubscribed, observeReturn);
+      room.off(RoomEvent.TrackUnsubscribed, forgetReturn);
+      speechObservers.forEach(stop => stop());
+      setAvatarSpeaking(false);
+      probes.forEach(cleanup => cleanup());
       ttsTrackReadyRef.current = null;
       try {
         room.localParticipant.unpublishTrack(livekitTrack);
@@ -635,53 +666,21 @@ export default function DemoPage({
     };
   }, [session.status, session.room]);
 
-  const stopTtsPlayback = useCallback(() => {
-    const source = ttsSourceRef.current;
-    ttsSourceRef.current = null;
-    if (!source) return;
-    source.onended = null;
-    try {
-      source.stop();
-    } catch {
-      /* source already stopped */
-    }
-    source.disconnect();
-  }, []);
-
-  const playTtsResponse = useCallback(async (base64Audio: string) => {
-    const audioCtx = audioCtxRef.current;
+  const voiceOutput = useCallback(async () => {
+    const context = audioCtxRef.current;
     const destination = audioDestRef.current;
-    const trackReady = ttsTrackReadyRef.current;
-    if (!audioCtx || !destination || !trackReady) return;
-
-    stopTtsPlayback();
-
-    try {
-      await trackReady;
-      if (audioCtx.state === "suspended") await audioCtx.resume();
-
-      const binary = atob(base64Audio);
-      const bytes = new Uint8Array(binary.length);
-      for (let index = 0; index < binary.length; index += 1) {
-        bytes[index] = binary.charCodeAt(index);
-      }
-
-      const audioBuffer = await audioCtx.decodeAudioData(bytes.buffer.slice(0));
-      if (audioCtxRef.current !== audioCtx || audioDestRef.current !== destination) return;
-
-      const source = audioCtx.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(destination);
-      ttsSourceRef.current = source;
-      source.onended = () => {
-        source.disconnect();
-        if (ttsSourceRef.current === source) ttsSourceRef.current = null;
-      };
-      source.start();
-    } catch (err) {
-      console.warn("TTS playback failed:", err);
-    }
-  }, [stopTtsPlayback]);
+    const ready = ttsTrackReadyRef.current;
+    if (!context || !destination || !ready) throw new Error("Avatar audio is not ready");
+    await context.resume(); await ready;
+    return { context, destination };
+  }, []);
+  const voice = useRealtimeVoice({
+    sessionId: session.sessionId, output: voiceOutput,
+    user: text => addMsg("user", text), assistant: text => addMsg("atlas", text),
+    thinking: setAiThinking, error: text => {setVoiceError(text); if (text) addMsg("system", text);},
+  });
+  const stopListening = voice.stop;
+  const startListening = voice.start;
 
   const hasFace = !!faceFile || faceUrl.trim().startsWith("https://");
   const aiEnabled = voiceMode === "ai" && configReady?.llm === true;
@@ -689,7 +688,6 @@ export default function DemoPage({
     if (!hasFace) return;
     setLocalMessages([]);
     setSessionTime(0);
-    chatHistoryRef.current = [];
     await session.connect(faceFile, faceUrl.trim() || null);
   };
 
@@ -697,11 +695,9 @@ export default function DemoPage({
     setMeetLeaveArmed(false);
     stopMirrorInput();
     stopListening();
-    stopTtsPlayback();
     await session.disconnect();
     addMsg("system", "Session ended");
     setSessionTime(0);
-    chatHistoryRef.current = [];
   };
 
   const armMeetLeave = () => {
@@ -709,9 +705,20 @@ export default function DemoPage({
     window.setTimeout(() => setMeetLeaveArmed(false), 2200);
   };
 
-  const viewerUrl = session.sessionId
-    ? `${typeof window !== "undefined" ? window.location.origin : ""}/watch/${session.sessionId}`
-    : "";
+  const [viewerLink, setViewerLink] = useState({ sessionId: "", path: "" });
+  useEffect(() => {
+    const id = session.sessionId;
+    if (!id) return;
+    let cancelled = false;
+    fetch(`/api/session/${id}/share`).then(async response => {
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!cancelled && typeof data.path === "string") setViewerLink({ sessionId: id, path: data.path });
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [session.sessionId]);
+  const viewerUrl = viewerLink.sessionId === session.sessionId && viewerLink.path
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}${viewerLink.path}` : "";
 
   const copyShareLink = useCallback(async () => {
     if (!viewerUrl) return;
@@ -730,44 +737,6 @@ export default function DemoPage({
     sendChatRef.current?.(text);
   }, []);
 
-  const scribe = useScribe({
-    modelId: "scribe_v2_realtime",
-    commitStrategy: CommitStrategy.VAD,
-    vadSilenceThresholdSecs: 0.8,
-    languageCode: "en",
-    onCommittedTranscript: (data) => {
-      if (voiceMode !== "ai") return;
-      if (data.text.trim()) sendChatRef.current?.(data.text.trim());
-    },
-  });
-
-  const scribeRef = useRef(scribe);
-  scribeRef.current = scribe;
-
-  const startListening = useCallback(async () => {
-    const s = scribeRef.current;
-    if (s.isConnected || !aiEnabled || voiceMode !== "ai") return;
-    try {
-      const res = await fetch("/api/scribe-token");
-      const { token } = await res.json();
-      if (!token) return;
-      await s.connect({
-        token,
-        microphone: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-      });
-    } catch (err) {
-      console.warn("Failed to start ElevenLabs STT:", err);
-    }
-  }, [aiEnabled, voiceMode]);
-
-  const stopListening = useCallback(() => {
-    scribeRef.current.disconnect();
-  }, []);
-
   useEffect(() => {
     if (session.status !== "connected") {
       stopMirrorInput();
@@ -776,12 +745,11 @@ export default function DemoPage({
 
     if (voiceMode === "mirror") {
       stopListening();
-      stopTtsPlayback();
       void startMirrorInput();
     } else {
       stopMirrorInput();
     }
-  }, [session.status, voiceMode, startMirrorInput, stopMirrorInput, stopListening, stopTtsPlayback]);
+  }, [session.status, voiceMode, startMirrorInput, stopMirrorInput, stopListening]);
 
   const toggleVoiceInput = useCallback(() => {
     if (voiceMode === "mirror") {
@@ -792,59 +760,15 @@ export default function DemoPage({
       }
       return;
     }
-    if (scribeRef.current.isConnected) {
-      stopListening();
-    } else {
-      void startListening();
-    }
-  }, [mirrorInputActive, startListening, startMirrorInput, stopListening, stopMirrorInput, voiceMode]);
+    voice.toggleMicrophone();
+  }, [mirrorInputActive, startMirrorInput, stopMirrorInput, voiceMode, voice.toggleMicrophone]);
 
   sendChatRef.current = (text: string) => {
     if (!text.trim()) return;
     addMsg("user", text);
-
-    if (voiceMode === "mirror") {
-      return;
-    }
-
-    if (aiEnabled) {
-      setAiThinking(true);
-      chatHistoryRef.current.push({ role: "user", content: text });
-
-      fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, history: chatHistoryRef.current.slice(0, -1) }),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("AI request failed");
-          return res.json();
-        })
-        .then((data) => {
-          setAiThinking(false);
-          if (data.text) {
-            addMsg("atlas", data.text);
-            chatHistoryRef.current.push({ role: "assistant", content: data.text });
-
-            fetch("/api/tts", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ text: data.text }),
-            })
-              .then((r) => (r.ok ? r.json() : null))
-              .then((tts) => {
-                if (tts?.audio) void playTtsResponse(tts.audio);
-              })
-              .catch(() => {});
-          }
-        })
-        .catch(() => {
-          addMsg("system", "Failed to reach AI");
-          setAiThinking(false);
-        });
-    } else {
-      session.sendChat(text);
-    }
+    if (voiceMode === "mirror") return;
+    if (aiEnabled) voice.sendText(text);
+    else session.sendChat(text);
   };
 
   // Auto-start listening when connected + AI enabled
@@ -857,12 +781,14 @@ export default function DemoPage({
 
   const isTiktokUi = uiMode === "tiktok";
   const overlayMessages = localMessages.filter((msg) => msg.role !== "system").slice(-2);
-  const tiktokOverlayMessages = scribe.partialTranscript
+  const tiktokOverlayMessages = voice.partialTranscript
     ? overlayMessages.filter((msg) => msg.role === "atlas").slice(-1)
     : overlayMessages;
   const showTiktokDialogue = isConnected || session.status === "connecting";
   const latestAtlasMessage = [...localMessages].reverse().find((msg) => msg.role === "atlas");
-  const voiceInputActive = voiceMode === "mirror" ? mirrorInputActive : scribe.isConnected;
+  const userCaption = voice.partialTranscript || voice.captions.user;
+  const assistantCaption = voice.captions.assistant;
+  const voiceInputActive = voiceMode === "mirror" ? mirrorInputActive : voice.isListening;
   const activeFormatMode: UiMode = uiMode;
   const activeFormatIndex = Math.max(0, UI_FORMATS.findIndex((format) => format.id === activeFormatMode));
   const formatPicker = (className = "") => (
@@ -888,6 +814,7 @@ export default function DemoPage({
       ))}
     </nav>
   );
+  const voiceAlert = voiceError ? <div role="alert" className="fixed top-16 left-1/2 -translate-x-1/2 z-[100] max-w-lg rounded-xl bg-red-950 px-5 py-3 text-sm text-white">{voiceError}</div> : null;
   const hiddenFaceInputs = (
     <>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
@@ -908,18 +835,19 @@ export default function DemoPage({
     const appleStatus = session.status === "connecting"
       ? "Connecting"
       : isConnected
-        ? voiceInputActive
-          ? "Listening"
-          : "Connected"
+        ? avatarSpeaking
+          ? "Speaking"
+          : aiThinking
+            ? "Thinking"
+            : voiceInputActive
+              ? "Listening"
+              : "Connected"
         : "Ready";
-    const appleCaption = scribe.partialTranscript
-      ? `${scribe.partialTranscript}…`
-      : aiThinking
-        ? "Thinking…"
-        : latestAtlasMessage?.text || (isConnected ? "Say something." : "Ready when you are.");
+    const appleCaption = assistantCaption || (aiThinking ? "Thinking…" : voice.captions.speechActive ? "Listening…" : userCaption ? "" : isConnected ? "Say something." : "Ready when you are.");
 
     return (
       <div className="apple-ui h-screen w-screen overflow-hidden text-white">
+        {voiceAlert}
         {hiddenFaceInputs}
         {formatPicker("global-format-picker apple-format-picker")}
 
@@ -954,9 +882,9 @@ export default function DemoPage({
               {session.status === "connecting" && <div className="apple-loading-ring" aria-hidden="true" />}
             </div>
 
-            <div className="apple-caption" aria-live="polite">
-              <strong>Atlas</strong>
-              <p>{appleCaption}</p>
+            <div className="apple-caption voice-dialogue" aria-live="polite" aria-label="Conversation captions">
+              {userCaption && <p><strong>You</strong> {userCaption}{voice.partialTranscript ? "…" : ""}</p>}
+              {appleCaption && <p><strong>Atlas</strong> {appleCaption}</p>}
             </div>
           </section>
 
@@ -1057,6 +985,7 @@ export default function DemoPage({
   if (uiMode === "teacher") {
     return (
       <div className="teacher-ui min-h-screen w-screen bg-[#edf1f5] text-[#111827]">
+        {voiceAlert}
         {hiddenFaceInputs}
         {formatPicker("global-format-picker")}
         <header className="teacher-topbar">
@@ -1163,7 +1092,7 @@ export default function DemoPage({
               <h2>Ask Atlas</h2>
               <p>
                 {isConnected
-                  ? latestAtlasMessage?.text || `Let’s work through step ${teacherStep + 1}: ${TEACHER_STEPS[teacherStep].label.toLowerCase()}.`
+                  ? assistantCaption || latestAtlasMessage?.text || `Let’s work through step ${teacherStep + 1}: ${TEACHER_STEPS[teacherStep].label.toLowerCase()}.`
                   : "Start a short guided explanation, or ask a question about the graph."}
               </p>
             </div>
@@ -1234,6 +1163,7 @@ export default function DemoPage({
     const meetPanelTitle = meetPanel === "chat" ? "In-call messages" : meetPanel === "people" ? "People" : "Call settings";
     return (
       <div className="meet-ui mode-shell h-screen w-screen overflow-hidden bg-[#202124] text-white">
+        {voiceAlert}
         {hiddenFaceInputs}
         {formatPicker("global-format-picker meet-global-format-picker")}
         <header className="meet-topbar">
@@ -1306,13 +1236,13 @@ export default function DemoPage({
             </div>
             {meetCaptions && (
               <div className="meet-floating-caption" aria-live="polite">
-                <strong>Atlas</strong>
+                <strong>{voice.partialTranscript || (userCaption && !assistantCaption) ? "You" : "Atlas"}</strong>
                 <span>
-                  {scribe.partialTranscript
-                    ? `${scribe.partialTranscript}…`
+                  {voice.partialTranscript
+                    ? `${voice.partialTranscript}…`
                     : aiThinking
                       ? "Thinking…"
-                      : latestAtlasMessage?.text || (isConnected ? "Listening — say something." : "Join when you’re ready.")}
+                      : assistantCaption || userCaption || (isConnected ? "Listening — say something." : "Join when you’re ready.")}
                 </span>
               </div>
             )}
@@ -1536,6 +1466,7 @@ export default function DemoPage({
   if (uiMode === "mirror") {
     return (
       <div className="mirror-ui min-h-screen w-screen overflow-hidden bg-[#f7f7f4] text-[#111111]">
+        {voiceAlert}
         {hiddenFaceInputs}
         {formatPicker("global-format-picker mirror-format-picker")}
 
@@ -1634,6 +1565,7 @@ export default function DemoPage({
         isTiktokUi ? "tiktok-ui relative" : "flex"
       }`}
     >
+      {voiceAlert}
       {formatPicker("global-format-picker")}
       {/* Video Panel */}
       <div
@@ -1776,13 +1708,13 @@ export default function DemoPage({
 
             {showTiktokDialogue && (
             <div className="tiktok-dialogue pointer-events-none absolute inset-x-5 z-20 flex flex-col items-start gap-2">
-              {tiktokOverlayMessages.length === 0 && !scribe.partialTranscript && !aiThinking && (
+              {tiktokOverlayMessages.length === 0 && !voice.partialTranscript && !aiThinking && (
                 <div className="tiktok-caption tiktok-status-caption">
                   {voiceMode === "mirror"
                     ? mirrorInputActive
                       ? "Mirror live"
                       : "Tap mic to mirror"
-                    : aiEnabled && scribe.isConnected
+                    : aiEnabled && voice.isListening
                       ? "Listening..."
                       : "Type or speak to start"}
                 </div>
@@ -1804,12 +1736,12 @@ export default function DemoPage({
                   {msg.text}
                 </div>
               ))}
-              {scribe.partialTranscript && (
+              {voice.partialTranscript && (
                 <div className="tiktok-caption tiktok-message tiktok-message-partial">
                   <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.16em] text-white/60">
                     You
                   </span>
-                  {scribe.partialTranscript}...
+                  {voice.partialTranscript}...
                 </div>
               )}
               {aiThinking && (
@@ -2029,7 +1961,7 @@ export default function DemoPage({
                     ? "Mirror is live — speak normally..."
                     : "Enable the mirror mic to speak through Atlas..."
                   : aiEnabled
-                  ? scribe.isConnected
+                  ? voice.isListening
                     ? "Listening — speak or type below..."
                     : "Type a message to start..."
                   : "Start speaking..."}
@@ -2062,13 +1994,13 @@ export default function DemoPage({
                 )}
               </div>
             ))}
-            {scribe.partialTranscript && (
+            {voice.partialTranscript && (
               <div className="flex flex-col items-end">
                 <span className="font-mono text-[9px] tracking-[0.15em] text-[#888] uppercase mb-1">
                   You
                 </span>
                 <div className="px-3 py-2 bg-[#151515] border border-[#333] text-[#666] text-[12px] italic">
-                  {scribe.partialTranscript}...
+                  {voice.partialTranscript}...
                 </div>
               </div>
             )}
@@ -2149,16 +2081,13 @@ export default function DemoPage({
                   <div>
                     <p className="font-mono text-[10px] text-[#ffaa00] tracking-[0.1em]">
                       {!configReady.llm && !configReady.tts
-                        ? "LLM + TTS not configured"
+                        ? "Voice is unavailable"
                         : !configReady.llm
-                          ? "LLM not configured"
-                          : "TTS not configured"}
+                          ? "Voice is unavailable"
+                          : "Voice is unavailable"}
                     </p>
                     <p className="font-mono text-[9px] text-[#886600] mt-1 leading-relaxed">
-                      Add {!configReady.llm && <code className="text-[#aa8800]">OPENAI_API_KEY</code>}
-                      {!configReady.llm && !configReady.tts && " and "}
-                      {!configReady.tts && <code className="text-[#aa8800]">ELEVENLABS_API_KEY</code>}
-                      {" "}to .env.local to enable AI responses
+                      Voice is temporarily unavailable. Please try again later.
                     </p>
                   </div>
                 </div>
@@ -2166,7 +2095,7 @@ export default function DemoPage({
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-accent" />
                   <p className="font-mono text-[10px] text-accent tracking-[0.1em]">
-                    LLM + TTS enabled
+                    OpenAI Realtime voice enabled
                   </p>
                 </div>
               )}

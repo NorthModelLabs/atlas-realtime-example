@@ -1,0 +1,79 @@
+{
+  "trials": [
+    {
+      "gain": 1,
+      "dtx": true,
+      "decoded_speech_peak_rms": 0.18477854704977706,
+      "decoded_tail_peak_rms": 0,
+      "tail_frames_above_gate": 0,
+      "stats": [
+        {
+          "packetsReceived": 245,
+          "packetsLost": 0,
+          "concealedSamples": 113895,
+          "silentConcealedSamples": 113640,
+          "jitterBufferDelay": 4214.4,
+          "jitterBufferEmittedCount": 217920
+        }
+      ]
+    },
+    {
+      "gain": 1,
+      "dtx": false,
+      "decoded_speech_peak_rms": 0.1771393276636231,
+      "decoded_tail_peak_rms": 0,
+      "tail_frames_above_gate": 0,
+      "stats": [
+        {
+          "packetsReceived": 422,
+          "packetsLost": 0,
+          "concealedSamples": 142440,
+          "silentConcealedSamples": 140880,
+          "jitterBufferDelay": 12192,
+          "jitterBufferEmittedCount": 387840
+        }
+      ]
+    },
+    {
+      "gain": 0.01,
+      "dtx": true,
+      "decoded_speech_peak_rms": 0.0017576216158997856,
+      "decoded_tail_peak_rms": 0,
+      "tail_frames_above_gate": 0,
+      "stats": [
+        {
+          "packetsReceived": 227,
+          "packetsLost": 0,
+          "concealedSamples": 103080,
+          "silentConcealedSamples": 103080,
+          "jitterBufferDelay": 3849.6,
+          "jitterBufferEmittedCount": 200640
+        }
+      ]
+    },
+    {
+      "gain": 0.01,
+      "dtx": false,
+      "decoded_speech_peak_rms": 0.0017285952884999304,
+      "decoded_tail_peak_rms": 0,
+      "tail_frames_above_gate": 0,
+      "stats": [
+        {
+          "packetsReceived": 422,
+          "packetsLost": 0,
+          "concealedSamples": 142440,
+          "silentConcealedSamples": 140880,
+          "jitterBufferDelay": 11232,
+          "jitterBufferEmittedCount": 387840
+        }
+      ]
+    }
+  ],
+  "conclusion": "Both conditions render the clean zero tail below the visual gate in local loopback; this does not establish a DTX root cause.",
+  "limits": [
+    "Local Chrome decoder, not production worker decoder.",
+    "No SFU, model, or provider in this test.",
+    "Only gains 1 and 0.01; no natural-noise inference.",
+    "V1 discarded: no speech reached receiver; V2 no sustained input after the fixture. V3 keeps three seconds of zero input active."
+  ]
+}

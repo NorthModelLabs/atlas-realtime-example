@@ -1,0 +1,33 @@
+{
+  "project": "atlas-stg-isolated-20260831",
+  "vm": "atlas-stg-mouth-tail-20261001",
+  "zone": "us-west1-a",
+  "maximum_gpus": 1,
+  "maximum_runtime_seconds": 1800,
+  "external_ip": false,
+  "production_changes": false,
+  "model_digest": "sha256:f853fbd1dc92ae7a514e93107e3696e8009f74e929180ac361e2e28e9d52e7e4",
+  "runner_digest": "sha256:830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee",
+  "startup_sha256": "e6d8e4fd85c82ad19a080b6b2de2da6e509b8c073d045293254978322728bc36",
+  "probe_sha256": "5a6ac9ebec91e91443d82f534c311134268a4ecb5225ff2c97a829f2c8cd6c96",
+  "recorder_sha256": "13a4065ffdb2379c30b5af5c6c3633966faf4dc2b800b8e8a7917255a12db3d3",
+  "conditions": [
+    {
+      "idle_mouth_strength": 0.85,
+      "condition": "baseline"
+    },
+    {
+      "idle_mouth_strength": 1.0,
+      "condition": "clamp"
+    },
+    {
+      "idle_mouth_strength": 0.85,
+      "condition": "repeat"
+    }
+  ],
+  "scope": "Direct model/runner comparison with prolonged exact-zero PCM, normal and quiet speech. All source/model/eye settings preserved except isolated mouth-strength condition. No timing or transport claim. Bounded retained input/outcome archive for verification.",
+  "machine_type": "g2-standard-16",
+  "guest_memory_mb": 65536,
+  "private_subnet": "atlas-stg-gpu-us-west1",
+  "private_cidr": "10.113.0.0/24"
+}

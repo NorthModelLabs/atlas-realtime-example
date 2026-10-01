@@ -1,0 +1,27 @@
+{
+  "preview": "dpl_AFYAoAGrNJHNRzcmriNhdCFxStAz",
+  "events": [
+    {
+      "at": 1790828013734,
+      "stage": "typed_input"
+    },
+    {
+      "at": 1790828013765,
+      "stage": "typed_input"
+    },
+    {
+      "at": 1790828013853,
+      "stage": "response.created",
+      "status": "in_progress"
+    },
+    {
+      "at": 1790828018566,
+      "stage": "response.done",
+      "status": "incomplete"
+    }
+  ],
+  "visible_error": "Voice request failed. Please try again.",
+  "latest_request": "Stop counting. Say only hello.",
+  "observed_reply": "counting continued; no hello reply",
+  "cleanup_http": 200
+}

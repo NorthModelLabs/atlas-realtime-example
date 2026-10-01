@@ -1,0 +1,291 @@
+[
+  {
+    "tail": 1,
+    "windows": [
+      {
+        "ms": 58,
+        "peak_rms": 0.00239
+      },
+      {
+        "ms": 158,
+        "peak_rms": 6e-05
+      },
+      {
+        "ms": 278,
+        "peak_rms": 9e-05
+      },
+      {
+        "ms": 397,
+        "peak_rms": 3e-05
+      },
+      {
+        "ms": 498,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 618,
+        "peak_rms": 5e-05
+      },
+      {
+        "ms": 719,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 838,
+        "peak_rms": 3e-05
+      },
+      {
+        "ms": 959,
+        "peak_rms": 3e-05
+      },
+      {
+        "ms": 1078,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 1198,
+        "peak_rms": 3e-05
+      },
+      {
+        "ms": 1318,
+        "peak_rms": 3e-05
+      },
+      {
+        "ms": 1438,
+        "peak_rms": 3e-05
+      }
+    ]
+  },
+  {
+    "tail": 2,
+    "windows": [
+      {
+        "ms": 19,
+        "peak_rms": 0.00576
+      },
+      {
+        "ms": 139,
+        "peak_rms": 9e-05
+      },
+      {
+        "ms": 240,
+        "peak_rms": 5e-05
+      },
+      {
+        "ms": 361,
+        "peak_rms": 6e-05
+      },
+      {
+        "ms": 481,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 599,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 720,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 842,
+        "peak_rms": 3e-05
+      },
+      {
+        "ms": 959,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 1060,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 1160,
+        "peak_rms": 3e-05
+      },
+      {
+        "ms": 1281,
+        "peak_rms": 3e-05
+      },
+      {
+        "ms": 1400,
+        "peak_rms": 3e-05
+      }
+    ]
+  },
+  {
+    "tail": 3,
+    "windows": [
+      {
+        "ms": 19,
+        "peak_rms": 0.00331
+      },
+      {
+        "ms": 139,
+        "peak_rms": 8e-05
+      },
+      {
+        "ms": 259,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 360,
+        "peak_rms": 0.00011
+      },
+      {
+        "ms": 479,
+        "peak_rms": 8e-05
+      },
+      {
+        "ms": 580,
+        "peak_rms": 8e-05
+      },
+      {
+        "ms": 700,
+        "peak_rms": 8e-05
+      },
+      {
+        "ms": 819,
+        "peak_rms": 6e-05
+      },
+      {
+        "ms": 919,
+        "peak_rms": 7e-05
+      },
+      {
+        "ms": 1019,
+        "peak_rms": 7e-05
+      },
+      {
+        "ms": 1140,
+        "peak_rms": 7e-05
+      },
+      {
+        "ms": 1241,
+        "peak_rms": 6e-05
+      },
+      {
+        "ms": 1359,
+        "peak_rms": 3e-05
+      },
+      {
+        "ms": 1459,
+        "peak_rms": 3e-05
+      }
+    ]
+  },
+  {
+    "tail": 4,
+    "windows": [
+      {
+        "ms": 60,
+        "peak_rms": 0.0011
+      },
+      {
+        "ms": 161,
+        "peak_rms": 6e-05
+      },
+      {
+        "ms": 280,
+        "peak_rms": 7e-05
+      },
+      {
+        "ms": 399,
+        "peak_rms": 0.00011
+      },
+      {
+        "ms": 500,
+        "peak_rms": 6e-05
+      },
+      {
+        "ms": 622,
+        "peak_rms": 6e-05
+      },
+      {
+        "ms": 740,
+        "peak_rms": 7e-05
+      },
+      {
+        "ms": 860,
+        "peak_rms": 5e-05
+      },
+      {
+        "ms": 980,
+        "peak_rms": 6e-05
+      },
+      {
+        "ms": 1081,
+        "peak_rms": 5e-05
+      },
+      {
+        "ms": 1202,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 1320,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 1440,
+        "peak_rms": 4e-05
+      }
+    ]
+  },
+  {
+    "tail": 5,
+    "windows": [
+      {
+        "ms": 60,
+        "peak_rms": 0.00104
+      },
+      {
+        "ms": 181,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 302,
+        "peak_rms": 7e-05
+      },
+      {
+        "ms": 420,
+        "peak_rms": 5e-05
+      },
+      {
+        "ms": 540,
+        "peak_rms": 5e-05
+      },
+      {
+        "ms": 660,
+        "peak_rms": 6e-05
+      },
+      {
+        "ms": 760,
+        "peak_rms": 6e-05
+      },
+      {
+        "ms": 880,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 980,
+        "peak_rms": 5e-05
+      },
+      {
+        "ms": 1100,
+        "peak_rms": 6e-05
+      },
+      {
+        "ms": 1200,
+        "peak_rms": 5e-05
+      },
+      {
+        "ms": 1300,
+        "peak_rms": 4e-05
+      },
+      {
+        "ms": 1422,
+        "peak_rms": 4e-05
+      }
+    ]
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "observed_at": "2026-10-01T04:07:33.447677+00:00",
+  "alias": "demo.northmodellabs.com",
+  "previous": "dpl_7CQ53P2EFj6BjX56qvVajJA2LXAb",
+  "current": "dpl_CpzxuFhZvF9M1Vs92emkR6Qd7DSe",
+  "runtime_commit": "8b18585d38be2b7f9b37993b31f9dc56efb1ba60",
+  "http": 200,
+  "scope": "only demo hostname alias; no GPU/runtime/account mutations"
+}

@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-01T02:38:23.403782+00:00",
+  "source": "us-central1-docker.pkg.dev/loopyai-478906/avatar-service/runner-launcher@sha256:830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee",
+  "destination": "us-central1-docker.pkg.dev/atlas-stg-isolated-20260831/atlas-stg-runtime/voice-warmup-base@sha256:830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee",
+  "digest": "sha256:830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee",
+  "manifest_identical": true,
+  "copied": true,
+  "production_mutation": false,
+  "deployment": false,
+  "mutable_tag_change": false,
+  "iam_changes": false
+}

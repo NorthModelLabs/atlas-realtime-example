@@ -1,0 +1,25 @@
+{
+  "observed_at": "2026-10-01T07:38:59.335559+00:00",
+  "main_workers_checked": 10,
+  "all_mouth_settings_match_isolated_probe": true,
+  "model_digest": "sha256:f853fbd1dc92ae7a514e93107e3696e8009f74e929180ac361e2e28e9d52e7e4",
+  "settings": {
+    "AVATAR_LIP_NORMALIZE_ENABLED": "true",
+    "AVATAR_LIP_NORMALIZE_THRESHOLD": "0.03",
+    "AVATAR_LIP_NORMALIZE_TARGET": "0.0",
+    "AVATAR_LIP_NORMALIZE_STRENGTH": "1.0",
+    "AVATAR_LIP_NORMALIZE_MAX_DELTA": "0.020",
+    "AVATAR_LIP_NORMALIZE_ADAPTIVE_ENABLED": "true",
+    "AVATAR_LIP_NORMALIZE_FULL_RATIO": "0.20",
+    "AVATAR_LIP_NORMALIZE_SPEECH_SCALE": "0.30",
+    "AVATAR_LIP_NORMALIZE_TRANSITION_FRAMES": "8",
+    "AVATAR_IDLE_MOUTH_LOCK_ENABLED": "true",
+    "AVATAR_IDLE_MOUTH_LOCK_STRENGTH": "0.85",
+    "AVATAR_IDLE_MOUTH_SILENCE_RMS": "0.0001",
+    "AVATAR_IDLE_MOUTH_SILENCE_DEBOUNCE_FRAMES": "2",
+    "AVATAR_IDLE_MOUTH_CLOSE_FRAMES": "8",
+    "AVATAR_IDLE_MOUTH_OPEN_FRAMES": "4",
+    "AVATAR_IDLE_MOUTH_IDS": "6,12,14,17,19,20"
+  },
+  "interpretation": "The production mouth gate threshold is RMS 0.0001, ten times lower than browser diagnostic quiet threshold 0.001. This is a candidate explanation requiring generated-frame evidence, not a demonstrated cause. Returned audio window peaks do not measure the gate input frame RMS."
+}

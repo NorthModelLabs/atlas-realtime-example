@@ -1,0 +1,248 @@
+[
+  {
+    "mode": "default",
+    "trial": 1,
+    "pause_ms": 0,
+    "events": [
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -3453,
+        "status": null
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": 751,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": 758,
+        "status": "in_progress"
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": 1697,
+        "status": "completed"
+      }
+    ],
+    "responses": [
+      {
+        "created_before_full_question": false,
+        "first_audio_after_final_speech_ms": 1358,
+        "transcript": "Two plus two equals four.",
+        "status": "completed"
+      }
+    ],
+    "initial_reasoning": null,
+    "effective_reasoning": null,
+    "input_transcripts": [
+      "What is 2 plus 2? Please answer in one short sentence."
+    ]
+  },
+  {
+    "mode": "minimal",
+    "trial": 1,
+    "pause_ms": 0,
+    "events": [
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -3622,
+        "status": null
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": 702,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": 708,
+        "status": "in_progress"
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": 1477,
+        "status": "completed"
+      }
+    ],
+    "responses": [
+      {
+        "created_before_full_question": false,
+        "first_audio_after_final_speech_ms": 1168,
+        "transcript": "Two plus two equals four.",
+        "status": "completed"
+      }
+    ],
+    "initial_reasoning": null,
+    "effective_reasoning": {
+      "effort": "minimal"
+    },
+    "input_transcripts": [
+      "What is 2 plus 2? Please answer in one short sentence."
+    ]
+  },
+  {
+    "mode": "minimal",
+    "trial": 2,
+    "pause_ms": 0,
+    "events": [
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -3606,
+        "status": null
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": 703,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": 710,
+        "status": "in_progress"
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": 1576,
+        "status": "completed"
+      }
+    ],
+    "responses": [
+      {
+        "created_before_full_question": false,
+        "first_audio_after_final_speech_ms": 1245,
+        "transcript": "Two plus two equals four.",
+        "status": "completed"
+      }
+    ],
+    "initial_reasoning": null,
+    "effective_reasoning": {
+      "effort": "minimal"
+    },
+    "input_transcripts": [
+      "What is 2 plus 2? Please answer in one short sentence."
+    ]
+  },
+  {
+    "mode": "default",
+    "trial": 2,
+    "pause_ms": 0,
+    "events": [
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -3620,
+        "status": null
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": 1073,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": 1080,
+        "status": "in_progress"
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": 2081,
+        "status": "completed"
+      }
+    ],
+    "responses": [
+      {
+        "created_before_full_question": false,
+        "first_audio_after_final_speech_ms": 1755,
+        "transcript": "Two plus two equals four.",
+        "status": "completed"
+      }
+    ],
+    "initial_reasoning": null,
+    "effective_reasoning": null,
+    "input_transcripts": [
+      "What is 2 plus 2? Please answer in one short sentence."
+    ]
+  },
+  {
+    "mode": "default",
+    "trial": 3,
+    "pause_ms": 0,
+    "events": [
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -3611,
+        "status": null
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": 700,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": 707,
+        "status": "in_progress"
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": 1762,
+        "status": "completed"
+      }
+    ],
+    "responses": [
+      {
+        "created_before_full_question": false,
+        "first_audio_after_final_speech_ms": 1360,
+        "transcript": "2 plus 2 equals 4.",
+        "status": "completed"
+      }
+    ],
+    "initial_reasoning": null,
+    "effective_reasoning": null,
+    "input_transcripts": [
+      "What is 2 plus 2? Please answer in one short sentence."
+    ]
+  },
+  {
+    "mode": "minimal",
+    "trial": 3,
+    "pause_ms": 0,
+    "events": [
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -3611,
+        "status": null
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": 704,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": 710,
+        "status": "in_progress"
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": 1507,
+        "status": "completed"
+      }
+    ],
+    "responses": [
+      {
+        "created_before_full_question": false,
+        "first_audio_after_final_speech_ms": 1139,
+        "transcript": "Two plus two equals four.",
+        "status": "completed"
+      }
+    ],
+    "initial_reasoning": null,
+    "effective_reasoning": {
+      "effort": "minimal"
+    },
+    "input_transcripts": [
+      "What is 2 plus 2? Please answer in one short sentence."
+    ]
+  }
+]

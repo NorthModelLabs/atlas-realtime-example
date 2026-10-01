@@ -21,7 +21,8 @@ export default function WatchPage({ params }: { params: Promise<{ id: string }> 
 
     (async () => {
       try {
-        const res = await fetch(`/api/session/${sessionId}/viewer`, { method: "POST" });
+        const capability = new URLSearchParams(window.location.hash.slice(1)).get("view") || "";
+        const res = await fetch(`/api/session/${sessionId}/viewer`, { method: "POST", headers: {"X-Demo-Viewer-Capability": capability} });
         const data = await res.json();
 
         if (cancelled) return;

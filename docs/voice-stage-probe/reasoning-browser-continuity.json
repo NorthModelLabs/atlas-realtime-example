@@ -1,0 +1,38 @@
+{
+  "candidate": {
+    "provider_rtc": {
+      "packetsLost": 12,
+      "concealedSamples": 9656,
+      "silentConcealedSamples": 0
+    },
+    "atlas_return_audio_rtc": {
+      "packetsLost": 6,
+      "concealedSamples": 0,
+      "silentConcealedSamples": 0
+    },
+    "atlas_return_video_rtc": {
+      "packetsLost": 17,
+      "framesDropped": 0,
+      "freezeCount": 0,
+      "totalFreezesDuration": 0
+    }
+  },
+  "baseline": {
+    "provider_rtc": {
+      "packetsLost": 9,
+      "concealedSamples": 12952,
+      "silentConcealedSamples": 2640
+    },
+    "atlas_return_audio_rtc": {
+      "packetsLost": 3,
+      "concealedSamples": 7587,
+      "silentConcealedSamples": 0
+    },
+    "atlas_return_video_rtc": {
+      "packetsLost": 10,
+      "framesDropped": 0,
+      "freezeCount": 0,
+      "totalFreezesDuration": 0
+    }
+  }
+}

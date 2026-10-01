@@ -1,0 +1,172 @@
+{
+  "observed_at": "2026-10-01T06:35:18.601834+00:00",
+  "scope": "isolated real L4 model plus pinned runner; synthetic native 16k PCM; paced 25fps consumer; no provider/browser/LiveKit",
+  "model_sha256": "f853fbd1dc92ae7a514e93107e3696e8009f74e929180ac361e2e28e9d52e7e4",
+  "runner_image_sha256": "830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee",
+  "runner_source_sha256": "55807a14915bb9d3b8862fcf8f93d0b05ae939d4916f445d68dd87d5677a7bec",
+  "warmups": [
+    {
+      "frames": 32,
+      "ms": 4258.6
+    },
+    {
+      "frames": 32,
+      "ms": 7307.5
+    },
+    {
+      "frames": 32,
+      "ms": 3046.6
+    },
+    {
+      "frames": 32,
+      "ms": 1229.6
+    }
+  ],
+  "trials": [
+    {
+      "mode": "paced",
+      "trial": 0,
+      "first_audio_ms": 1633.5,
+      "max_gap_ms": 41.1,
+      "frames": 100,
+      "ordered_exact_pcm": true,
+      "inference_calls": [
+        {
+          "frames": 32,
+          "requested_frames": null,
+          "ms": 1220.1
+        },
+        {
+          "frames": 32,
+          "requested_frames": 32,
+          "ms": 1241.0
+        },
+        {
+          "frames": 32,
+          "requested_frames": 32,
+          "ms": 1227.4
+        },
+        {
+          "frames": 32,
+          "requested_frames": 32,
+          "ms": 1228.7
+        },
+        {
+          "frames": 4,
+          "requested_frames": 4,
+          "ms": 364.6
+        }
+      ]
+    },
+    {
+      "mode": "ahead",
+      "trial": 1,
+      "first_audio_ms": 1457.9,
+      "max_gap_ms": 41.6,
+      "frames": 100,
+      "ordered_exact_pcm": true,
+      "inference_calls": [
+        {
+          "frames": 32,
+          "requested_frames": null,
+          "ms": 2070.2
+        },
+        {
+          "frames": 32,
+          "requested_frames": 32,
+          "ms": 2242.3
+        },
+        {
+          "frames": 32,
+          "requested_frames": 32,
+          "ms": 1237.3
+        },
+        {
+          "frames": 32,
+          "requested_frames": 32,
+          "ms": 1237.1
+        },
+        {
+          "frames": 4,
+          "requested_frames": 4,
+          "ms": 367.1
+        }
+      ]
+    },
+    {
+      "mode": "ahead",
+      "trial": 2,
+      "first_audio_ms": 1334.1,
+      "max_gap_ms": 41.7,
+      "frames": 100,
+      "ordered_exact_pcm": true,
+      "inference_calls": [
+        {
+          "frames": 32,
+          "requested_frames": null,
+          "ms": 2066.6
+        },
+        {
+          "frames": 32,
+          "requested_frames": 32,
+          "ms": 2128.4
+        },
+        {
+          "frames": 32,
+          "requested_frames": 32,
+          "ms": 1237.8
+        },
+        {
+          "frames": 32,
+          "requested_frames": 32,
+          "ms": 1240.1
+        },
+        {
+          "frames": 4,
+          "requested_frames": 4,
+          "ms": 366.8
+        }
+      ]
+    },
+    {
+      "mode": "paced",
+      "trial": 3,
+      "first_audio_ms": 1624.0,
+      "max_gap_ms": 41.8,
+      "frames": 100,
+      "ordered_exact_pcm": true,
+      "inference_calls": [
+        {
+          "frames": 32,
+          "requested_frames": null,
+          "ms": 2079.0
+        },
+        {
+          "frames": 32,
+          "requested_frames": 32,
+          "ms": 1246.1
+        },
+        {
+          "frames": 32,
+          "requested_frames": 32,
+          "ms": 1248.6
+        },
+        {
+          "frames": 32,
+          "requested_frames": 32,
+          "ms": 1248.3
+        },
+        {
+          "frames": 4,
+          "requested_frames": 4,
+          "ms": 372.0
+        }
+      ]
+    }
+  ],
+  "passed": true,
+  "mean_first_audio_paced_ms": 1628.75,
+  "mean_first_audio_ahead_ms": 1396.0,
+  "failed_initial_attempt": "runner process exit 2 before timings; synthetic fixture directory was 0700 under startup umask 077; explicit chmod 0755 in retry",
+  "production_changed": false
+}

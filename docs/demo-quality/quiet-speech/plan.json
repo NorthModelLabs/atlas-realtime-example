@@ -1,0 +1,72 @@
+{
+  "project": "atlas-stg-isolated-20260831",
+  "vm": "atlas-stg-mouth-tail-20261001",
+  "zone": "us-central1-c",
+  "maximum_gpus": 1,
+  "machine_type": "g2-standard-12",
+  "maximum_runtime_seconds": 1800,
+  "external_ip": false,
+  "production_changes": false,
+  "model_digest": "sha256:f853fbd1dc92ae7a514e93107e3696e8009f74e929180ac361e2e28e9d52e7e4",
+  "runner_digest": "sha256:830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee",
+  "conditions": {
+    "baseline": 0.0001,
+    "small": 0.0002,
+    "candidate": 0.0003
+  },
+  "speech_gains": [
+    1,
+    0.1,
+    0.01
+  ],
+  "noise_pcm16": 6,
+  "speech_selected_relative_frames": {
+    "0": [
+      15,
+      30,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      60,
+      75,
+      90
+    ],
+    "1": [
+      15,
+      30,
+      38,
+      39,
+      40,
+      41,
+      42,
+      48,
+      49,
+      50,
+      51,
+      52
+    ],
+    "2": [
+      15,
+      30,
+      38,
+      45,
+      49,
+      50,
+      51,
+      52,
+      53,
+      60,
+      75,
+      94
+    ]
+  },
+  "purpose": "Quiet-speech visual regression of visual silence threshold only; same verified human model, eye settings, audio bytes and timing. No LiveKit or production connections.",
+  "startup_sha256": "20d409d927c0f2934e4e60d0e6f84ae394ce853004256b7c8818c426da884c0b",
+  "startup_bytes": 18839,
+  "probe_sha256": "df75248a535d5ca3524b404b228b51f9ac7ea3359d9af95aa3103f17c6e625b7",
+  "comparison_scope": "Controlled source amplitudes with envelope-risk frames selected before rendering. Candidate may be rejected if it suppresses quiet articulation."
+}

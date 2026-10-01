@@ -1,0 +1,17 @@
+--- a/dispatcher.py
++++ b/dispatcher.py
+@@ -746,7 +746,13 @@
+                     self._warmup_request_task = asyncio.create_task(
+                         self._run_avatar_service_warmup()
+                     )
+-                    await self._warmup_request_task
++                    try:
++                        await self._warmup_request_task
++                    except asyncio.CancelledError:
++                        # A launch cancels this idle request, not the loop.
++                        if asyncio.current_task().cancelling():
++                            raise
++                        self.telemetry.record("warmup_request_cancelled")
+                 await asyncio.sleep(max(1.0, DISPATCHER_WARMUP_INTERVAL_SECONDS))
+             except asyncio.CancelledError:
+                 raise

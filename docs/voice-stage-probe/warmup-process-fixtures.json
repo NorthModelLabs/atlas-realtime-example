@@ -1,0 +1,24 @@
+[
+  {
+    "worker": 0,
+    "process": [
+      {
+        "pid": "1",
+        "fixture_exists": true,
+        "fixture_sha256": "2b1bfc8db7e1788f5372d6fbb564f0cf5ca6bb0343f11de4639427c64e37ed79",
+        "service_url": null
+      }
+    ]
+  },
+  {
+    "worker": 3,
+    "process": [
+      {
+        "pid": "1",
+        "fixture_exists": true,
+        "fixture_sha256": "3a0d38dba0cfbcbf6b208afc58bb41f97f3219d5deaaebde9a481549b6120830",
+        "service_url": null
+      }
+    ]
+  }
+]

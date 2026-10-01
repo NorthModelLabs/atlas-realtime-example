@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "audio_samples": 16,
+  "video_frames": 375,
+  "dropped_frames": 3,
+  "text": "Apple\nTikTok\nTeach\nMeet\nYOU\nMultiply that answer by three. Keep answering in English.\nATLAS\nThat gives twelve.\nAtlas Realtime\nPrivate \u00b7 01:52\nEnd\nUpload\nImage\nMic\nTools\nSEND",
+  "errors": [],
+  "requests": [
+    {
+      "path": "/api/config",
+      "status": 200
+    },
+    {
+      "path": "/api/session",
+      "status": 200
+    },
+    {
+      "path": "/api/session/ses_cd97a359d6c74243a7cd/share",
+      "status": 200
+    },
+    {
+      "path": "/api/session/ses_cd97a359d6c74243a7cd/voice",
+      "status": 200
+    }
+  ],
+  "assertion_note": "Accepted spelled-out twelve; initial numeric-only assertion was too strict."
+}

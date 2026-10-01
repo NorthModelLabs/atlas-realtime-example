@@ -1,0 +1,50 @@
+{
+  "build_id": "938c9328-ebdd-4151-831a-f8e83a5016f3",
+  "passed": true,
+  "tests": 4,
+  "max_allowed_pcm16_lsb_difference": 2,
+  "metrics": [
+    {
+      "samples": 32208,
+      "max_lsb_difference": 2
+    },
+    {
+      "samples": 6400,
+      "max_lsb_difference": 2
+    },
+    {
+      "samples": 1968,
+      "max_lsb_difference": 2
+    },
+    {
+      "samples": 656,
+      "max_lsb_difference": 2
+    },
+    {
+      "samples": 640,
+      "max_lsb_difference": 2
+    },
+    {
+      "samples": 624,
+      "max_lsb_difference": 2
+    },
+    {
+      "samples": 160,
+      "max_lsb_difference": 2
+    },
+    {
+      "samples": 16,
+      "max_lsb_difference": 0
+    },
+    {
+      "samples": 640,
+      "max_lsb_difference": 2
+    },
+    {
+      "samples": 2560,
+      "max_lsb_difference": 2
+    }
+  ],
+  "previous_build": "85820dfb-6917-4ad9-95b4-a39a6eb8ed23",
+  "previous_failure": "Bit-exact assertion across independent native resamplers; revised test preserves exact lengths/order and measures <=2 LSB error."
+}

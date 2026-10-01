@@ -1,0 +1,88 @@
+[
+  {
+    "attempt": "paired-control",
+    "operation": "operation-1790842975886-65cc31f6d1d74-c5115822-6cc186aa",
+    "status": "DONE",
+    "error": {
+      "errors": [
+        {
+          "code": "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS",
+          "message": "The zone 'projects/atlas-stg-isolated-20260831/zones/us-central1-a' does not have enough resources available to fulfill the request.  'NULL:0/NULL:0/NULL:0 (state:STOCKOUT, sub-state:STOCKOUT, resource type:compute)'.",
+          "errorDetails": [
+            {
+              "help": {
+                "links": [
+                  {
+                    "description": "Troubleshooting documentation",
+                    "url": "https://cloud.google.com/compute/docs/resource-error"
+                  }
+                ]
+              }
+            },
+            {
+              "localizedMessage": {
+                "locale": "en-US",
+                "message": "A g2-standard-16 VM instance with 1 nvidia-l4 accelerator(s) is currently unavailable in the us-central1-a zone. Alternatively, you can try your request again with a different VM hardware configuration or at a later time. For more information, see the troubleshooting documentation."
+              }
+            },
+            {
+              "errorInfo": {
+                "reason": "resource_availability",
+                "domain": "compute.googleapis.com",
+                "metadatas": {
+                  "attachment": "nvidia-l4:1",
+                  "vmType": "g2-standard-16",
+                  "zone": "us-central1-a",
+                  "zonesAvailable": ""
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "attempt": "paired-control-12",
+    "operation": "operation-1790843099549-65cc326cc0f79-212ea87d-8ec6aa7d",
+    "status": "DONE",
+    "error": {
+      "errors": [
+        {
+          "code": "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS",
+          "message": "The zone 'projects/atlas-stg-isolated-20260831/zones/us-central1-a' does not have enough resources available to fulfill the request.  'NULL:0/NULL:0/NULL:0 (state:STOCKOUT, sub-state:STOCKOUT, resource type:compute)'.",
+          "errorDetails": [
+            {
+              "help": {
+                "links": [
+                  {
+                    "description": "Troubleshooting documentation",
+                    "url": "https://cloud.google.com/compute/docs/resource-error"
+                  }
+                ]
+              }
+            },
+            {
+              "localizedMessage": {
+                "locale": "en-US",
+                "message": "A g2-standard-12 VM instance with 1 nvidia-l4 accelerator(s) is currently unavailable in the us-central1-a zone. Alternatively, you can try your request again with a different VM hardware configuration or at a later time. For more information, see the troubleshooting documentation."
+              }
+            },
+            {
+              "errorInfo": {
+                "reason": "resource_availability",
+                "domain": "compute.googleapis.com",
+                "metadatas": {
+                  "attachment": "nvidia-l4:1",
+                  "vmType": "g2-standard-12",
+                  "zone": "us-central1-a",
+                  "zonesAvailable": ""
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

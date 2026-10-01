@@ -1,0 +1,13 @@
+{
+  "observed_at": "2026-10-01T09:49:52.634224+00:00",
+  "public_health": {
+    "https://demo.northmodellabs.com": 200,
+    "https://dashboard.northmodellabs.com": 200,
+    "https://api.atlasv1.com/health": 200
+  },
+  "alias": {
+    "deployment_id": "dpl_4Gn3kBtiXyzeTusyp8y1b5imU3Ff",
+    "project_id": "prj_0njKCW2u69Y6Swzav2keV1dNzv85"
+  },
+  "gpu_recheck": "Not performed: Google Cloud requires reauthentication; last passing direct guard 09:39:07 UTC."
+}

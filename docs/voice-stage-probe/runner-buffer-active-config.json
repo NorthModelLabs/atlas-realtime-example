@@ -1,0 +1,11 @@
+[
+  {
+    "process": "dispatcher",
+    "settings": {
+      "AVATAR_AUDIO_QUEUE_MAX_FRAMES": "32",
+      "AVATAR_RUNNER_MODE": "inprocess",
+      "AVATAR_SILENCE_GATE_ENABLED": "false",
+      "AVATAR_SPEECH_PREFETCH_ENABLED": "true"
+    }
+  }
+]

@@ -1,0 +1,77 @@
+{
+  "events": [
+    {
+      "gap_ms": 100.1,
+      "at": 1790846171084,
+      "returned_audio_active": false,
+      "receiver_delta": {},
+      "window_ms": null
+    },
+    {
+      "gap_ms": 116.7,
+      "at": 1790846187351,
+      "returned_audio_active": false,
+      "receiver_delta": {
+        "packetsLost": 0,
+        "nackCount": 0,
+        "pliCount": 0,
+        "framesDecoded": 25,
+        "framesDropped": 0
+      },
+      "window_ms": 999
+    },
+    {
+      "gap_ms": 116.7,
+      "at": 1790846203649,
+      "returned_audio_active": false,
+      "receiver_delta": {
+        "packetsLost": 0,
+        "nackCount": 0,
+        "pliCount": 0,
+        "framesDecoded": 24,
+        "framesDropped": 0
+      },
+      "window_ms": 1001
+    },
+    {
+      "gap_ms": 133.3,
+      "at": 1790846233548,
+      "returned_audio_active": false,
+      "receiver_delta": {
+        "packetsLost": 0,
+        "nackCount": 0,
+        "pliCount": 0,
+        "framesDecoded": 25,
+        "framesDropped": 0
+      },
+      "window_ms": 999
+    },
+    {
+      "gap_ms": 133.4,
+      "at": 1790846250832,
+      "returned_audio_active": false,
+      "receiver_delta": {
+        "packetsLost": 0,
+        "nackCount": 0,
+        "pliCount": 0,
+        "framesDecoded": 25,
+        "framesDropped": 0
+      },
+      "window_ms": 999
+    },
+    {
+      "gap_ms": 166.6,
+      "at": 1790846254516,
+      "returned_audio_active": false,
+      "receiver_delta": {
+        "packetsLost": 0,
+        "nackCount": 0,
+        "pliCount": 0,
+        "framesDecoded": 25,
+        "framesDropped": 0
+      },
+      "window_ms": 999
+    }
+  ],
+  "limits": "One-second counter windows bracket gaps; no exact packet/frame attribution."
+}

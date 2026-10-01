@@ -1,0 +1,22 @@
+{
+  "project": "atlas-stg-isolated-20260831",
+  "vm": "atlas-stg-mouth-tail-20261001",
+  "zone": "us-central1-c",
+  "maximum_gpus": 1,
+  "maximum_runtime_seconds": 1800,
+  "external_ip": false,
+  "production_changes": false,
+  "model_digest": "sha256:f853fbd1dc92ae7a514e93107e3696e8009f74e929180ac361e2e28e9d52e7e4",
+  "runner_digest": "sha256:830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee",
+  "startup_sha256": "0566c2ae588e804aace8b63b92434ac596dbbb21cf1156d944cb55be63c1f702",
+  "probe_sha256": "164e4bbcb4d8b377ff258762afedfd01d0b335e7ccc6e93a877e13e79ece7ba4",
+  "recorder_sha256": "3886cc0e2ea288559fc1a84eef523d4a5f282c0e2ad7fcf8582c2925aa4dc9e6",
+  "conditions": [
+    "clean tail",
+    "6-unit PCM tail",
+    "clean tail repeat"
+  ],
+  "scope": "Exact runner push_audio/queue/resampling to unchanged model. Synthetic public speech only. Does not include actual LiveKit/provider decoding. Recorder remains unpromoted.",
+  "machine_type": "g2-standard-16",
+  "guest_memory_mb": 65536
+}

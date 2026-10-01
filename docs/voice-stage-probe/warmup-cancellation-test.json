@@ -1,0 +1,12 @@
+{
+  "deployed": {
+    "loop_survives_customer_launch": false,
+    "reproduced": true
+  },
+  "candidate": {
+    "loop_survives_customer_launch": true,
+    "skips_while_busy": true,
+    "resumes_after_session": true,
+    "shutdown_cancels_loop_and_request": true
+  }
+}

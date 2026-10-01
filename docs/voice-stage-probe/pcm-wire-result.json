@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "livekit_sdk": "1.1.5",
+  "server": "v1.13.7",
+  "unauthorized_denied": true,
+  "ordered_pcm_bytes": 38400,
+  "duplicate_idempotent": true,
+  "ends": 2,
+  "stale_generation_denied": true,
+  "unregistered_after_close": true,
+  "scope": "real SDK/RPC; fake capture sink; private network; no GPU or production endpoints",
+  "build_id": "cb9000ef-1cfc-4926-b413-8445f787b0d6",
+  "server_image_digest": "sha256:6fd3b7088874c4d119160dd688798dfec852bc014786d392caad15f6f63912a3"
+}

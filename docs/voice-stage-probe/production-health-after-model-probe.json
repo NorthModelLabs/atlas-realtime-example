@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-01T03:37:26.735977+00:00",
+  "main_workers": 10,
+  "ready": 10,
+  "image_ids_unchanged": true,
+  "http": {
+    "https://demo.northmodellabs.com": 200,
+    "https://dashboard.northmodellabs.com": 200,
+    "https://api.atlasv1.com/health": 200
+  }
+}

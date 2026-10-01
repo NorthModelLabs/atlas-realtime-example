@@ -1,0 +1,241 @@
+{
+  "scope": "Exploratory compressed-still mouth ROI (109,101,46,23). Pixel differences include JPEG effects and pose. Not motion or visual acceptance proof.",
+  "rows": [
+    {
+      "condition": "baseline",
+      "trial": 0,
+      "frames": 11,
+      "unique_jpeg_hashes": 11,
+      "differences": [
+        {
+          "ms": 400,
+          "mean_absolute_difference": 0
+        },
+        {
+          "ms": 800,
+          "mean_absolute_difference": 5.716761184625079
+        },
+        {
+          "ms": 1200,
+          "mean_absolute_difference": 8.612161310649023
+        },
+        {
+          "ms": 1600,
+          "mean_absolute_difference": 5.342785129174543
+        },
+        {
+          "ms": 2000,
+          "mean_absolute_difference": 5.914933837429111
+        },
+        {
+          "ms": 3000,
+          "mean_absolute_difference": 9.714870825456837
+        },
+        {
+          "ms": 4000,
+          "mean_absolute_difference": 4.138626339004411
+        },
+        {
+          "ms": 5000,
+          "mean_absolute_difference": 6.691556395715186
+        },
+        {
+          "ms": 6000,
+          "mean_absolute_difference": 4.267170762444865
+        },
+        {
+          "ms": 7000,
+          "mean_absolute_difference": 2.8462507876496534
+        },
+        {
+          "ms": 8000,
+          "mean_absolute_difference": 2.358538122243226
+        }
+      ]
+    },
+    {
+      "condition": "clamp",
+      "trial": 0,
+      "frames": 11,
+      "unique_jpeg_hashes": 11,
+      "differences": [
+        {
+          "ms": 400,
+          "mean_absolute_difference": 0
+        },
+        {
+          "ms": 800,
+          "mean_absolute_difference": 5.528670447385003
+        },
+        {
+          "ms": 1200,
+          "mean_absolute_difference": 8.48456206679269
+        },
+        {
+          "ms": 1600,
+          "mean_absolute_difference": 5.410207939508506
+        },
+        {
+          "ms": 2000,
+          "mean_absolute_difference": 6.174858223062381
+        },
+        {
+          "ms": 3000,
+          "mean_absolute_difference": 9.635790800252048
+        },
+        {
+          "ms": 4000,
+          "mean_absolute_difference": 4.339319470699433
+        },
+        {
+          "ms": 5000,
+          "mean_absolute_difference": 6.5847511027095145
+        },
+        {
+          "ms": 6000,
+          "mean_absolute_difference": 4.285129174543163
+        },
+        {
+          "ms": 7000,
+          "mean_absolute_difference": 2.713610586011342
+        },
+        {
+          "ms": 8000,
+          "mean_absolute_difference": 2.792690611216131
+        }
+      ]
+    },
+    {
+      "condition": "repeat",
+      "trial": 0,
+      "frames": 10,
+      "unique_jpeg_hashes": 10,
+      "differences": [
+        {
+          "ms": 400,
+          "mean_absolute_difference": 0
+        },
+        {
+          "ms": 800,
+          "mean_absolute_difference": 5.658790170132325
+        },
+        {
+          "ms": 1200,
+          "mean_absolute_difference": 8.63421550094518
+        },
+        {
+          "ms": 1600,
+          "mean_absolute_difference": 5.284183994959042
+        },
+        {
+          "ms": 2000,
+          "mean_absolute_difference": 5.835538752362949
+        },
+        {
+          "ms": 3000,
+          "mean_absolute_difference": 9.761499684940139
+        },
+        {
+          "ms": 4000,
+          "mean_absolute_difference": 4.062696912413359
+        },
+        {
+          "ms": 5000,
+          "mean_absolute_difference": 6.6950220541902965
+        },
+        {
+          "ms": 6000,
+          "mean_absolute_difference": 4.132955261499685
+        },
+        {
+          "ms": 8000,
+          "mean_absolute_difference": 2.3969754253308126
+        }
+      ]
+    },
+    {
+      "condition": "baseline",
+      "trial": 1,
+      "frames": 5,
+      "unique_jpeg_hashes": 5,
+      "differences": [
+        {
+          "ms": 400,
+          "mean_absolute_difference": 0
+        },
+        {
+          "ms": 800,
+          "mean_absolute_difference": 3.8153749212350347
+        },
+        {
+          "ms": 1600,
+          "mean_absolute_difference": 5.432577189666037
+        },
+        {
+          "ms": 3000,
+          "mean_absolute_difference": 8.91398865784499
+        },
+        {
+          "ms": 6000,
+          "mean_absolute_difference": 3.1427221172022684
+        }
+      ]
+    },
+    {
+      "condition": "clamp",
+      "trial": 1,
+      "frames": 5,
+      "unique_jpeg_hashes": 5,
+      "differences": [
+        {
+          "ms": 400,
+          "mean_absolute_difference": 0
+        },
+        {
+          "ms": 800,
+          "mean_absolute_difference": 3.764650283553875
+        },
+        {
+          "ms": 1600,
+          "mean_absolute_difference": 5.218336483931947
+        },
+        {
+          "ms": 3000,
+          "mean_absolute_difference": 8.9880277252678
+        },
+        {
+          "ms": 6000,
+          "mean_absolute_difference": 2.287334593572779
+        }
+      ]
+    },
+    {
+      "condition": "repeat",
+      "trial": 1,
+      "frames": 5,
+      "unique_jpeg_hashes": 5,
+      "differences": [
+        {
+          "ms": 400,
+          "mean_absolute_difference": 0
+        },
+        {
+          "ms": 800,
+          "mean_absolute_difference": 3.855702583490863
+        },
+        {
+          "ms": 1600,
+          "mean_absolute_difference": 5.406427221172023
+        },
+        {
+          "ms": 3000,
+          "mean_absolute_difference": 8.883427851291746
+        },
+        {
+          "ms": 6000,
+          "mean_absolute_difference": 3.131064902331443
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "steps": [
+    {
+      "name": "gcr.io/cloud-builders/docker",
+      "entrypoint": "bash",
+      "args": [
+        "-c",
+        "set -euo pipefail\ncleanup() { docker rm -f pcm-server >/dev/null 2>&1 || true; docker network rm pcm-isolated >/dev/null 2>&1 || true; }\ntrap cleanup EXIT\ndocker pull livekit/livekit-server@sha256:6fd3b7088874c4d119160dd688798dfec852bc014786d392caad15f6f63912a3\ndocker pull us-central1-docker.pkg.dev/atlas-stg-isolated-20260831/atlas-stg-runtime/voice-warmup-base@sha256:830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee\ndocker network create --internal --subnet=172.28.51.0/24 pcm-isolated\ndocker run -d --name pcm-server --network=pcm-isolated --ip=172.28.51.2 --read-only --cap-drop=ALL --security-opt=no-new-privileges --cpus=1 --memory=512m livekit/livekit-server@sha256:6fd3b7088874c4d119160dd688798dfec852bc014786d392caad15f6f63912a3 --dev --bind 0.0.0.0 --node-ip 172.28.51.2\nsleep 3\ndocker run --rm --network=pcm-isolated --read-only --cap-drop=ALL --security-opt=no-new-privileges --cpus=2 --memory=4g --tmpfs=/tmp:rw,nosuid,size=256m --volume=/workspace:/probe:ro --entrypoint=python us-central1-docker.pkg.dev/atlas-stg-isolated-20260831/atlas-stg-runtime/voice-warmup-base@sha256:830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee /probe/probe.py\n"
+      ]
+    }
+  ],
+  "serviceAccount": "projects/atlas-stg-isolated-20260831/serviceAccounts/atlas-stg-build-runner@atlas-stg-isolated-20260831.iam.gserviceaccount.com",
+  "options": {
+    "logging": "CLOUD_LOGGING_ONLY"
+  },
+  "timeout": "300s"
+}

@@ -1,0 +1,237 @@
+{
+  "integrity": [
+    {
+      "source": "returned",
+      "samples": 4798976,
+      "block_samples": 4798976,
+      "flushedSamples": 4798976,
+      "gaps": [
+        {
+          "after": 9856,
+          "next": 10368
+        }
+      ],
+      "capped": false,
+      "first_frame": 256,
+      "last_frame": 4799744
+    },
+    {
+      "source": "provider",
+      "samples": 4799488,
+      "block_samples": 4799488,
+      "flushedSamples": 4799488,
+      "gaps": [
+        {
+          "after": 9856,
+          "next": 10368
+        }
+      ],
+      "capped": false,
+      "first_frame": 256,
+      "last_frame": 4800256
+    }
+  ],
+  "returned_vs_recorded_envelope_alignment": {
+    "lag_10ms_bins": -1,
+    "cosine_similarity": 0.9903389900587436,
+    "recorded_audio_pts_start_seconds": 0.075
+  },
+  "turns": [
+    {
+      "turn": 1,
+      "provider_event_start": 9.199,
+      "provider_event_stop": 11.368,
+      "analysis_until": 26.138,
+      "audio": {
+        "provider": {
+          "last_above_threshold_seconds": {
+            "0.005": 11.05,
+            "0.001": 11.13,
+            "0.0001": 11.55,
+            "1e-05": 11.57
+          },
+          "next_3s_peak_window_rms": 0.0006714434633814615,
+          "next_3s_windows_above_model_gate": 20
+        },
+        "returned": {
+          "last_above_threshold_seconds": {
+            "0.005": 13.43,
+            "0.001": 13.5,
+            "0.0001": 13.82,
+            "1e-05": 26.14
+          },
+          "next_3s_peak_window_rms": 0.0009721458774689366,
+          "next_3s_windows_above_model_gate": 6
+        },
+        "recorded-audio": {
+          "last_above_threshold_seconds": {
+            "0.005": 13.515,
+            "0.001": 13.585,
+            "0.0001": 14.145,
+            "1e-05": 26.145
+          },
+          "next_3s_peak_window_rms": 0.00042097664192681036,
+          "next_3s_windows_above_model_gate": 10
+        }
+      }
+    },
+    {
+      "turn": 2,
+      "provider_event_start": 27.138,
+      "provider_event_stop": 30.328,
+      "analysis_until": 44.199,
+      "audio": {
+        "provider": {
+          "last_above_threshold_seconds": {
+            "0.005": 30.13,
+            "0.001": 30.19,
+            "0.0001": 30.61,
+            "1e-05": 30.61
+          },
+          "next_3s_peak_window_rms": 0.0007696338643414252,
+          "next_3s_windows_above_model_gate": 11
+        },
+        "returned": {
+          "last_above_threshold_seconds": {
+            "0.005": 32.36,
+            "0.001": 32.43,
+            "0.0001": 32.45,
+            "1e-05": 44.2
+          },
+          "next_3s_peak_window_rms": 0.0007339666752528038,
+          "next_3s_windows_above_model_gate": 2
+        },
+        "recorded-audio": {
+          "last_above_threshold_seconds": {
+            "0.005": 32.435,
+            "0.001": 32.505,
+            "0.0001": 32.745,
+            "1e-05": 44.205
+          },
+          "next_3s_peak_window_rms": 0.0003470615096208594,
+          "next_3s_windows_above_model_gate": 4
+        }
+      }
+    },
+    {
+      "turn": 3,
+      "provider_event_start": 45.199,
+      "provider_event_stop": 47.998,
+      "analysis_until": 62.232,
+      "audio": {
+        "provider": {
+          "last_above_threshold_seconds": {
+            "0.005": 47.73,
+            "0.001": 47.77,
+            "0.0001": 48.22,
+            "1e-05": 48.23
+          },
+          "next_3s_peak_window_rms": 0.0008407705296711814,
+          "next_3s_windows_above_model_gate": 16
+        },
+        "returned": {
+          "last_above_threshold_seconds": {
+            "0.005": 50.04,
+            "0.001": 50.08,
+            "0.0001": 50.11,
+            "1e-05": 62.21
+          },
+          "next_3s_peak_window_rms": 0.0006712487507315294,
+          "next_3s_windows_above_model_gate": 3
+        },
+        "recorded-audio": {
+          "last_above_threshold_seconds": {
+            "0.005": 50.125,
+            "0.001": 50.145,
+            "0.0001": 50.415,
+            "1e-05": 62.235
+          },
+          "next_3s_peak_window_rms": 0.0009214326648696159,
+          "next_3s_windows_above_model_gate": 6
+        }
+      }
+    },
+    {
+      "turn": 4,
+      "provider_event_start": 63.232,
+      "provider_event_stop": 65.889,
+      "analysis_until": 92.351,
+      "audio": {
+        "provider": {
+          "last_above_threshold_seconds": {
+            "0.005": 65.51,
+            "0.001": 65.6,
+            "0.0001": 66.12,
+            "1e-05": 66.14
+          },
+          "next_3s_peak_window_rms": 0.0007391724451246843,
+          "next_3s_windows_above_model_gate": 15
+        },
+        "returned": {
+          "last_above_threshold_seconds": {
+            "0.005": 67.71,
+            "0.001": 67.72,
+            "0.0001": 67.73,
+            "1e-05": 92.36
+          },
+          "next_3s_peak_window_rms": 0.0002996627168830998,
+          "next_3s_windows_above_model_gate": 1
+        },
+        "recorded-audio": {
+          "last_above_threshold_seconds": {
+            "0.005": 67.785,
+            "0.001": 67.785,
+            "0.0001": 68.095,
+            "1e-05": 92.355
+          },
+          "next_3s_peak_window_rms": 0.0006439684834524127,
+          "next_3s_windows_above_model_gate": 4
+        }
+      }
+    },
+    {
+      "turn": 5,
+      "provider_event_start": 93.351,
+      "provider_event_stop": 95.809,
+      "analysis_until": 99,
+      "audio": {
+        "provider": {
+          "last_above_threshold_seconds": {
+            "0.005": 95.44,
+            "0.001": 95.46,
+            "0.0001": 95.99,
+            "1e-05": 96.02
+          },
+          "next_3s_peak_window_rms": 0.0005715816842582573,
+          "next_3s_windows_above_model_gate": 35
+        },
+        "returned": {
+          "last_above_threshold_seconds": {
+            "0.005": 97.63,
+            "0.001": 97.65,
+            "0.0001": 98.48,
+            "1e-05": 99.0
+          },
+          "next_3s_peak_window_rms": 0.0006791719125643296,
+          "next_3s_windows_above_model_gate": 14
+        },
+        "recorded-audio": {
+          "last_above_threshold_seconds": {
+            "0.005": 97.705,
+            "0.001": 97.725,
+            "0.0001": 98.765,
+            "1e-05": 99.005
+          },
+          "next_3s_peak_window_rms": 0.0005184255383349616,
+          "next_3s_windows_above_model_gate": 30
+        }
+      }
+    }
+  ],
+  "limits": [
+    "Window RMS thresholds locate candidate tails, not exact phonetic end.",
+    "MediaRecorder re-encodes returned audio as Opus; raw observer PCM is retained separately.",
+    "Provider observer PCM is before outgoing Atlas transport; exact server/model input remains unobserved.",
+    "Not a latency benchmark."
+  ]
+}

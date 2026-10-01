@@ -1,0 +1,19 @@
+{
+  "multipart/form-data": {
+    "required": [
+      "audio_file",
+      "image_file"
+    ],
+    "fields": {
+      "audio_file": {
+        "type": "string"
+      },
+      "image_file": {
+        "type": "string"
+      },
+      "cache_key": {},
+      "max_frames": {},
+      "stream_format": {}
+    }
+  }
+}

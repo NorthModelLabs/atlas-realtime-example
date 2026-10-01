@@ -1,0 +1,24 @@
+[
+  {
+    "deployment_label": "agent-worker",
+    "metadata": {
+      "source_sha256": "e3ef40adac282b7331d73c42b4b8c49dcd272f7d3780e488ac8bb75144137175",
+      "stream_handler_registration_count": 0,
+      "passthrough_function_present": true
+    },
+    "images": [
+      "us-central1-docker.pkg.dev/loopyai-478906/avatar-service/agent-worker@sha256:3bfd081c72f562c52ea7afeb76fbba88c6ae6bac0491dab1ae8e1619bc310ab2"
+    ]
+  },
+  {
+    "deployment_label": "agent-worker-launch-25",
+    "metadata": {
+      "source_sha256": "de7a5c2528fc42c2295d8f9701cda1962cfa36e60c87f2bec5268b06f6fb633f",
+      "stream_handler_registration_count": 0,
+      "passthrough_function_present": true
+    },
+    "images": [
+      "us-central1-docker.pkg.dev/loopyai-478906/avatar-service/agent-worker@sha256:b719d691f583067cf392793e06989535cf15acfffb64f35becf4d29a95a2c970"
+    ]
+  }
+]

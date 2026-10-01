@@ -1,3 +1,4 @@
+import { creationGuard } from "@/app/lib/demo-access";
 import { NextRequest, NextResponse } from "next/server";
 
 const LLM_BASE_URL = process.env.LLM_BASE_URL || "https://api.openai.com/v1";
@@ -15,6 +16,7 @@ interface ChatMessage {
 }
 
 export async function POST(req: NextRequest) {
+  const denied = creationGuard(req); if (denied) return denied;
   if (!LLM_API_KEY) {
     return NextResponse.json(
       { error: "not_configured", message: "OPENAI_API_KEY or LLM_API_KEY is not set." },

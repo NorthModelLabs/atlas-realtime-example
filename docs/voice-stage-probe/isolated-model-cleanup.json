@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-01T03:38:42.450975+00:00",
+  "owned_instance_id": "5752044785369117268",
+  "operation": "operation-1790825916756-65cbf269f71f5-cd6d9e95-7adb8f5c",
+  "status": "DONE",
+  "checks": {
+    "instances": "absent",
+    "disks": "absent"
+  }
+}

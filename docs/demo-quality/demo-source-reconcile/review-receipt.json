@@ -1,0 +1,32 @@
+{
+  "observed_at": "2026-10-01T19:57:54.947851+00:00",
+  "base_reviewed": "8f0436c06ec212aaff02a742463443c1ecd3d54f",
+  "head_reviewed": "f35b6e1c055f71aa79c0a530ccb1cc78358466ea",
+  "uncommitted_runtime_changes": [
+    "remove duplicate teacher-mode voiceAlert",
+    "allow CommonJS requires only in retained docs/**/*.cjs scripts"
+  ],
+  "runtime_sha256": "ddb5279c6d9cebe252f2bd2da44788da13a9cbb658df617e320275f1be8c1e12",
+  "checks": {
+    "unit": "passed",
+    "lint": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "http_boundary": "passed",
+    "secret_review": "passed"
+  },
+  "unit_tests": 11,
+  "guard_tests": 5,
+  "lint_errors": 0,
+  "lint_warnings": 3,
+  "http_real_provider_calls": 0,
+  "historical_secret_scan": {
+    "commits_scanned": 48,
+    "bytes_scanned_approx": 15165101,
+    "raw_findings": 2,
+    "triage": "Both generic-api-key findings are literal synthetic renderer cache_key voice-probe-fixed-r2 in model-bench-r2.py and model-bench-r3.py; not authentication credentials.",
+    "unresolved_findings": 0
+  },
+  "script_sha256": "be1970d73e4562849423e0055b1f802c4b94d38555fbeaa9a624cbec78ccb080",
+  "live_changes": false
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "zone": "us-central1-c",
+    "operation": "operation-1790875172393-65cca9e7cd07b-ae5599cd-d808b8ad",
+    "status": "DONE",
+    "machine_type": "g2-standard-12",
+    "error_codes": [
+      "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS"
+    ],
+    "resource_check": {
+      "instances": {
+        "absent": true
+      },
+      "disks": {
+        "absent": true
+      },
+      "observed_at": "2026-10-01T17:24:42.598640+00:00"
+    }
+  },
+  {
+    "zone": "us-central1-a",
+    "operation": "operation-1790875262734-65ccaa3df50c5-707ff935-e18d242f",
+    "status": "DONE",
+    "machine_type": "g2-standard-12",
+    "error_codes": [
+      "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS"
+    ],
+    "resource_check": {
+      "instances": {
+        "absent": true
+      },
+      "disks": {
+        "absent": true
+      },
+      "observed_at": "2026-10-01T17:24:41.308342+00:00"
+    }
+  },
+  {
+    "zone": "us-central1-b",
+    "operation": "operation-1790875394458-65ccaabb941ff-e8f3f69b-25e3becd",
+    "status": "DONE",
+    "machine_type": "g2-standard-12",
+    "error_codes": [
+      "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS"
+    ],
+    "resource_check": {
+      "instances": {
+        "absent": true
+      },
+      "disks": {
+        "absent": true
+      },
+      "observed_at": "2026-10-01T17:24:41.877318+00:00"
+    }
+  }
+]

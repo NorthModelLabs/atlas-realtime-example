@@ -1,0 +1,40 @@
+{
+  "host": "https://demo.northmodellabs.com",
+  "started": 1790816830512,
+  "voiceRequests": [
+    {
+      "status": 200,
+      "at": 1790816833639
+    }
+  ],
+  "errors": [],
+  "returnedAudio": [
+    {
+      "at": 1790816841380,
+      "rms": 0.006399383703420814
+    },
+    {
+      "at": 1790816842300,
+      "rms": 0.06503464165124884
+    },
+    {
+      "at": 1790816842487,
+      "rms": 0.023963612559622708
+    },
+    {
+      "at": 1790816842675,
+      "rms": 0.009188820409220538
+    }
+  ],
+  "dom": "Apple\nTikTok\nTeach\nMeet\nListening\n00:43\nJohn\nListening\nAtlas\n\nHello from Atlas.\n\nUpload\nMute\nSettings",
+  "video": [
+    {
+      "width": 512,
+      "height": 512,
+      "frames": 1059
+    }
+  ],
+  "sessions": [
+    "ses_be548911745e4208bb32"
+  ]
+}

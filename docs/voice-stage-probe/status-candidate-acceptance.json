@@ -1,0 +1,63 @@
+{
+  "at": "2026-10-01T02:11:15.103Z",
+  "host": "https://demo-atlas-cizf66fnc-north-model-labs.vercel.app",
+  "errors": [],
+  "requests": [
+    {
+      "path": "/api/config",
+      "status": 200
+    },
+    {
+      "path": "/api/session",
+      "status": 200
+    },
+    {
+      "path": "/api/session/<owned-session>/share",
+      "status": 200
+    },
+    {
+      "path": "/api/session/<owned-session>/voice",
+      "status": 200
+    }
+  ],
+  "diagnostic_events": 0,
+  "statuses": [
+    {
+      "at": 1790820650294,
+      "value": "John is connecting"
+    },
+    {
+      "at": 1790820654300,
+      "value": "John is connected"
+    },
+    {
+      "at": 1790820655614,
+      "value": "John is listening"
+    },
+    {
+      "at": 1790820669114,
+      "value": "John is thinking"
+    },
+    {
+      "at": 1790820669473,
+      "value": "John is listening"
+    },
+    {
+      "at": 1790820672054,
+      "value": "John is speaking"
+    },
+    {
+      "at": 1790820673434,
+      "value": "John is listening"
+    },
+    {
+      "at": 1790820673497,
+      "value": "John is speaking"
+    },
+    {
+      "at": 1790820674757,
+      "value": "John is listening"
+    }
+  ],
+  "caption": "You What is 2 plus 2? Please answer in one short sentence.\n\nAtlas Two plus two equals four."
+}

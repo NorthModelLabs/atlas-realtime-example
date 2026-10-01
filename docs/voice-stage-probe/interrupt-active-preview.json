@@ -1,0 +1,136 @@
+{
+  "preview": "dpl_7fNMrbvvQq4fFpMUYTn8MKZmqBtw",
+  "events": [
+    {
+      "at": 1790828496283,
+      "stage": "typed_input"
+    },
+    {
+      "at": 1790828496387,
+      "stage": "response.created",
+      "status": "in_progress"
+    },
+    {
+      "at": 1790828497082,
+      "stage": "provider_audio",
+      "active": true,
+      "rms": 0.01676
+    },
+    {
+      "at": 1790828497561,
+      "stage": "provider_audio",
+      "active": false,
+      "rms": 0.00093
+    },
+    {
+      "at": 1790828498301,
+      "stage": "provider_audio",
+      "active": true,
+      "rms": 0.01882
+    },
+    {
+      "at": 1790828498861,
+      "stage": "provider_audio",
+      "active": false,
+      "rms": 0.00061
+    },
+    {
+      "at": 1790828499213,
+      "stage": "atlas_return_audio",
+      "active": true,
+      "rms": 0.00545
+    },
+    {
+      "at": 1790828499283,
+      "stage": "typed_input"
+    },
+    {
+      "at": 1790828499382,
+      "stage": "output_audio_buffer.cleared"
+    },
+    {
+      "at": 1790828499467,
+      "stage": "response.done",
+      "status": "cancelled"
+    },
+    {
+      "at": 1790828499588,
+      "stage": "response.created",
+      "status": "in_progress"
+    },
+    {
+      "at": 1790828499672,
+      "stage": "atlas_return_audio",
+      "active": false,
+      "rms": 0.00016
+    },
+    {
+      "at": 1790828499773,
+      "stage": "atlas_return_audio",
+      "active": true,
+      "rms": 0.01719
+    },
+    {
+      "at": 1790828499832,
+      "stage": "atlas_return_audio",
+      "active": false,
+      "rms": 0.00089
+    },
+    {
+      "at": 1790828500056,
+      "stage": "response.done",
+      "status": "completed"
+    },
+    {
+      "at": 1790828500242,
+      "stage": "provider_audio",
+      "active": true,
+      "rms": 0.00905
+    },
+    {
+      "at": 1790828500593,
+      "stage": "atlas_return_audio",
+      "active": true,
+      "rms": 0.00883
+    },
+    {
+      "at": 1790828500921,
+      "stage": "provider_audio",
+      "active": false,
+      "rms": 0.00078
+    },
+    {
+      "at": 1790828501073,
+      "stage": "atlas_return_audio",
+      "active": false,
+      "rms": 0.0002
+    },
+    {
+      "at": 1790828501092,
+      "stage": "atlas_return_audio",
+      "active": true,
+      "rms": 0.01707
+    },
+    {
+      "at": 1790828501133,
+      "stage": "atlas_return_audio",
+      "active": false,
+      "rms": 8e-05
+    },
+    {
+      "at": 1790828502533,
+      "stage": "atlas_return_audio",
+      "active": true,
+      "rms": 0.00864
+    },
+    {
+      "at": 1790828503213,
+      "stage": "atlas_return_audio",
+      "active": false,
+      "rms": 0.00093
+    }
+  ],
+  "errors": [],
+  "latest_answer": "hello",
+  "cleanup_http": 200
+}

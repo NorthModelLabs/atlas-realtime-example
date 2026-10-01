@@ -1,0 +1,18 @@
+{
+  "observed_at": "2026-10-01T02:14:44.324428+00:00",
+  "deployment": "dpl_7CQ53P2EFj6BjX56qvVajJA2LXAb",
+  "runtime": "0a46733690550f69dd5083d820f53ba6aa030e64",
+  "rollback": "dpl_BmQfZxuWAiUhSk4DNm5Vt1xpKGxp",
+  "dashboard_unchanged": true,
+  "/": {
+    "http": 200
+  },
+  "/api/config": {
+    "http": 200,
+    "voice": "openai-realtime"
+  },
+  "/nml-icon.png": {
+    "http": 200,
+    "matches_white_interior_icon": true
+  }
+}

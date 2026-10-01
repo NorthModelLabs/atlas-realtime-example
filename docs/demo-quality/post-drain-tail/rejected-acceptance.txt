@@ -1,0 +1,36 @@
+✔ active speech is sample-identical at normal, quiet and whisper levels, without a block delay (8.291958ms)
+✔ quiet audio is never conditioned without an explicit drain (4.944667ms)
+✔ drain alone does not suppress audible speech buffered at the receiver (1.662458ms)
+✔ quiet post-drain tail is attenuated only after the quiet interval, with unchanged sample count (0.769875ms)
+✔ new response preserves its first quiet sample even after a suppressed tail (0.737666ms)
+✔ conditioner expires after one second even without another control event (0.754542ms)
+✖ quiet buffered signal survives a provider drain event (required acceptance) (0.919417ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 92.358625
+
+✖ failing tests:
+
+test at docs/demo-quality/post-drain-tail/rejected-acceptance.mjs:36:1
+✖ quiet buffered signal survives a provider drain event (required acceptance) (0.919417ms)
+  AssertionError [ERR_ASSERTION]: output changed a required preserved sample
+      at equal (file:///Users/ericsheen/Desktop/avatarhub-production-audit/.codex-work/apple-demo-restore-20260930/docs/demo-quality/post-drain-tail/rejected-acceptance.mjs:12:104)
+      at TestContext.<anonymous> (file:///Users/ericsheen/Desktop/avatarhub-production-audit/.codex-work/apple-demo-restore-20260930/docs/demo-quality/post-drain-tail/rejected-acceptance.mjs:38:24)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

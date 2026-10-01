@@ -1,0 +1,41 @@
+{
+  "build_id": "7b3f3e79-fd93-4d07-b04c-c041cf80c1a4",
+  "status": "SUCCESS",
+  "source_sha256": "55807a14915bb9d3b8862fcf8f93d0b05ae939d4916f445d68dd87d5677a7bec",
+  "mock_server_frames": 32,
+  "gpu_calls": 0,
+  "results": [
+    {
+      "requested_frames": 8,
+      "enqueued_frames": 8,
+      "audio_samples_preserved_in_order": true,
+      "mock_server_frame_records_read": 9,
+      "mock_end_record_reached": false,
+      "response_context_closed": true
+    },
+    {
+      "requested_frames": 16,
+      "enqueued_frames": 16,
+      "audio_samples_preserved_in_order": true,
+      "mock_server_frame_records_read": 17,
+      "mock_end_record_reached": false,
+      "response_context_closed": true
+    },
+    {
+      "requested_frames": 18,
+      "enqueued_frames": 18,
+      "audio_samples_preserved_in_order": true,
+      "mock_server_frame_records_read": 19,
+      "mock_end_record_reached": false,
+      "response_context_closed": true
+    },
+    {
+      "requested_frames": 32,
+      "enqueued_frames": 32,
+      "audio_samples_preserved_in_order": true,
+      "mock_server_frame_records_read": 32,
+      "mock_end_record_reached": true,
+      "response_context_closed": true
+    }
+  ]
+}

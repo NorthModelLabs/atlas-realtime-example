@@ -1,0 +1,17 @@
+{
+  "workers": [
+    "avatar-pasteback-main-security-7"
+  ],
+  "event_counts": {
+    "gpu_batch_submitted": 92,
+    "gpu_first_speaking_frame": 1,
+    "gpu_batch_done": 91,
+    "gpu_render_batch_timing": 91,
+    "audio_queue_speech_backpressure": 1,
+    "audio_queue_speech_backpressure_released": 2,
+    "audio_queue_silence_drop": 1
+  },
+  "render_batch_ms_min": 1225,
+  "render_batch_ms_max": 1273,
+  "limits": "Only owned-session matching log lines. No claim that all batches are logged or clocks synchronized."
+}

@@ -1,0 +1,23 @@
+{
+  "main_workers": {
+    "ready": 10,
+    "digests": [
+      "830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee",
+      "b69fd39d00c132c6d96cbbc3fd4fdaa8a8bb3640c1260430c33db020b07bd991",
+      "f853fbd1dc92ae7a514e93107e3696e8009f74e929180ac361e2e28e9d52e7e4"
+    ]
+  },
+  "public_health": {
+    "https://demo.northmodellabs.com": 200,
+    "https://dashboard.northmodellabs.com": 200,
+    "https://api.atlasv1.com/health": 200
+  },
+  "dashboard": {
+    "snapshot_unchanged": true
+  },
+  "alias": {
+    "deployment_id": "dpl_4Gn3kBtiXyzeTusyp8y1b5imU3Ff",
+    "project_id": "prj_0njKCW2u69Y6Swzav2keV1dNzv85"
+  },
+  "observed_at": "2026-10-01T05:06:34.670397+00:00"
+}

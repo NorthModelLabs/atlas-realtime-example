@@ -1,0 +1,101 @@
+{
+  "source": "owned synthetic browser session, simultaneous returned WebM audio/video; frames selected by actual PTS",
+  "reference": "last recorded-audio 10ms RMS window above .001 within each response, not exact phonetic endpoint",
+  "turns": [
+    {
+      "turn": 1,
+      "open_at_ms": [
+        0,
+        200,
+        400
+      ],
+      "closed_at_ms": [
+        800,
+        1200,
+        1600,
+        2000
+      ]
+    },
+    {
+      "turn": 2,
+      "open_at_ms": [
+        0,
+        200
+      ],
+      "closed_at_ms": [
+        400,
+        800,
+        1200,
+        1600,
+        2000
+      ]
+    },
+    {
+      "turn": 3,
+      "open_at_ms": [
+        0
+      ],
+      "closed_at_ms": [
+        200,
+        400,
+        800,
+        1200,
+        1600,
+        2000
+      ]
+    },
+    {
+      "turn": 4,
+      "open_at_ms": [
+        0
+      ],
+      "closed_at_ms": [
+        200,
+        400,
+        800,
+        1200,
+        1600,
+        2000
+      ]
+    },
+    {
+      "turn": 5,
+      "open_at_ms": [
+        0,
+        200,
+        400
+      ],
+      "nearly_closed_at_ms": [
+        800
+      ],
+      "closed_at_ms": [
+        1200,
+        1600,
+        2000
+      ]
+    }
+  ],
+  "images": [
+    {
+      "file": "turn-1-contact.png",
+      "sha256": "15db6592cccceecfefd68da93ea8040aef709941f7eb01cecf41487b23b78be6"
+    },
+    {
+      "file": "turn-2-contact.png",
+      "sha256": "c5291397ba1a431c60463df30ac5acfaccb21ef08de4d6bfd87fec011061d596"
+    },
+    {
+      "file": "turn-3-contact.png",
+      "sha256": "7d354265e4d88eb9641578a340b5a1ee50cf8c5831edf119d7c1ae6288005d86"
+    },
+    {
+      "file": "turn-4-contact.png",
+      "sha256": "e5deb2e494158f5a788b9eab1d009d3f8f58f8b4128c3e3b498db1821ce04b56"
+    },
+    {
+      "file": "turn-5-contact.png",
+      "sha256": "bc37ffa19fc0cc21871f60f0d5f0e6cba5b3587c50eb8ccdb7779ce3227ad2c4"
+    }
+  ],
+  "fix_validated": false
+}

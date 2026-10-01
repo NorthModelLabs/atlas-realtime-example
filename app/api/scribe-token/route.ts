@@ -1,8 +1,10 @@
+import { creationGuard } from "@/app/lib/demo-access";
 import { NextResponse } from "next/server";
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || "";
 
-export async function GET() {
+export async function GET(req: Request) {
+  const denied = creationGuard(req); if (denied) return denied;
   if (!ELEVENLABS_API_KEY) {
     return NextResponse.json({ error: "ElevenLabs API key not configured" }, { status: 503 });
   }

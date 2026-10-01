@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-01T18:36:47.428987+00:00",
+  "command": "python3 -B tests/diagnostics/test_renderer_input_capture.py",
+  "tests": 10,
+  "passed": true,
+  "runtime_capture_performed": false,
+  "production_changed": false,
+  "source_sha256": {
+    "scripts/diagnostics/renderer_input_capture.py": "13a4065ffdb2379c30b5af5c6c3633966faf4dc2b800b8e8a7917255a12db3d3",
+    "scripts/diagnostics/verify_renderer_capture.py": "21b8c91fe29b1a0a54833c324cd5e0567ff2161af651f411019acbcfd804a5d5",
+    "tests/diagnostics/test_renderer_input_capture.py": "f10f733175f0d01d6aeee83cc24c3563c01f316629a6b45fe3dbb87bed1b2d55"
+  }
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "at": 1790877086023,
+    "gapMs": 216.7,
+    "last_observed_return_audio_active": null,
+    "stats_bracket_ms": [
+      1790877085709,
+      1790877086705
+    ],
+    "counter_delta": {
+      "packetsLost": 0,
+      "nackCount": 0,
+      "pliCount": 0,
+      "framesDropped": 0,
+      "freezeCount": 1
+    }
+  },
+  {
+    "at": 1790877127804,
+    "gapMs": 216.6,
+    "last_observed_return_audio_active": false,
+    "stats_bracket_ms": [
+      1790877126703,
+      1790877128704
+    ],
+    "counter_delta": {
+      "packetsLost": 1,
+      "nackCount": 9,
+      "pliCount": 0,
+      "framesDropped": 0,
+      "freezeCount": 1
+    }
+  },
+  {
+    "at": 1790877133603,
+    "gapMs": 250,
+    "last_observed_return_audio_active": false,
+    "stats_bracket_ms": [
+      1790877132705,
+      1790877133704
+    ],
+    "counter_delta": {
+      "packetsLost": 4,
+      "nackCount": 2,
+      "pliCount": 0,
+      "retransmittedPacketsReceived": 4,
+      "framesDropped": 0,
+      "freezeCount": 1
+    }
+  },
+  {
+    "at": 1790877142802,
+    "gapMs": 166.7,
+    "last_observed_return_audio_active": true,
+    "stats_bracket_ms": [
+      1790877141702,
+      1790877143702
+    ],
+    "counter_delta": {
+      "packetsLost": 5,
+      "nackCount": 3,
+      "pliCount": 0,
+      "retransmittedPacketsReceived": 5,
+      "framesDropped": 0,
+      "freezeCount": 0
+    }
+  }
+]
