@@ -16,7 +16,7 @@ The patch fails unless the dispatcher source hash exactly matches the captured p
 
 The original dispatcher image was mirrored by immutable digest into the isolated staging registry; manifest bytes matched. No production registry mutation, mutable tag change, deployment or IAM expansion was used. The first candidate build lacked permission to pull the production base, addressed by that staging mirror. The second caught an incorrect integrity-check path for `agent_worker.py`; the pinned launcher image contains `avatar_runner.py`, `dispatcher.py`, `mouth_mode.py` and `start-launcher.sh`. The corrected guard inventories all existing non-dispatcher workspace files and retains explicit runner/mouth/startup hashes.
 
-## Remaining acceptance
+## Build acceptance (historical checkpoint)
 
 Build `1776406b-6360-432f-9b84-e5f9135510fc` succeeded. The staging controller image is pinned to `sha256:7236e4d3214079381380859b3c6099b5d719f68b129c73086e3e88e63b333004`. In-image tests passed cancellation survival, busy-session skipping, idle resumption, shutdown cancellation and independent warmup fixture selection. All non-dispatcher workspace bytes remained unchanged, including explicit runner, mouth-mode and startup-script hashes. Next, run isolated inference with the exact main model digest. The bounded new staging GPU VM could not be created: GCE returned UNAVAILABLE and authoritative checks found no instance. No benchmark has run there. Do not use a production GPU or substitute the unrelated test4 model. This candidate is not deployed to production and does not yet prove a latency improvement or the ~1.3-second target.
 
@@ -45,3 +45,8 @@ The mirrored main model started successfully with egress denied. Its first 32-fr
 The owned guest's failure handler stopped it. Compute authoritatively reported `TERMINATED`, instance ID `5752044785369117268`, last-stop timestamp 03:14:31 UTC. No staging GPU remains running for this probe; its private disk and cached pinned images are retained for the bounded follow-up. The existing serial monitor may finish its final observation; do not create a second VM or restart from an observation timeout.
 
 The inherited `sidecar-image-ready` phase label referred to the static fixture image in this modified probe. No sidecar container was started: the registration phase was removed from the generated startup. Future probes should rename that label to avoid ambiguity.
+
+
+## Latest acceptance — 03:37 UTC
+
+The later exact-model experiments and warmup inference acceptance are complete; see MODEL-TIMINGS.md and isolated-model-r3-results.json. Earlier paragraphs describing a running pull or missing benchmark are historical checkpoints. Warmed first-frame delivery is approximately 0.40 seconds, distinct from the approximately 1.25–1.30-second duration of an entire 32-frame stream. The reviewed controller method passed three real-inference calls on the isolated GPU. The VM is stopped and cleanup is recorded separately. The candidate remains staging-only; production images and configuration are unchanged. Warmup reliability defects remain present in production until a separately verified rollout, and the whole-conversation response target and intermittent continuity issue are not claimed solved.
