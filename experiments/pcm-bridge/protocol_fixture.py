@@ -13,6 +13,7 @@ async def main():
             self.frames = []
             self.now = 0.0
             self.clears = 0
+            self.ends = 0
 
         async def sleep(self, seconds):
             self.now += seconds
@@ -20,6 +21,9 @@ async def main():
 
         async def write(self, data):
             self.frames.append(data)
+
+        async def end(self):
+            self.ends += 1
 
         async def clear(self):
             self.clears += 1
@@ -34,7 +38,7 @@ async def main():
             if message.get("inspect"):
                 data = b"".join(sink.frames)
                 result = {"bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(),
-                          "clears": sink.clears, "phase": bridge.phase}
+                          "clears": sink.clears, "ends": sink.ends, "phase": bridge.phase}
             else:
                 result = json.loads(await bridge.handle(message.get("caller", "fixture-driver"),
                                                         json.dumps(message["payload"])))

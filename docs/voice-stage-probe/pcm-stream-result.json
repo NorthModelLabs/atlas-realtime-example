@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "livekit_sdk": "1.1.5",
+  "livekit_agents": "1.5.2",
+  "server": "v1.13.7",
+  "samples_per_turn": [
+    240,
+    12000,
+    24000
+  ],
+  "exact_pcm": true,
+  "receiver_alive_after_end": true,
+  "rooms_connected_after_end": true,
+  "playback_notifications_received": true,
+  "scope": "actual DataStreamAudioOutput/Receiver; no AvatarRunner rendering, resampling or GPU",
+  "build_id": "c971528a-d627-4cf4-9744-fee763bd3b17",
+  "build_status": "SUCCESS",
+  "cleanup": "rooms_disconnected",
+  "teardown_warning": "RPC response publish raced room disconnect; playback notifications had already been observed. Shutdown warning not resolved by this test."
+}

@@ -23,6 +23,7 @@ class BridgeError(Exception):
 
 class Sink(Protocol):
     async def write(self, pcm: bytes) -> None: ...
+    async def end(self) -> None: ...
     async def clear(self) -> None: ...
 
 
@@ -41,7 +42,6 @@ class PcmBridge:
     MAX_TURN_BYTES = BYTES_PER_SECOND * 30
     MAX_PAYLOAD = 14 * 1024
     LOOKAHEAD_SECONDS = 1.28
-    BATCH_BYTES = 61440  # 32 x 40ms at 24kHz; unchanged runner batch size.
 
     def __init__(self, driver: str, sink: Sink, *, enabled: bool = False,
                  clock: Callable[[], float] = time.monotonic,
@@ -220,16 +220,13 @@ class PcmBridge:
         if self.phase != "open":
             raise BridgeError("PCM turn is not open")
         self.phase = "sealing"
-        async def pad():
-            # Do not close the avatar data stream or emit a room-ending marker.
-            # Stage acceptance must verify this padding against resampling/tails.
-            remaining = (-self.forwarded_bytes) % self.BATCH_BYTES
-            while remaining:
-                size = min(remaining, self.CHUNK_BYTES)
-                await self._write(bytes(size))
-                remaining -= size
+        async def seal():
+            # Flush the receiver's partial segment explicitly. Silence can be
+            # dropped under backpressure and is not a reliable end marker.
+            # This ACK means input sealed, not that playback has completed.
+            await asyncio.wait_for(self.sink.end(), self.operation_timeout)
             self.phase = "sealed"
-        self.worker = asyncio.create_task(pad())
+        self.worker = asyncio.create_task(seal())
         try:
             await asyncio.shield(self.worker)
         except asyncio.CancelledError:

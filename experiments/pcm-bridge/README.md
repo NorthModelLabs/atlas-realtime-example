@@ -21,11 +21,14 @@ the first audio chunk. A turn that has ended is sealed, not declared heard or
 played; cancellation must finish before opening the next generation. A failed
 sink clear makes the connection unusable until reconnected.
 
-The current tail experiment pads to a 32-frame boundary without closing the
-avatar stream. **This is not accepted as sufficient for production:** the exact
-runner may drop incoming silence under backpressure, and its 24→16-kHz
-resampling and receiver frame boundaries require an integrated tail test. A
-successful local `end` only proves bytes were passed to the test sink.
+The sink must provide an explicit asynchronous `end()` that seals the input
+segment and flushes its partial tail. The prototype does not pad with synthetic
+silence. An isolated test of the exact deployed runner preserved 10-, 50- and
+100-frame utterances and accepted subsequent turns with explicit segment markers;
+see [the contract results](../../docs/voice-stage-probe/SEGMENT-CONTRACT.md).
+This used a simulated model and bypassed SDK media publishing. Actual data-stream
+closure, resampling and distributed cancellation remain acceptance requirements.
+A successful local `end` means input sealed, not audio played.
 
 `livekit_ingress.py` registers `atlas.pcm.v1` only when explicitly enabled for a
 PCM-only session. Its caller identity comes from LiveKit, never the JSON payload.
@@ -45,13 +48,24 @@ node --test sender.test.mjs
 ```
 
 The Python suite tests authorization, reordering, retries, bounded admission,
-cancellation races, missing chunks, sink failure, tail padding, pacing, duration
+cancellation races, missing chunks, sink failure, explicit tail sealing, pacing, duration
 limits and malformed input. The Node suite tests sender backpressure/failure and
 launches the real Python ingress as a local subprocess to verify byte-for-byte
-speech preservation plus padding across arbitrary provider chunk boundaries.
+speech preservation across arbitrary provider chunk boundaries.
 `protocol_fixture.py` is test-only and never connects to LiveKit or OpenAI.
 
-Remaining acceptance: SDK registration/wire compatibility; authenticated owned
+The private SDK/RPC wire test passed against LiveKit SDK 1.1.5 and a disposable
+LiveKit server v1.13.7: caller authorization, ordered 38,400-byte PCM transfer,
+idempotent retry/end, stale-generation rejection and handler removal all passed.
+Its sink only collected bytes; it did not exercise GPU playback or establish the
+production server version. Evidence: `../../docs/voice-stage-probe/pcm-wire-result.json`.
+
+The actual pinned SDK audio output/receiver also preserved three consecutive
+24-kHz segments (10 ms, 500 ms, 1 second), including the partial tail, and
+delivered playback-finished notifications. A shutdown RPC warning remains
+recorded; these tests do not exercise renderer resampling or a real GPU.
+
+Remaining acceptance: authenticated owned
 staging session routing; cancellation through the actual SDK/runner; resampling,
 tail and stalled-consumer behavior; real-model continuity; microphone/VAD and
 warm multi-turn browser measurements. Keep the existing media default until

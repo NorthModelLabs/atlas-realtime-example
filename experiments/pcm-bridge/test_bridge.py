@@ -26,7 +26,7 @@ class Sink:
         self.events = []
         self.entered = asyncio.Event()
         self.hold = None
-        self.fail_write = self.fail_clear = False
+        self.fail_write = self.fail_clear = self.fail_end = False
 
     async def write(self, data):
         self.entered.set()
@@ -36,6 +36,11 @@ class Sink:
             raise RuntimeError("private sink detail")
         self.writes.append((self.clock(), data))
         self.events.append(("write", data[:2]))
+
+    async def end(self):
+        self.events.append(("end",))
+        if self.fail_end:
+            raise RuntimeError("private end detail")
 
     async def clear(self):
         self.events.append(("clear",))
@@ -166,21 +171,48 @@ class BridgeTests(unittest.IsolatedAsyncioTestCase):
         await asyncio.sleep(0)
         self.assertIn(("clear",), self.sink.events)
 
-    async def test_partial_tail_is_padded_without_a_stream_close(self):
+    async def test_partial_tail_is_sealed_without_synthetic_silence(self):
         data = b"\x03\x00" * 240  # 10ms short speech.
         await self.push(0, data)
         with self.assertRaisesRegex(BridgeError, "missing chunks"):
             await self.rpc("end", generation=self.generation, count=2)
         result = await self.rpc("end", generation=self.generation, count=1)
         combined = b"".join(x[1] for x in self.sink.writes)
-        self.assertEqual(combined, data + bytes(61440 - len(data)))
-        self.assertEqual(result, {"sealed": True, "forwarded_samples": 30720})
+        self.assertEqual(combined, data)
+        self.assertEqual(self.sink.events[-1], ("end",))
+        self.assertEqual(result, {"sealed": True, "forwarded_samples": 240})
         self.assertFalse(any(x[0] == "clear" for x in self.sink.events))
         before = len(self.sink.writes)
         self.assertEqual(await self.rpc("end", generation=self.generation, count=1), result)
         self.assertEqual(len(self.sink.writes), before)
+        self.assertEqual(self.sink.events.count(("end",)), 1)
         with self.assertRaises(BridgeError):
             await self.push(1)
+
+    async def test_end_failure_clears_and_prevents_reopening(self):
+        await self.push(0)
+        self.sink.fail_end = True
+        with self.assertRaisesRegex(BridgeError, "tail failed"):
+            await self.rpc("end", generation=self.generation, count=1)
+        self.assertIn(("clear",), self.sink.events)
+        with self.assertRaisesRegex(BridgeError, "closed"):
+            await self.rpc("open", turn="response_2")
+
+    async def test_cancel_during_end_cannot_seal_replacement_turn(self):
+        entered, release = asyncio.Event(), asyncio.Event()
+        async def slow_end():
+            entered.set()
+            await release.wait()
+        self.sink.end = slow_end
+        ending = asyncio.create_task(self.rpc("end", generation=self.generation, count=0))
+        await entered.wait()
+        await self.rpc("cancel", generation=self.generation)
+        with self.assertRaisesRegex(BridgeError, "cancelled"):
+            await ending
+        generation = (await self.rpc("open", turn="response_2"))["generation"]
+        release.set()
+        await self.push(0, generation=generation)
+        self.assertEqual(self.bridge.phase, "open")
 
     async def test_cumulative_ahead_limit_starts_at_first_audio_not_open(self):
         self.clock.now = 100  # Provider/model response takes time after opening.

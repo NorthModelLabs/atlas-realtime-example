@@ -77,10 +77,11 @@ test("browser sender and Python ingress preserve exact PCM across arbitrary prov
     const ended = await sender.finish();
     assert.equal(ended.sealed, true);
     const result = await request({inspect: true});
-    const expected = Buffer.concat([original, Buffer.alloc((61440 - original.length % 61440) % 61440)]);
+    const expected = Buffer.from(original);
     assert.equal(result.bytes, expected.length);
     assert.equal(result.sha256, createHash("sha256").update(expected).digest("hex"));
     assert.equal(result.clears, 0);
+    assert.equal(result.ends, 1);
     assert.equal(result.phase, "sealed");
     assert(maxInFlight <= 4);
     await sender.cancel();
