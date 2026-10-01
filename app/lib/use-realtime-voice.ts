@@ -86,7 +86,7 @@ export function useRealtimeVoice(options: Options) {
         if (!superseded && event.type === "response.output_audio_transcript.done" && event.response_id === previous.responseId && event.transcript?.trim()) opts.current.assistant(event.transcript.trim());
         if (event.type === "response.done") {
           opts.current.thinking(c.turns.busy);
-          if (event.response?.status === "failed") opts.current.error("Voice response failed. Please try again.");
+          if (!superseded && event.response?.id === previous.responseId && event.response?.status === "failed") opts.current.error("Voice response failed. Please try again.");
         }
         if (event.type === "error") {
           c.turns.failed(event.error?.event_id);
