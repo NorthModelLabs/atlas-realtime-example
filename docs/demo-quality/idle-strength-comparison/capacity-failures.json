@@ -1,0 +1,63 @@
+{
+  "attempts": [
+    {
+      "zone": "us-central1-c",
+      "machine_type": "g2-standard-16",
+      "request_directory": "/private/tmp/atlas-mouth-idle-20261001",
+      "operation": "operation-1790880214804-65ccbcb09e6e4-7b40bf2f-8d8e3c85",
+      "error_codes": [
+        "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS"
+      ],
+      "absence": {
+        "instances_absent": true,
+        "disks_absent": true,
+        "observed_at": "2026-10-01T18:44:51.381932+00:00"
+      }
+    },
+    {
+      "zone": "us-central1-a",
+      "machine_type": "g2-standard-16",
+      "request_directory": "/private/tmp/atlas-mouth-idle-zone-a-20261001",
+      "operation": "operation-1790880310527-65ccbd0be84b5-024d0b11-a7637074",
+      "error_codes": [
+        "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS"
+      ],
+      "absence": {
+        "instances_absent": true,
+        "disks_absent": true,
+        "observed_at": "2026-10-01T18:47:07.901936+00:00"
+      }
+    },
+    {
+      "zone": "us-central1-b",
+      "machine_type": "g2-standard-16",
+      "request_directory": "/private/tmp/atlas-mouth-idle-zone-b-20261001",
+      "operation": "operation-1790880465206-65ccbd9f6bcb6-ce97a91f-70f59bff",
+      "error_codes": [
+        "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS"
+      ],
+      "absence": {
+        "instances_absent": true,
+        "disks_absent": true,
+        "observed_at": "2026-10-01T18:48:42.043208+00:00"
+      }
+    },
+    {
+      "zone": "us-central1-c",
+      "machine_type": "g2-standard-12",
+      "request_directory": "/private/tmp/atlas-mouth-idle-shape12-20261001",
+      "operation": "operation-1790880558762-65ccbdf8a4972-9f4d1ca9-2badc56d",
+      "error_codes": [
+        "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS"
+      ],
+      "absence": {
+        "instances_absent": true,
+        "disks_absent": true,
+        "observed_at": "2026-10-01T18:50:51.205168+00:00"
+      }
+    }
+  ],
+  "us_central1_f_g2_standard_12": "machine type not found; no creation attempted",
+  "runtime_trials_completed": 0,
+  "production_mutations": false
+}

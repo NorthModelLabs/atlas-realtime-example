@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-01T18:40:50.501832+00:00",
+  "pod": "avatar-pasteback-main-security-2",
+  "bounded_lines_examined": 696,
+  "owned_cache_matching_lines": [
+    {
+      "at": "2026-10-01T18:16:53.244494182Z",
+      "owned_cache": "lk_c13d9b22cecf",
+      "numeric": [],
+      "message_shape": "2026-10-01T18:16:53.244494182Z no cache hit for cache_key: lk_c13d9b22cecf using s_motion as initial past_motion"
+    }
+  ],
+  "framewise_log_lines_count": 0,
+  "raw_retained": false
+}
