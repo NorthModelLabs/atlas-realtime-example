@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-01T20:08:23.473337+00:00",
+  "branch_alias_restore_status": 200,
+  "aliases": {
+    "atlas-realtime-example.vercel.app": {
+      "deployment": "dpl_HGxTHqaWCXg4HAUsBUorrFC85f3p",
+      "project": "prj_5AupKllwth1bTY6NpUInysY6M7Fu"
+    },
+    "atlas-realtime-example-north-model-labs.vercel.app": {
+      "deployment": "dpl_HGxTHqaWCXg4HAUsBUorrFC85f3p",
+      "project": "prj_5AupKllwth1bTY6NpUInysY6M7Fu"
+    },
+    "atlas-realtime-example-git-main-north-model-labs.vercel.app": {
+      "deployment": "dpl_HGxTHqaWCXg4HAUsBUorrFC85f3p",
+      "project": "prj_5AupKllwth1bTY6NpUInysY6M7Fu"
+    },
+    "demo.northmodellabs.com": {
+      "deployment": "dpl_4Gn3kBtiXyzeTusyp8y1b5imU3Ff",
+      "project": "prj_0njKCW2u69Y6Swzav2keV1dNzv85"
+    },
+    "dashboard.northmodellabs.com": {
+      "deployment": "dpl_6bCzZtA8k7UqpsLbo2NRJb6KTRrg",
+      "project": "prj_sI35eo05hx23gF7DYOd8wRaCADZh"
+    }
+  },
+  "health": {
+    "https://demo.northmodellabs.com": 200,
+    "https://atlas-realtime-example.vercel.app": 200,
+    "https://dashboard.northmodellabs.com": 200,
+    "https://api.atlasv1.com/health": 200
+  },
+  "legacy": {
+    "target": "dpl_HGxTHqaWCXg4HAUsBUorrFC85f3p",
+    "git": {
+      "createDeployments": "disabled"
+    },
+    "autoAssignCustomDomains": false,
+    "autoAssignCustomDomainsUpdatedBy": "system"
+  },
+  "all_three_legacy_restored": true,
+  "demo_dashboard_aliases_unchanged": true
+}

@@ -39,6 +39,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--apply', action='store_true')
     args = parser.parse_args()
+    if args.apply:
+        raise RuntimeError("Retired: createDeployments=disabled did not prevent a Git production deployment. Do not reuse this merge procedure; see INCIDENT.md.")
     os.umask(0o077)
     args.output.mkdir(mode=0o700, parents=True, exist_ok=False)
     session = requests.Session()

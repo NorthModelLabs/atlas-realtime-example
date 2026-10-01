@@ -59,13 +59,8 @@ class GuardTests(unittest.TestCase):
             return state
     def test_read_only_never_writes(self):
         s=self.run_case(apply=False);self.assertIsNone(s['error']);self.assertEqual(s['writes'],[])
-    def test_success_leaves_legacy_disabled(self):
-        s=self.run_case();self.assertIsNone(s['error']);self.assertEqual(s['writes'],['git:disabled','draft','merge']);self.assertTrue(s['merged']);self.assertEqual(s['git'],'disabled')
-    def test_rejected_merge_restores_git_and_draft(self):
-        s=self.run_case('merge_rejected');self.assertIsInstance(s['error'],RuntimeError);self.assertEqual(s['git'],'enabled');self.assertTrue(s['draft']);self.assertFalse(s['merged'])
-    def test_ambiguous_merge_does_not_reenable_git(self):
-        s=self.run_case('merge_timeout');self.assertIsInstance(s['error'],TimeoutError);self.assertTrue(s['merged']);self.assertEqual(s['git'],'disabled');self.assertNotIn('git:enabled',s['writes'])
-    def test_head_drift_blocks_every_write(self):
-        s=self.run_case(head='unexpected');self.assertIsInstance(s['error'],AssertionError);self.assertEqual(s['writes'],[])
+    def test_retired_apply_blocks_all_writes(self):
+        s=self.run_case();self.assertIsInstance(s['error'],RuntimeError)
+        self.assertIn('Retired:',str(s['error']));self.assertEqual(s['writes'],[])
 
 if __name__=='__main__':unittest.main()

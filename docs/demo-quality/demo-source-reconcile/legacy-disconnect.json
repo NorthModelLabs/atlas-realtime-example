@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-01T20:09:25.356322+00:00",
+  "disconnect_status": 200,
+  "project_id": "prj_5AupKllwth1bTY6NpUInysY6M7Fu",
+  "link": null,
+  "production_target": "dpl_HGxTHqaWCXg4HAUsBUorrFC85f3p",
+  "all_five_aliases_unchanged": true,
+  "autoAssignCustomDomains": false,
+  "health": {
+    "https://demo.northmodellabs.com": 200,
+    "https://atlas-realtime-example.vercel.app": 200,
+    "https://dashboard.northmodellabs.com": 200,
+    "https://api.atlasv1.com/health": 200
+  }
+}

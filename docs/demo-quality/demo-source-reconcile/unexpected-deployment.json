@@ -1,0 +1,51 @@
+{
+  "at": "2026-10-01T20:05:59.826724+00:00",
+  "deployment": {
+    "id": "dpl_cdxSCSwYwm7vf7UoUVbQCxSBR1rz",
+    "name": "atlas-realtime-example",
+    "projectId": "prj_5AupKllwth1bTY6NpUInysY6M7Fu",
+    "readyState": "READY",
+    "status": "READY",
+    "target": "production",
+    "source": "git",
+    "alias": [
+      "atlas-realtime-example.vercel.app",
+      "atlas-realtime-example-north-model-labs.vercel.app",
+      "atlas-realtime-example-git-main-north-model-labs.vercel.app"
+    ],
+    "aliasAssigned": true,
+    "aliasError": null,
+    "createdAt": 1790885072768,
+    "ready": 1790885109910,
+    "errorCode": null,
+    "errorMessage": null,
+    "automaticAliases": [
+      "atlas-realtime-example-north-model-labs.vercel.app",
+      "atlas-realtime-example-git-main-north-model-labs.vercel.app"
+    ],
+    "gitSource": {
+      "ref": "main",
+      "repoId": 1201480016,
+      "sha": "78ddbf0be6515a989df4c8ad0c04db3a92bda306",
+      "type": "github",
+      "prId": null
+    },
+    "commit": "78ddbf0be6515a989df4c8ad0c04db3a92bda306"
+  },
+  "aliases": {
+    "demo.northmodellabs.com": {
+      "deploymentId": "dpl_4Gn3kBtiXyzeTusyp8y1b5imU3Ff",
+      "projectId": "prj_0njKCW2u69Y6Swzav2keV1dNzv85"
+    },
+    "atlas-realtime-example.vercel.app": {
+      "deploymentId": "dpl_cdxSCSwYwm7vf7UoUVbQCxSBR1rz",
+      "projectId": "prj_5AupKllwth1bTY6NpUInysY6M7Fu"
+    }
+  },
+  "legacy": {
+    "git": {
+      "createDeployments": "disabled"
+    },
+    "target": "dpl_cdxSCSwYwm7vf7UoUVbQCxSBR1rz"
+  }
+}

@@ -1,5 +1,7 @@
 # Demo source PR reconciliation — 2026-10-01
 
+**Superseded by [INCIDENT.md](INCIDENT.md):** PR #1 merged, but the disabled Git-deployment setting did not prevent a temporary legacy rollout. The legacy deployment was restored and its Git link disconnected. The old apply procedure is retired; do not execute it.
+
 The source PR is mergeable, but merging it now is not deployment-safe for the separately hosted legacy demo. This audit made no remote changes. The smallest resolution is to disable Git-triggered deployments on the legacy project, verify that setting and its existing aliases, then merge the reviewed source without moving any live alias. Keep the dedicated demo project manually released until a separate, tested deployment connection is desired.
 
 ## Current authoritative state
