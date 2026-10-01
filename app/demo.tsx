@@ -331,6 +331,7 @@ export default function DemoPage({
   const [localMessages, setLocalMessages] = useState<ChatMsg[]>([]);
   const [swapping, setSwapping] = useState(false);
   const [aiThinking, setAiThinking] = useState(false);
+  const [voiceError, setVoiceError] = useState("");
   const [faceLoading, setFaceLoading] = useState(false);
 
   const [configReady, setConfigReady] = useState<{ llm: boolean; tts: boolean } | null>(null);
@@ -641,7 +642,7 @@ export default function DemoPage({
   const voice = useRealtimeVoice({
     sessionId: session.sessionId, output: voiceOutput,
     user: text => addMsg("user", text), assistant: text => addMsg("atlas", text),
-    thinking: setAiThinking, error: text => addMsg("system", text),
+    thinking: setAiThinking, error: text => {setVoiceError(text); if (text) addMsg("system", text);},
   });
   const stopListening = voice.stop;
   const startListening = voice.start;
@@ -776,6 +777,7 @@ export default function DemoPage({
       ))}
     </nav>
   );
+  const voiceAlert = voiceError ? <div role="alert" className="fixed top-16 left-1/2 -translate-x-1/2 z-[100] max-w-lg rounded-xl bg-red-950 px-5 py-3 text-sm text-white">{voiceError}</div> : null;
   const hiddenFaceInputs = (
     <>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
@@ -808,6 +810,7 @@ export default function DemoPage({
 
     return (
       <div className="apple-ui h-screen w-screen overflow-hidden text-white">
+        {voiceAlert}
         {hiddenFaceInputs}
         {formatPicker("global-format-picker apple-format-picker")}
 
@@ -945,8 +948,10 @@ export default function DemoPage({
   if (uiMode === "teacher") {
     return (
       <div className="teacher-ui min-h-screen w-screen bg-[#edf1f5] text-[#111827]">
+        {voiceAlert}
         {hiddenFaceInputs}
-        {formatPicker("global-format-picker")}
+        {voiceAlert}
+      {formatPicker("global-format-picker")}
         <header className="teacher-topbar">
           <div className="teacher-heading">
             <span>Interactive lesson · Calculus</span>
@@ -1122,6 +1127,7 @@ export default function DemoPage({
     const meetPanelTitle = meetPanel === "chat" ? "In-call messages" : meetPanel === "people" ? "People" : "Call settings";
     return (
       <div className="meet-ui mode-shell h-screen w-screen overflow-hidden bg-[#202124] text-white">
+        {voiceAlert}
         {hiddenFaceInputs}
         {formatPicker("global-format-picker meet-global-format-picker")}
         <header className="meet-topbar">
@@ -1424,6 +1430,7 @@ export default function DemoPage({
   if (uiMode === "mirror") {
     return (
       <div className="mirror-ui min-h-screen w-screen overflow-hidden bg-[#f7f7f4] text-[#111111]">
+        {voiceAlert}
         {hiddenFaceInputs}
         {formatPicker("global-format-picker mirror-format-picker")}
 
@@ -1522,6 +1529,7 @@ export default function DemoPage({
         isTiktokUi ? "tiktok-ui relative" : "flex"
       }`}
     >
+      {voiceAlert}
       {formatPicker("global-format-picker")}
       {/* Video Panel */}
       <div

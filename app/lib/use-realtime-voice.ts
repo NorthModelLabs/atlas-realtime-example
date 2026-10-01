@@ -36,6 +36,7 @@ export function useRealtimeVoice(options: Options) {
   }, []);
   const start = useCallback(async () => {
     if (current.current || !opts.current.sessionId) return;
+    opts.current.error("");
     const id = opts.current.sessionId;
     const peer = new RTCPeerConnection();
     const channel = peer.createDataChannel("oai-events");
