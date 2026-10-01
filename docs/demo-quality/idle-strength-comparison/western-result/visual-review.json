@@ -1,0 +1,25 @@
+{
+  "accepted_for_promotion": false,
+  "reason": "Exact-zero baseline did not reproduce the late reopening; strength 1.0 shows no clear improvement in sampled stills. No production strength change justified.",
+  "reviewed_contacts": [
+    "trial-0-tail-0.jpg",
+    "trial-0-tail-5.jpg",
+    "trial-0-tail-10.jpg",
+    "trial-1-tail-0.jpg",
+    "trial-1-speech-0.jpg",
+    "trial-1-speech-5.jpg",
+    "trial-1-speech-10.jpg"
+  ],
+  "observations": [
+    "Normal speech: sampled mouth appears closed at +400 ms and later with both strengths; baseline repeat consistent.",
+    "Quiet speech: sampled voiced frames retain visible articulation with both strengths; this is not exhaustive onset or phoneme acceptance.",
+    "No visible late reopening in retained zero-input tail samples. Small pixel differences remain and are not proof of no mouth motion."
+  ],
+  "limitations": [
+    "256x256 JPEG stills at selected times, not continuous video or physical playout.",
+    "One repeat normal-tail frame at +7000 ms lost serial part 0; not synthesized.",
+    "Approximate fixture resampling; not browser/LiveKit decode.",
+    "Full conversational normalized-input-to-final-playout capture remains outstanding."
+  ],
+  "next_action": "Capture actual decoded transport PCM and aligned returned audio/video for owned synthetic conversation in isolated staging, then identify whether residual input or presentation timing accompanies reopening. Do not change thresholds, clip quiet audio, freeze video, or alter batching."
+}

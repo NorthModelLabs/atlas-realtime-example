@@ -1,0 +1,15 @@
+{
+  "headers": 108,
+  "incomplete": [
+    {
+      "condition": "repeat",
+      "trial": 0,
+      "frame": 301,
+      "expected_parts": 12,
+      "missing_parts": [
+        0
+      ]
+    }
+  ],
+  "scope": "Exhaustive serial-marker scan; no missing bytes synthesized"
+}

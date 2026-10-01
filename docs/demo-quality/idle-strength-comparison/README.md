@@ -1,27 +1,29 @@
-# Idle mouth-strength comparison — pending runtime
+# Idle mouth-strength comparison — candidate not accepted
 
-No candidate is accepted or deployed. The purpose of this comparison is to test whether the remaining generated mouth deformation under the current 0.85 idle-lock blend can produce visible movement during prolonged exact-zero input. It is a hypothesis, not a conclusion from the existing browser measurements.
+The isolated GPU comparison completed. Changing idle mouth-lock strength from 0.85 to 1.0 did **not** demonstrate a fix for the live-demo mouth tail. No candidate was deployed. The live symptom remains unresolved.
 
-## Owned production-session correlation
+## Result and limits
 
-The earlier late-reopening session `ses_eb8a23a8cf5448ecab45` ran on `avatar-pasteback-main-security-2`, with internal cache `lk_c13d9b22cecf`. A bounded read-only log query retained only this owned session's numeric timing records. Around the reopened frame, the runner continued returning full 32-frame batches; its log does not identify that frame's normalized audio samples or gate weight. This establishes routing and continued batch output, not causality or end-to-end latency. No batching optimization follows from it.
+Three conditions ran sequentially on the original model and runner: strength 0.85, strength 1.0, then repeat 0.85. Each used identical normal and 0.01-gain public synthetic speech, followed by more than nine seconds of exact-zero PCM. All other model/eye settings, silence threshold, and close/open/debounce timing were preserved.
 
-The matching model log identifies the owned cache initialization but has no framewise idle-envelope diagnostics in the observed window. No production instrumentation was added and no customer media was read. Full-transport normalized-input capture is still outstanding.
+All six trials passed input/output accounting: 72 inference calls, 2,304 returned frames, paired audio byte-identical to submitted PCM, and identical inputs across conditions. The private input/outcome archives passed hash and frame-count verification. They remain private; only summaries and public-fixture images are committed.
 
-## Exact planned comparison
+In the reviewed stills, the mouth appears closed by +400 ms with both strengths and remains closed at later sampled points. Quiet voiced samples retain articulation. The 0.85 repeat is consistent. This does not reproduce the live late reopening or demonstrate improvement from strength 1.0. Small compressed-image differences remain; stills cannot prove an absence of continuous micro-motion.
 
-One isolated staging L4, original model digest `f853fbd1…` and runner digest `830547f2…`, fixed original face and speech fixture. Conditions are baseline mouth strength 0.85, isolated candidate strength 1.0, then baseline repeat 0.85. All other model and eye settings stay at baseline; the silence threshold and close/open/debounce timing are unchanged. Both normal and 0.01-gain speech are followed by more than nine seconds of exact-zero PCM.
+107 of 108 selected JPEGs were reconstructed and hash-verified. The repeat's normal-speech +7,000 ms frame lost serial chunk 0. It is explicitly missing, not reconstructed from another condition. See `western-result/serial-completeness.json` and the blank contact-sheet cell.
 
-`probe.py` uses the actual runner inference method, checks every paired output-audio byte against input, saves selected speech/tail images, and emits a bounded compressed archive of the private input/outcome captures. `analyze.py` verifies archive/file hashes, each requested/returned frame count, and total paired-audio equality against the submitted fixture. Raw PCM is kept privately and is not committed. This direct inference experiment does **not** include browser/LiveKit decoding or establish physical playout timing. The fixture's resampling uses the earlier approximate interpolation, not the actual runner resampler.
+These are direct original model/runner calls, not a browser/LiveKit conversation. The fixture uses approximate resampling. No full transport drain, physical playout timing, general quiet-articulation safety, or complete mouth remediation is claimed. See `western-result/capture-analysis.json` and `visual-review.json`.
 
-Runtime visual evidence must show a baseline symptom and an improvement without suppressing quiet articulation before considering this a useful candidate. Even a pass would still need repeated full-conversation visual acceptance. If the symptom is absent from the zero-input baseline, that result would not justify a production strength change; continue with the actual transport/input investigation.
+## Preserved production and cleanup
 
-## Capacity and cleanup
+Five central-region allocations failed for capacity and left no VM or boot disk. The existing private western staging subnet allowed one g2-standard-16/L4 test without new networking. The VM used digest pins, no public IP, a 30-minute cloud stop deadline, independent guest shutdown, and model egress denial. It was stopped and deleted with its boot disk at 19:28:53 UTC; see `western-result/cleanup.json`.
 
-Four sequential requests were rejected with `ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS`: g2-standard-16 in us-central1-c, -a and -b; g2-standard-12 in -c. Each terminal rejection was followed by authoritative checks confirming that neither its VM nor boot disk existed. The remaining region zone -f does not expose g2-standard-12, so no request was made there. No GPU trial ran. The scripts and result analyzer are prepared, but they provide no renderer/visual result yet.
+All ten production workers and their controller passed original-image and visual-setting checks at 19:16:06 UTC. The public watcher recorded HTTP 200 for demo, dashboard, and API health throughout its observations. No production model/settings, routes, account rows, balances, or keys were changed by this experiment. The capacity blocker was resolved for this comparison.
 
-Every request used the isolated staging project, private networking without an external IP, one L4 maximum, original digest pins, a 30-minute cloud stop deadline and independent guest shutdown. See `capacity-failures.json`. No production GPU, model setting, route, account or key was changed. The public health watcher reported HTTP 200 throughout its observations and was stopped after the terminal failures.
+## Owned production-session evidence and next investigation
 
-All ten production workers and their controller passed the original image and visual-setting guard at 18:43:21 UTC. Capacity is the current blocker for this specific comparison. This is its first blocked goal turn; the goal remains active and unresolved. Do not count the prepared scripts or failed allocations as evidence that mouth strength fixes the symptom.
+Earlier session `ses_eb8a23a8cf5448ecab45` ran on `avatar-pasteback-main-security-2`, cache `lk_c13d9b22cecf`. Bounded owned-session logs show full 32-frame render batches around the visible late reopening. They do not identify the displayed frame's normalized input samples or idle envelope. The model log has cache initialization but no framewise gate diagnostics. No production instrumentation or customer-media capture was added.
 
-Final read-only release guard: 2026-10-01T18:53:41.321519+00:00. Ten main workers ready with original image hashes; demo/dashboard/API health HTTP 200; public demo alias and dashboard snapshot unchanged. See `release-health.json`.
+Next, capture actual decoded transport PCM and align it with returned audio/video for an owned synthetic staging conversation. The missing evidence is whether the live reopening coincides with residual model input or a presentation-boundary mismatch. Preserve current audio timing and model pins; do not promote the unproven strength change or resume latency/batching work.
+
+Final release check at 19:29:15 UTC: ten main workers ready on preserved digests; demo, dashboard, and API health HTTP 200; dashboard snapshot and public demo alias unchanged. See `release-health.json`.

@@ -55,6 +55,20 @@
         "disks_absent": true,
         "observed_at": "2026-10-01T18:50:51.205168+00:00"
       }
+    },
+    {
+      "zone": "us-central1-c",
+      "machine_type": "g2-standard-8",
+      "request_directory": "/private/tmp/atlas-mouth-idle-shape8-20261001",
+      "operation": "operation-1790881226847-65ccc075c75f5-4028c7ac-84092b4e",
+      "error_codes": [
+        "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS"
+      ],
+      "absence": {
+        "instances_absent": true,
+        "disks_absent": true,
+        "observed_at": "2026-10-01T19:01:13.842190+00:00"
+      }
     }
   ],
   "us_central1_f_g2_standard_12": "machine type not found; no creation attempted",
