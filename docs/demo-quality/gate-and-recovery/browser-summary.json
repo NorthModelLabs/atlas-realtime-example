@@ -1,0 +1,25 @@
+{
+  "javascript_errors": [],
+  "requests": [
+    {
+      "path": "/api/config",
+      "status": 200
+    },
+    {
+      "path": "/api/session",
+      "status": 200
+    },
+    {
+      "path": "/api/session/owned-session/share",
+      "status": 200
+    },
+    {
+      "path": "/api/session/owned-session/voice",
+      "status": 200
+    }
+  ],
+  "owned_session_cleanup_status": 200,
+  "model_variant": "atlas-current",
+  "worker": "avatar-pasteback-main-security-9",
+  "visual_human_avatar_checked": true
+}

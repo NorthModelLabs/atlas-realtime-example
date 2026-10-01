@@ -105,7 +105,19 @@ export function probeAudio(context: AudioContext, stream: MediaStream, stage: st
 export function probeStats(read: () => Promise<RTCStatsReport | undefined>, stage: string) {
   if (!enabled) return () => {};
   let stopped = false, reading = false;
-  const fields = ["kind", "packetsReceived", "packetsSent", "packetsLost", "jitter", "jitterBufferDelay", "jitterBufferTargetDelay", "jitterBufferMinimumDelay", "jitterBufferEmittedCount", "concealedSamples", "silentConcealedSamples", "concealmentEvents", "insertedSamplesForDeceleration", "removedSamplesForAcceleration", "totalSamplesReceived", "framesDecoded", "framesDropped", "freezeCount", "totalFreezesDuration", "totalDecodeTime", "currentRoundTripTime", "availableOutgoingBitrate", "totalPacketSendDelay", "bytesSent", "bytesReceived"];
+  // Include recovery and assembly counters: a decoded-frame gap can be packet
+  // recovery rather than a slow renderer. Optional browser fields stay absent.
+  const fields = [
+    "kind", "timestamp", "estimatedPlayoutTimestamp",
+    "packetsReceived", "packetsSent", "packetsLost", "packetsDiscarded",
+    "nackCount", "pliCount", "firCount", "retransmittedPacketsReceived",
+    "jitter", "jitterBufferDelay", "jitterBufferTargetDelay", "jitterBufferMinimumDelay", "jitterBufferEmittedCount",
+    "concealedSamples", "silentConcealedSamples", "concealmentEvents",
+    "insertedSamplesForDeceleration", "removedSamplesForAcceleration", "totalSamplesReceived",
+    "framesReceived", "framesDecoded", "framesDropped", "framesAssembledFromMultiplePackets",
+    "totalAssemblyTime", "totalProcessingDelay", "freezeCount", "totalFreezesDuration", "totalDecodeTime",
+    "currentRoundTripTime", "availableOutgoingBitrate", "totalPacketSendDelay", "bytesSent", "bytesReceived",
+  ];
   const interval = setInterval(async () => {
     if (reading) return; reading = true;
     try {
@@ -114,6 +126,16 @@ export function probeStats(read: () => Promise<RTCStatsReport | undefined>, stag
         if (!["inbound-rtp", "outbound-rtp", "candidate-pair"].includes(row.type)) return;
         if (row.type === "candidate-pair" && !row.nominated) return;
         const values: Record<string, unknown> = {type: row.type};
+        if (row.type === "candidate-pair") {
+          // Identify a relay/TCP path without recording candidate addresses,
+          // ports, URLs, credentials, or track/account identifiers.
+          for (const [side, id] of [["local", row.localCandidateId], ["remote", row.remoteCandidateId]]) {
+            const candidate = report.get(id);
+            if (["host", "srflx", "prflx", "relay"].includes(candidate?.candidateType)) values[`${side}CandidateType`] = candidate.candidateType;
+            if (["udp", "tcp"].includes(candidate?.protocol)) values[`${side}Protocol`] = candidate.protocol;
+            if (["udp", "tcp", "tls"].includes(candidate?.relayProtocol)) values[`${side}RelayProtocol`] = candidate.relayProtocol;
+          }
+        }
         for (const key of fields) if (typeof row[key] === "number" || key === "kind") values[key] = row[key];
         voiceProbe(stage, values);
       });
