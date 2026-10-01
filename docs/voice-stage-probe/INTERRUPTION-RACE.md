@@ -15,3 +15,15 @@ Reference: [OpenAI Realtime client events](https://developers.openai.com/api/ref
 Final preview `dpl_7fNMrbvvQq4fFpMUYTn8MKZmqBtw` built successfully. Three ordinary UI replacement pairs ended in the requested “hello,” with cancellation followed by one new response, no provider error events, no JavaScript errors and app API HTTP 200. These browser pairs arrived after the initial acknowledgement (about 0.5–0.8 seconds apart); the narrower before-acknowledgement interval is covered by the deterministic regression test, not claimed as reproduced in this candidate browser run. A forced-fill attempt did not submit a second message and is excluded.
 
 After 43 seconds with no returned speech, a new counting answer was interrupted 70 ms after its first returned audio. The provider reported cancellation 184 ms after the interrupt input and a new response 305 ms after it. The replacement “hello” appeared correctly. Old returned audio still appeared after provider cancellation; returned speech was not instantly flushed. This remains a limitation, not an accepted fix for downstream interruption delay. The owned session was deleted with HTTP 200. No GPU configuration changed.
+
+Final review also retained the caption-ID guard for failure alerts, so a failed superseded response cannot display an error over a newer turn. This one-line correction is commit `d618f07`; TypeScript passed again. The production candidate is `dpl_4Gn3kBtiXyzeTusyp8y1b5imU3Ff`, built with diagnostics disabled. Its predecessor production candidate was never assigned to the public hostname.
+
+## Publication and post-release verification
+
+On October 1 at 04:28:40 UTC, only `demo.northmodellabs.com` moved from `dpl_CpzxuFhZvF9M1Vs92emkR6Qd7DSe` (rollback) to `dpl_4Gn3kBtiXyzeTusyp8y1b5imU3Ff`, runtime `d618f07a59c7e9a4e6dba575f3ec1297043b96cb`. Final unaliased acceptance recognized the spoken question, answered correctly, showed returned Speaking followed by Listening, and had zero JavaScript errors/diagnostic messages. Its owned session cleanup returned 200.
+
+Public URL acceptance then submitted counting followed by “Stop counting. Say only hello.” The replacement “Hello.” appeared without an error; config/session/share/voice returned 200, no JavaScript errors or diagnostic messages appeared, and that owned session cleanup returned 200. This establishes functional response sequencing, not the duration of all downstream audio still in flight.
+
+The 04:29:37 UTC read verified the published alias, all ten main-security workers ready with the same original avatar/dispatcher/sidecar image hashes, unchanged dashboard configuration, and HTTP 200 from the demo, dashboard and public API health endpoint. No model/worker image, worker configuration, customer row or existing key was changed by the release.
+
+The full goal remains open: roughly 1.3-second whole-conversation response time is not demonstrated, queued Atlas audio persists after provider cancellation, and sporadic cutoffs/post-speech mouth motion are not claimed fixed.

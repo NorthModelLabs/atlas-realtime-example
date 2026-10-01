@@ -1,0 +1,26 @@
+{
+  "url": "https://demo.northmodellabs.com",
+  "replacement_answer": true,
+  "visible_error": false,
+  "javascript_errors": [],
+  "diagnostic_messages": 0,
+  "requests": [
+    {
+      "path": "/api/config",
+      "status": 200
+    },
+    {
+      "path": "/api/session",
+      "status": 200
+    },
+    {
+      "path": "/api/session/owned-session/share",
+      "status": 200
+    },
+    {
+      "path": "/api/session/owned-session/voice",
+      "status": 200
+    }
+  ],
+  "dom": "- navigation \"Demo mode\":\n  - button \"Switch to Apple UI\": Apple\n  - button \"Switch to TikTok UI\": TikTok\n  - button \"Switch to Teach UI\": Teach\n  - button \"Switch to Meet UI\": Meet\n- text: You Stop counting. Say only hello. Atlas Hello. Atlas Realtime Private · 00:02\n- button \"Disconnect\"\n- text: End\n- button \"Upload avatar\"\n- text: Upload\n- button \"Download avatar image\"\n- text: Image\n- button \"Start microphone\":\n  - img\n- text: Mic\n- button \"Open avatar tools\"\n- text: Tools\n- textbox \"Ask something...\"\n- button \"Send\" [disabled]\n- alert"
+}
