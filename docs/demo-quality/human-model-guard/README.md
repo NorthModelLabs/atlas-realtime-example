@@ -8,7 +8,7 @@ All ten main-security workers were ready. Their running and desired images remai
 
 ## Repeatable preservation check
 
-Run `python3 scripts/check-human-model.py --output /private/tmp/human-model-audit.json` from this worktree before and after any approved demo/rendering change. It performs only `kubectl get` using the explicit main-security selector and cluster context. It exits unsuccessfully for a wrong digest, mutable image tag, missing/unready worker or visual-setting drift. It does not modify or restart anything. Do not replace the expected baseline to make an unexplained mismatch pass.
+Run `python3 scripts/check-human-model.py --output /private/tmp/human-model-audit.json` from this worktree before and after any approved demo/rendering change. It performs only `kubectl get` for Pods and their StatefulSet replacement template using the explicit main-security selector and cluster context. It exits unsuccessfully for a wrong digest, mutable image tag, missing/unready worker or visual-setting drift. It does not modify or restart anything. Do not replace the expected baseline to make an unexplained mismatch pass.
 
 The baseline pins model `f853fbd1dc92ae7a514e93107e3696e8009f74e929180ac361e2e28e9d52e7e4`, runner `830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee`, and sidecar `b69fd39d00c132c6d96cbbc3fd4fdaa8a8bb3640c1260430c33db020b07bd991`. Mutable names such as test4/test5 are not sufficient identity evidence.
 
@@ -16,4 +16,6 @@ Pair a passing audit with a fresh owned demo session: confirm its actual pool as
 
 Validation: the live audit passed; local fixtures confirmed rejection of a wrong model, changed eye target, missing worker, mutable tag and unready container. Numeric evidence and the cropped owned-session screenshot are retained here; credentials and raw session contents are excluded.
 
-The mouth-tail candidate remains staging-only. Quiet-speech regression is running on a separate bounded GPU with the identical model/runner digests and unchanged eye settings. This preservation audit does not claim either mouth-tail or occasional packet-recovery stutter is fixed.
+The mouth-tail candidate remains staging-only. The completed quiet-speech regression used a separate bounded GPU with identical model/runner digests and unchanged eye settings; both threshold-only candidates were rejected and the VM/disk were deleted. See [quiet-speech](../quiet-speech/README.md). This preservation audit does not claim either mouth-tail or occasional packet-recovery stutter is fixed.
+
+A longer protected-preview capture subsequently caught a wide-eyed idle expression on main-security worker 7 despite the unchanged hashes/settings. This is recorded in [upstream-tail](../upstream-tail/README.md). The first short public spot-check remains valid for the frame captured, but it is not evidence that all expressions are correct.

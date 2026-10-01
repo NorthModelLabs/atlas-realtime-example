@@ -1,0 +1,10 @@
+{
+  "model_variant": "atlas-current",
+  "worker": "avatar-pasteback-main-security-7",
+  "owned_session_deleted_http_status": 200,
+  "javascript_errors": [],
+  "screenshots": 16,
+  "numeric_events": 7440,
+  "complete_three_frame_tails": 5,
+  "production_changes": false
+}

@@ -17,6 +17,28 @@ ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "docs/demo-quality/human-model-guard/expected.json"
 
 
+def inspect_spec(spec, expected):
+    failures = []
+    model = next((c for c in spec["containers"]
+                  if c["name"] == expected["model_container"]), None)
+    if not model or not model["image"].endswith("@sha256:" + expected["model_digest"]):
+        failures.append("desired human model container mismatch")
+    for container in spec["containers"]:
+        if "@sha256:" not in container["image"] or container["image"].split(
+                "@sha256:")[-1] not in expected["image_digests"]:
+            failures.append("desired image is not pinned to preserved digest")
+    if sorted(c["image"].split("@sha256:")[-1] for c in spec["containers"]) != sorted(expected["image_digests"]):
+        failures.append("desired image inventory differs from baseline")
+    visual = {e["name"]: e.get("value", "<indirect>")
+              for e in (model or {}).get("env", [])
+              if e["name"].startswith(tuple(expected["visual_prefixes"]))}
+    changed = sorted(k for k in set(visual) | set(expected["visual_settings"])
+                     if visual.get(k) != expected["visual_settings"].get(k))
+    if changed:
+        failures.append("visual setting drift: " + ", ".join(changed))
+    return failures, visual
+
+
 def inspect(pods, expected):
     errors = []
     rows = []
@@ -36,25 +58,14 @@ def inspect(pods, expected):
         digests = [c.get("imageID", "").split("@sha256:")[-1] for c in statuses]
         if sorted(digests) != sorted(expected["image_digests"]):
             failures.append("running image digest mismatch")
-        model = next((c for c in pod["spec"]["containers"]
-                      if c["name"] == expected["model_container"]), None)
         model_status = next((c for c in statuses
                              if c["name"] == expected["model_container"]), {})
-        if not model or not model_status.get("imageID", "").endswith(
+        if not model_status.get("imageID", "").endswith(
                 "@sha256:" + expected["model_digest"]):
             failures.append("human model container mismatch")
         # Explicit digest pinning matters even when today's running image matches.
-        for container in pod["spec"]["containers"]:
-            if "@sha256:" not in container["image"] or container["image"].split(
-                    "@sha256:")[-1] not in expected["image_digests"]:
-                failures.append("desired image is not pinned to preserved digest")
-        visual = {e["name"]: e.get("value", "<indirect>")
-                  for e in (model or {}).get("env", [])
-                  if e["name"].startswith(tuple(expected["visual_prefixes"]))}
-        changed = sorted(k for k in set(visual) | set(expected["visual_settings"])
-                         if visual.get(k) != expected["visual_settings"].get(k))
-        if changed:
-            failures.append("visual setting drift: " + ", ".join(changed))
+        spec_failures, visual = inspect_spec(pod["spec"], expected)
+        failures.extend(spec_failures)
         rows.append({"pod": name, "passed": not failures, "failures": failures,
                      "image_digests": sorted(digests),
                      "visual_settings_sha256": hashlib.sha256(
@@ -74,6 +85,20 @@ def main():
     if result.returncode:
         raise RuntimeError("Read-only Kubernetes audit failed; no changes attempted")
     report = inspect(json.loads(result.stdout)["items"], expected)
+    # A correct running Pod is insufficient if its replacement template drifted.
+    command = ["kubectl", "--context=" + expected["context"], "-n", expected["namespace"],
+               "get", "statefulset", "avatar-pasteback-main-security", "-o", "json"]
+    result = subprocess.run(command, capture_output=True, text=True, timeout=45)
+    if result.returncode:
+        raise RuntimeError("Read-only controller audit failed; no changes attempted")
+    controller = json.loads(result.stdout)
+    failures, _ = inspect_spec(controller["spec"]["template"]["spec"], expected)
+    if controller["spec"].get("replicas") != expected["workers"]:
+        failures.append("controller desired worker count differs from baseline")
+    report["controller"] = {"name": controller["metadata"]["name"],
+                            "passed": not failures, "failures": failures}
+    report["errors"].extend("controller: " + error for error in failures)
+    report["passed"] = not report["errors"]
     report["observed_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
     report["baseline_sha256"] = hashlib.sha256(BASELINE.read_bytes()).hexdigest()
     report["scope"] = "Read-only main human pool image and explicit visual-setting audit"

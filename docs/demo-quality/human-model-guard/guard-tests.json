@@ -5,6 +5,8 @@
     "changed_eyes": "rejected",
     "missing_worker": "rejected",
     "mutable_tag": "rejected",
-    "unready": "rejected"
+    "unready": "rejected",
+    "replacement_template_wrong_model": "rejected",
+    "replacement_template_missing_container": "rejected"
   }
 }

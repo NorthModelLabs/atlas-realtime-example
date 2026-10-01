@@ -1,0 +1,114 @@
+{
+  "actual_helper_ast_verified": true,
+  "cases": [
+    {
+      "gain": 1,
+      "threshold": 0.0002,
+      "opening_frames": 4,
+      "additional_close_frames_during_fixture": 8,
+      "additional_close_frames_above_rms_0_001": 0,
+      "max_additional_close_above_rms_0_001": 0,
+      "max_additional_close_during_fixture": 0.18359375
+    },
+    {
+      "gain": 1,
+      "threshold": 0.0003,
+      "opening_frames": 4,
+      "additional_close_frames_during_fixture": 14,
+      "additional_close_frames_above_rms_0_001": 0,
+      "max_additional_close_above_rms_0_001": 0,
+      "max_additional_close_during_fixture": 0.18359375
+    },
+    {
+      "gain": 1,
+      "threshold": 0.0002,
+      "opening_frames": 1,
+      "additional_close_frames_during_fixture": 8,
+      "additional_close_frames_above_rms_0_001": 0,
+      "max_additional_close_above_rms_0_001": 0,
+      "max_additional_close_during_fixture": 0.18359375
+    },
+    {
+      "gain": 0.1,
+      "threshold": 0.0002,
+      "opening_frames": 4,
+      "additional_close_frames_during_fixture": 12,
+      "additional_close_frames_above_rms_0_001": 3,
+      "max_additional_close_above_rms_0_001": 0.34375,
+      "max_additional_close_during_fixture": 0.34375
+    },
+    {
+      "gain": 0.1,
+      "threshold": 0.0003,
+      "opening_frames": 4,
+      "additional_close_frames_during_fixture": 12,
+      "additional_close_frames_above_rms_0_001": 3,
+      "max_additional_close_above_rms_0_001": 0.34375,
+      "max_additional_close_during_fixture": 0.34375
+    },
+    {
+      "gain": 0.1,
+      "threshold": 0.0002,
+      "opening_frames": 1,
+      "additional_close_frames_during_fixture": 9,
+      "additional_close_frames_above_rms_0_001": 0,
+      "max_additional_close_above_rms_0_001": 0,
+      "max_additional_close_during_fixture": 0.18359375
+    },
+    {
+      "gain": 0.01,
+      "threshold": 0.0002,
+      "opening_frames": 4,
+      "additional_close_frames_during_fixture": 25,
+      "additional_close_frames_above_rms_0_001": 3,
+      "max_additional_close_above_rms_0_001": 0.34375,
+      "max_additional_close_during_fixture": 0.34375
+    },
+    {
+      "gain": 0.01,
+      "threshold": 0.0003,
+      "opening_frames": 4,
+      "additional_close_frames_during_fixture": 36,
+      "additional_close_frames_above_rms_0_001": 3,
+      "max_additional_close_above_rms_0_001": 0.34375,
+      "max_additional_close_during_fixture": 0.80078125
+    },
+    {
+      "gain": 0.01,
+      "threshold": 0.0002,
+      "opening_frames": 1,
+      "additional_close_frames_during_fixture": 22,
+      "additional_close_frames_above_rms_0_001": 0,
+      "max_additional_close_above_rms_0_001": 0,
+      "max_additional_close_during_fixture": 0.18359375
+    },
+    {
+      "gain": 0.001,
+      "threshold": 0.0002,
+      "opening_frames": 4,
+      "additional_close_frames_during_fixture": 42,
+      "additional_close_frames_above_rms_0_001": 0,
+      "max_additional_close_above_rms_0_001": 0,
+      "max_additional_close_during_fixture": 0.95703125
+    },
+    {
+      "gain": 0.001,
+      "threshold": 0.0003,
+      "opening_frames": 4,
+      "additional_close_frames_during_fixture": 42,
+      "additional_close_frames_above_rms_0_001": 0,
+      "max_additional_close_above_rms_0_001": 0,
+      "max_additional_close_during_fixture": 0.95703125
+    },
+    {
+      "gain": 0.001,
+      "threshold": 0.0002,
+      "opening_frames": 1,
+      "additional_close_frames_during_fixture": 42,
+      "additional_close_frames_above_rms_0_001": 0,
+      "max_additional_close_above_rms_0_001": 0,
+      "max_additional_close_during_fixture": 0.95703125
+    }
+  ],
+  "limitation": "Envelope-only exploration, no rendered acceptance or production change. Very low-amplitude speech can remain indistinguishable from faint noise by a fixed RMS gate."
+}

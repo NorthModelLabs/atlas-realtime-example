@@ -1,0 +1,25 @@
+{
+  "technical_trials_completed": 9,
+  "paired_audio_exact_trials": 9,
+  "rendered_frames": 2304,
+  "selected_images_expected": 144,
+  "selected_images_retained_and_hashed": 142,
+  "missing_images": [
+    {
+      "condition": "candidate",
+      "trial": 0,
+      "frame": 176
+    },
+    {
+      "condition": "candidate",
+      "trial": 1,
+      "frame": 80
+    }
+  ],
+  "visual_acceptance": {
+    "baseline": "control",
+    "small": "not accepted for production: quieter syllable opening suppressed/delayed",
+    "candidate": "not accepted for production: quieter syllable opening suppressed/delayed"
+  },
+  "production_mutations": false
+}
