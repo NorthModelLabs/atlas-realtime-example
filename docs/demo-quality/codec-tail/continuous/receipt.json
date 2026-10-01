@@ -1,0 +1,7 @@
+{
+  "model_variant": "atlas-current",
+  "owned_session_deleted_http_status": 200,
+  "javascript_errors": [],
+  "worker_assignment": "Not independently rechecked: Google Cloud reauthentication required.",
+  "public_model_configuration_changed": false
+}

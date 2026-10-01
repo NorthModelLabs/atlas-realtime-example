@@ -1,0 +1,31 @@
+{
+  "baseline": {
+    "complete_tails": 3,
+    "open_at_first_sample": [
+      2
+    ],
+    "open_at_second_sample": [
+      2
+    ],
+    "all_closed_at_final_sample": true
+  },
+  "continuous": {
+    "complete_tails": 4,
+    "open_at_first_sample": [
+      2,
+      3
+    ],
+    "all_closed_at_second_sample": true,
+    "all_closed_at_final_sample": true
+  },
+  "accepted_fix": false,
+  "reason": "Separate conversations are not identical source audio; a small difference in sampled closure timing does not establish a causal remedy. Residual movement persists without DTX.",
+  "experimental_switch_removed_from_source": true,
+  "visual_review": "Human appearance preserved in reviewed samples; not a universal expression guarantee.",
+  "validation": {
+    "typescript": "passed",
+    "build": "passed",
+    "eslint": "0 errors; pre-existing useCallback dependency warning at app/demo.tsx:767"
+  },
+  "cloud_auth": "Reauthentication required after last successful guard at 09:39:07 UTC; public HTTP health is not a GPU digest recheck."
+}

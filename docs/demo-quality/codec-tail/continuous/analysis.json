@@ -1,0 +1,393 @@
+{
+  "events": 6440,
+  "video_callbacks": 2522,
+  "stage_counts": {
+    "atlas_outgoing_audio_window": 910,
+    "atlas_return_audio_window": 911,
+    "atlas_video_frame": 2522,
+    "atlas_video_state": 1,
+    "browser_scheduler": 99,
+    "atlas_outgoing_rtc": 204,
+    "atlas_return_audio_rtc": 204,
+    "atlas_return_video_rtc": 204,
+    "provider_audio_window": 889,
+    "provider_rtc": 300,
+    "microphone_audio": 30,
+    "input_audio_buffer.speech_started": 5,
+    "input_audio_buffer.speech_stopped": 5,
+    "response.created": 5,
+    "output_audio_buffer.started": 5,
+    "provider_audio": 47,
+    "atlas_outgoing_audio": 46,
+    "response.done": 5,
+    "atlas_return_audio": 44,
+    "output_audio_buffer.stopped": 4
+  },
+  "tail_windows": [
+    {
+      "returned_quiet_at": 1790848227787,
+      "screenshot_offsets_ms": [
+        463,
+        869,
+        1479
+      ],
+      "files": [
+        "frame-1790848228250.jpg",
+        "frame-1790848228656.jpg",
+        "frame-1790848229266.jpg"
+      ],
+      "most_recent_source_quiet_at": 1790848225647,
+      "returned_minus_source_quiet_ms": 2140,
+      "after_returned_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 11,
+          "observations": 63,
+          "peak_rms": 2.86e-06,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 63
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 12,
+          "observations": 65,
+          "peak_rms": 2.86e-06,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 65
+        },
+        "atlas_return_audio_window": {
+          "windows": 12,
+          "observations": 65,
+          "peak_rms": 6.923e-05,
+          "min_rms": 1.243e-05,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 65
+        }
+      },
+      "after_source_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 11,
+          "observations": 63,
+          "peak_rms": 0.00011269,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 1,
+          "below_observer_quiet_observations": 63
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 11,
+          "observations": 62,
+          "peak_rms": 0.00011946,
+          "min_rms": 1.65e-06,
+          "above_visual_gate_observations": 1,
+          "below_observer_quiet_observations": 62
+        },
+        "atlas_return_audio_window": {
+          "windows": 11,
+          "observations": 62,
+          "peak_rms": 0.09875571,
+          "min_rms": 3.315e-05,
+          "above_visual_gate_observations": 53,
+          "below_observer_quiet_observations": 15
+        }
+      }
+    },
+    {
+      "returned_quiet_at": 1790848245851,
+      "screenshot_offsets_ms": [
+        452,
+        855,
+        1465
+      ],
+      "files": [
+        "frame-1790848246303.jpg",
+        "frame-1790848246706.jpg",
+        "frame-1790848247316.jpg"
+      ],
+      "most_recent_source_quiet_at": 1790848243731,
+      "returned_minus_source_quiet_ms": 2120,
+      "after_returned_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 12,
+          "observations": 69,
+          "peak_rms": 2.34e-06,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 69
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 12,
+          "observations": 66,
+          "peak_rms": 2.86e-06,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 66
+        },
+        "atlas_return_audio_window": {
+          "windows": 12,
+          "observations": 66,
+          "peak_rms": 0.00011523,
+          "min_rms": 1.405e-05,
+          "above_visual_gate_observations": 2,
+          "below_observer_quiet_observations": 66
+        }
+      },
+      "after_source_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 11,
+          "observations": 64,
+          "peak_rms": 0.00032339,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 6,
+          "below_observer_quiet_observations": 64
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 11,
+          "observations": 62,
+          "peak_rms": 0.00036469,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 2,
+          "below_observer_quiet_observations": 62
+        },
+        "atlas_return_audio_window": {
+          "windows": 11,
+          "observations": 62,
+          "peak_rms": 0.11033226,
+          "min_rms": 2.682e-05,
+          "above_visual_gate_observations": 51,
+          "below_observer_quiet_observations": 16
+        }
+      }
+    },
+    {
+      "returned_quiet_at": 1790848264389,
+      "screenshot_offsets_ms": [
+        457,
+        860,
+        1466
+      ],
+      "files": [
+        "frame-1790848264846.jpg",
+        "frame-1790848265249.jpg",
+        "frame-1790848265855.jpg"
+      ],
+      "most_recent_source_quiet_at": 1790848262108,
+      "returned_minus_source_quiet_ms": 2281,
+      "after_returned_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 12,
+          "observations": 67,
+          "peak_rms": 2.86e-06,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 67
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 11,
+          "observations": 64,
+          "peak_rms": 2.86e-06,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 64
+        },
+        "atlas_return_audio_window": {
+          "windows": 11,
+          "observations": 64,
+          "peak_rms": 0.00012575,
+          "min_rms": 1.071e-05,
+          "above_visual_gate_observations": 2,
+          "below_observer_quiet_observations": 64
+        }
+      },
+      "after_source_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 12,
+          "observations": 67,
+          "peak_rms": 0.00029649,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 7,
+          "below_observer_quiet_observations": 67
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 12,
+          "observations": 68,
+          "peak_rms": 0.00029631,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 7,
+          "below_observer_quiet_observations": 68
+        },
+        "atlas_return_audio_window": {
+          "windows": 12,
+          "observations": 68,
+          "peak_rms": 0.09496308,
+          "min_rms": 2.728e-05,
+          "above_visual_gate_observations": 56,
+          "below_observer_quiet_observations": 16
+        }
+      }
+    },
+    {
+      "returned_quiet_at": 1790848281947,
+      "screenshot_offsets_ms": [
+        436,
+        842,
+        1448
+      ],
+      "files": [
+        "frame-1790848282383.jpg",
+        "frame-1790848282789.jpg",
+        "frame-1790848283395.jpg"
+      ],
+      "most_recent_source_quiet_at": 1790848279732,
+      "returned_minus_source_quiet_ms": 2215,
+      "after_returned_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 12,
+          "observations": 68,
+          "peak_rms": 2.86e-06,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 68
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 12,
+          "observations": 67,
+          "peak_rms": 2.86e-06,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 67
+        },
+        "atlas_return_audio_window": {
+          "windows": 12,
+          "observations": 67,
+          "peak_rms": 0.00034151,
+          "min_rms": 1.28e-05,
+          "above_visual_gate_observations": 2,
+          "below_observer_quiet_observations": 67
+        }
+      },
+      "after_source_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 12,
+          "observations": 67,
+          "peak_rms": 0.00052043,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 5,
+          "below_observer_quiet_observations": 67
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 12,
+          "observations": 66,
+          "peak_rms": 0.00047846,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 3,
+          "below_observer_quiet_observations": 66
+        },
+        "atlas_return_audio_window": {
+          "windows": 12,
+          "observations": 66,
+          "peak_rms": 0.1547705,
+          "min_rms": 2.738e-05,
+          "above_visual_gate_observations": 52,
+          "below_observer_quiet_observations": 21
+        }
+      }
+    }
+  ],
+  "transport_paths": {
+    "provider_rtc": [
+      {
+        "localCandidateType": "prflx",
+        "localProtocol": "udp",
+        "remoteCandidateType": "host",
+        "remoteProtocol": "udp"
+      }
+    ],
+    "atlas_outgoing_rtc": [
+      {
+        "localCandidateType": "prflx",
+        "localProtocol": "udp",
+        "remoteCandidateType": "host",
+        "remoteProtocol": "udp"
+      }
+    ],
+    "atlas_return_video_rtc": [
+      {
+        "localCandidateType": "prflx",
+        "localProtocol": "udp",
+        "remoteCandidateType": "host",
+        "remoteProtocol": "udp"
+      }
+    ]
+  },
+  "video_gaps_over_100ms": [
+    {
+      "at": 1790848242583,
+      "displayGapMs": 133.3,
+      "processingMs": 2.1,
+      "captureMs": 102034.8,
+      "receiveMs": 102220.5,
+      "expectedDisplayMs": 102222.4
+    },
+    {
+      "at": 1790848253116,
+      "displayGapMs": 149.9,
+      "processingMs": 2.6,
+      "captureMs": 112630.7,
+      "receiveMs": 112738,
+      "expectedDisplayMs": 112755.3
+    },
+    {
+      "at": 1790848263914,
+      "displayGapMs": 183.3,
+      "processingMs": 3.6,
+      "captureMs": 123396.7,
+      "receiveMs": 123544,
+      "expectedDisplayMs": 123554.9
+    },
+    {
+      "at": 1790848276700,
+      "displayGapMs": 133.4,
+      "processingMs": 3,
+      "captureMs": 136236.8,
+      "receiveMs": 136331.7,
+      "expectedDisplayMs": 136337.8
+    },
+    {
+      "at": 1790848277664,
+      "displayGapMs": 100.1,
+      "processingMs": 2.3,
+      "captureMs": 137195.7,
+      "receiveMs": 137288.1,
+      "expectedDisplayMs": 137304.4
+    },
+    {
+      "at": 1790848286630,
+      "displayGapMs": 166.6,
+      "processingMs": 1.8,
+      "captureMs": 146033.8,
+      "receiveMs": 146268.5,
+      "expectedDisplayMs": 146270.6
+    },
+    {
+      "at": 1790848298164,
+      "displayGapMs": 150,
+      "processingMs": 3.6,
+      "captureMs": 157712.8,
+      "receiveMs": 157787.6,
+      "expectedDisplayMs": 157803.5
+    },
+    {
+      "at": 1790848303914,
+      "displayGapMs": 183.3,
+      "processingMs": 4.1,
+      "captureMs": 163434.8,
+      "receiveMs": 163542.4,
+      "expectedDisplayMs": 163553.3
+    }
+  ],
+  "limits": [
+    "Browser sampled RMS is not model-input PCM; browser resampling, Opus encoding/decoding and packet concealment lie between the measurement and the model.",
+    "Prior source quiet can be a pause rather than the final response end; it is not a latency benchmark.",
+    "One synthetic call/network path; no inference that all users share this transport issue."
+  ]
+}

@@ -1,0 +1,358 @@
+{
+  "events": 4678,
+  "video_callbacks": 1811,
+  "stage_counts": {
+    "atlas_outgoing_audio_window": 668,
+    "atlas_return_audio_window": 667,
+    "atlas_video_frame": 1811,
+    "atlas_video_state": 1,
+    "browser_scheduler": 73,
+    "atlas_outgoing_rtc": 150,
+    "atlas_return_audio_rtc": 150,
+    "atlas_return_video_rtc": 150,
+    "provider_rtc": 220,
+    "provider_audio_window": 647,
+    "microphone_audio": 24,
+    "input_audio_buffer.speech_started": 4,
+    "input_audio_buffer.speech_stopped": 4,
+    "response.created": 4,
+    "output_audio_buffer.started": 4,
+    "provider_audio": 30,
+    "atlas_outgoing_audio": 30,
+    "response.done": 4,
+    "atlas_return_audio": 33,
+    "output_audio_buffer.stopped": 4
+  },
+  "tail_windows": [
+    {
+      "returned_quiet_at": 1790847958454,
+      "screenshot_offsets_ms": [
+        441,
+        848,
+        1457
+      ],
+      "files": [
+        "frame-1790847958895.jpg",
+        "frame-1790847959302.jpg",
+        "frame-1790847959911.jpg"
+      ],
+      "most_recent_source_quiet_at": 1790847956256,
+      "returned_minus_source_quiet_ms": 2198,
+      "after_returned_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 11,
+          "observations": 64,
+          "peak_rms": 2.86e-06,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 64
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 11,
+          "observations": 62,
+          "peak_rms": 2.86e-06,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 62
+        },
+        "atlas_return_audio_window": {
+          "windows": 11,
+          "observations": 62,
+          "peak_rms": 6.949e-05,
+          "min_rms": 1.582e-05,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 62
+        }
+      },
+      "after_source_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 12,
+          "observations": 67,
+          "peak_rms": 0.00022208,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 3,
+          "below_observer_quiet_observations": 67
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 12,
+          "observations": 66,
+          "peak_rms": 0.00019769,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 5,
+          "below_observer_quiet_observations": 66
+        },
+        "atlas_return_audio_window": {
+          "windows": 12,
+          "observations": 66,
+          "peak_rms": 0.15099477,
+          "min_rms": 2.844e-05,
+          "above_visual_gate_observations": 59,
+          "below_observer_quiet_observations": 15
+        }
+      }
+    },
+    {
+      "returned_quiet_at": 1790847976217,
+      "screenshot_offsets_ms": [
+        426,
+        832,
+        1441
+      ],
+      "files": [
+        "frame-1790847976643.jpg",
+        "frame-1790847977049.jpg",
+        "frame-1790847977658.jpg"
+      ],
+      "most_recent_source_quiet_at": 1790847974017,
+      "returned_minus_source_quiet_ms": 2200,
+      "after_returned_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 11,
+          "observations": 63,
+          "peak_rms": 2.86e-06,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 63
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 11,
+          "observations": 61,
+          "peak_rms": 2.86e-06,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 61
+        },
+        "atlas_return_audio_window": {
+          "windows": 11,
+          "observations": 61,
+          "peak_rms": 0.00028595,
+          "min_rms": 2.255e-05,
+          "above_visual_gate_observations": 12,
+          "below_observer_quiet_observations": 61
+        }
+      },
+      "after_source_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 12,
+          "observations": 66,
+          "peak_rms": 0.00048701,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 17,
+          "below_observer_quiet_observations": 66
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 12,
+          "observations": 67,
+          "peak_rms": 0.00048053,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 17,
+          "below_observer_quiet_observations": 67
+        },
+        "atlas_return_audio_window": {
+          "windows": 12,
+          "observations": 67,
+          "peak_rms": 0.13634587,
+          "min_rms": 2.813e-05,
+          "above_visual_gate_observations": 62,
+          "below_observer_quiet_observations": 9
+        }
+      }
+    },
+    {
+      "returned_quiet_at": 1790847992598,
+      "screenshot_offsets_ms": [
+        477,
+        880,
+        1487
+      ],
+      "files": [
+        "frame-1790847993075.jpg",
+        "frame-1790847993478.jpg",
+        "frame-1790847994085.jpg"
+      ],
+      "most_recent_source_quiet_at": 1790847990376,
+      "returned_minus_source_quiet_ms": 2222,
+      "after_returned_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 12,
+          "observations": 67,
+          "peak_rms": 2.86e-06,
+          "min_rms": 0,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 67
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 11,
+          "observations": 62,
+          "peak_rms": 2.86e-06,
+          "min_rms": 0,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 62
+        },
+        "atlas_return_audio_window": {
+          "windows": 11,
+          "observations": 62,
+          "peak_rms": 9.288e-05,
+          "min_rms": 2.384e-05,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 62
+        }
+      },
+      "after_source_quiet_200_to_1500ms": {
+        "provider_audio_window": {
+          "windows": 12,
+          "observations": 66,
+          "peak_rms": 0.00046184,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 7,
+          "below_observer_quiet_observations": 66
+        },
+        "atlas_outgoing_audio_window": {
+          "windows": 12,
+          "observations": 67,
+          "peak_rms": 0.0004515,
+          "min_rms": 2.34e-06,
+          "above_visual_gate_observations": 8,
+          "below_observer_quiet_observations": 67
+        },
+        "atlas_return_audio_window": {
+          "windows": 12,
+          "observations": 67,
+          "peak_rms": 1.852e-05,
+          "min_rms": 1.096e-05,
+          "above_visual_gate_observations": 0,
+          "below_observer_quiet_observations": 67
+        }
+      }
+    }
+  ],
+  "transport_paths": {
+    "provider_rtc": [
+      {
+        "localCandidateType": "prflx",
+        "localProtocol": "udp",
+        "remoteCandidateType": "host",
+        "remoteProtocol": "udp"
+      }
+    ],
+    "atlas_outgoing_rtc": [
+      {
+        "localCandidateType": "prflx",
+        "localProtocol": "udp",
+        "remoteCandidateType": "host",
+        "remoteProtocol": "udp"
+      }
+    ],
+    "atlas_return_video_rtc": [
+      {
+        "localCandidateType": "prflx",
+        "localProtocol": "udp",
+        "remoteCandidateType": "host",
+        "remoteProtocol": "udp"
+      }
+    ]
+  },
+  "video_gaps_over_100ms": [
+    {
+      "at": 1790847943823,
+      "displayGapMs": 166.7,
+      "processingMs": 4.8,
+      "captureMs": null,
+      "receiveMs": 59159.8,
+      "expectedDisplayMs": 59170.2
+    },
+    {
+      "at": 1790847959855,
+      "displayGapMs": 600,
+      "processingMs": 17.3,
+      "captureMs": 75095.2,
+      "receiveMs": 75111,
+      "expectedDisplayMs": 75302.9
+    },
+    {
+      "at": 1790847969971,
+      "displayGapMs": 166.6,
+      "processingMs": 1.7,
+      "captureMs": 85096.2,
+      "receiveMs": 85307.3,
+      "expectedDisplayMs": 85319.1
+    },
+    {
+      "at": 1790847979421,
+      "displayGapMs": 133.4,
+      "processingMs": 2.1,
+      "captureMs": 94658.3,
+      "receiveMs": 94751.1,
+      "expectedDisplayMs": 94768.8
+    },
+    {
+      "at": 1790847980421,
+      "displayGapMs": 133.4,
+      "processingMs": 2.1,
+      "captureMs": 95578.2,
+      "receiveMs": 95763.5,
+      "expectedDisplayMs": 95768.7
+    },
+    {
+      "at": 1790847993604,
+      "displayGapMs": 200,
+      "processingMs": 3.7,
+      "captureMs": 108856.2,
+      "receiveMs": 108938.6,
+      "expectedDisplayMs": 108951.5
+    },
+    {
+      "at": 1790847995121,
+      "displayGapMs": 116.6,
+      "processingMs": 1.8,
+      "captureMs": 110296.2,
+      "receiveMs": 110463.8,
+      "expectedDisplayMs": 110468.1
+    },
+    {
+      "at": 1790847995404,
+      "displayGapMs": 116.6,
+      "processingMs": 0.7,
+      "captureMs": 110616.2,
+      "receiveMs": 110741,
+      "expectedDisplayMs": 110751.4
+    },
+    {
+      "at": 1790847995904,
+      "displayGapMs": 150,
+      "processingMs": 2.1,
+      "captureMs": 111097.2,
+      "receiveMs": 111247.1,
+      "expectedDisplayMs": 111251.4
+    },
+    {
+      "at": 1790847998321,
+      "displayGapMs": 150,
+      "processingMs": 2,
+      "captureMs": 113575.2,
+      "receiveMs": 113658.1,
+      "expectedDisplayMs": 113668
+    },
+    {
+      "at": 1790848006188,
+      "displayGapMs": 216.7,
+      "processingMs": 3.7,
+      "captureMs": 121337.2,
+      "receiveMs": 121531.6,
+      "expectedDisplayMs": 121534.4
+    },
+    {
+      "at": 1790848006688,
+      "displayGapMs": 116.7,
+      "processingMs": 3.8,
+      "captureMs": 121940.2,
+      "receiveMs": 122019.7,
+      "expectedDisplayMs": 122034.3
+    }
+  ],
+  "limits": [
+    "Browser sampled RMS is not model-input PCM; browser resampling, Opus encoding/decoding and packet concealment lie between the measurement and the model.",
+    "Prior source quiet can be a pause rather than the final response end; it is not a latency benchmark.",
+    "One synthetic call/network path; no inference that all users share this transport issue."
+  ]
+}

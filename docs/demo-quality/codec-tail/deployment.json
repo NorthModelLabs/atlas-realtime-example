@@ -1,0 +1,12 @@
+{
+  "id": "dpl_2wZ8ak2tPBVonu8emC9SsrUSR8Cv",
+  "url": "https://demo-atlas-7tp75bf37-north-model-labs.vercel.app",
+  "target": null,
+  "readyState": "READY",
+  "source_commit": "25d3476",
+  "public_alias_promoted": false,
+  "build_environment": {
+    "NEXT_PUBLIC_VOICE_DIAGNOSTICS": "true",
+    "NEXT_PUBLIC_TTS_CONTINUOUS_AUDIO": "true"
+  }
+}
