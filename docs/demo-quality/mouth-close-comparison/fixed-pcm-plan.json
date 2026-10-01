@@ -1,0 +1,27 @@
+{
+  "project": "atlas-stg-isolated-20260831",
+  "zone": "us-west1-a",
+  "instance": "atlas-stg-mouth-tail-20261001",
+  "action": "one fresh isolated L4 fixed-PCM comparison after previous probe cleanup",
+  "cloud_stop_seconds": 1800,
+  "guest_stop_minutes": 28,
+  "startup_sha256": "56d720677fbc322c7f9a08aea0758d5d92676d18dc79859e2720b33ce4ad2095",
+  "startup_bytes": 25664,
+  "input_fixtures": {
+    "0": {
+      "sha256": "26c3f4c421ffb3c12022e46e6e970fbff8bf04faf38f07e46cb4facda761c586",
+      "bytes": 368640
+    },
+    "1": {
+      "sha256": "205fa644b0dafb306b310c425cbe99979409a77eb925f7fab3628828624e1eab",
+      "bytes": 368640
+    }
+  },
+  "conditions": {
+    "baseline": 8,
+    "clamp": 2,
+    "repeat": 8
+  },
+  "production_changes": false,
+  "acceptance": "exact input equality, compact archive SHA, all frames/calls accounted, independent visual review; not live transport acceptance"
+}
