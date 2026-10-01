@@ -1,0 +1,112 @@
+[
+  {
+    "worker": "avatar-pasteback-main-security-0",
+    "settings": [
+      {
+        "AVATAR_VIDEO_FPS": "25",
+        "AVATAR_SPEECH_PREFETCH_ENABLED": "true",
+        "AVATAR_SILENCE_GATE_ENABLED": "false",
+        "AVATAR_AUDIO_QUEUE_MAX_FRAMES": "32"
+      }
+    ]
+  },
+  {
+    "worker": "avatar-pasteback-main-security-1",
+    "settings": [
+      {
+        "AVATAR_VIDEO_FPS": "25",
+        "AVATAR_SPEECH_PREFETCH_ENABLED": "true",
+        "AVATAR_SILENCE_GATE_ENABLED": "false",
+        "AVATAR_AUDIO_QUEUE_MAX_FRAMES": "32"
+      }
+    ]
+  },
+  {
+    "worker": "avatar-pasteback-main-security-2",
+    "settings": [
+      {
+        "AVATAR_VIDEO_FPS": "25",
+        "AVATAR_SPEECH_PREFETCH_ENABLED": "true",
+        "AVATAR_SILENCE_GATE_ENABLED": "false",
+        "AVATAR_AUDIO_QUEUE_MAX_FRAMES": "32"
+      }
+    ]
+  },
+  {
+    "worker": "avatar-pasteback-main-security-3",
+    "settings": [
+      {
+        "AVATAR_VIDEO_FPS": "25",
+        "AVATAR_SPEECH_PREFETCH_ENABLED": "true",
+        "AVATAR_SILENCE_GATE_ENABLED": "false",
+        "AVATAR_AUDIO_QUEUE_MAX_FRAMES": "32"
+      }
+    ]
+  },
+  {
+    "worker": "avatar-pasteback-main-security-4",
+    "settings": [
+      {
+        "AVATAR_VIDEO_FPS": "25",
+        "AVATAR_SPEECH_PREFETCH_ENABLED": "true",
+        "AVATAR_SILENCE_GATE_ENABLED": "false",
+        "AVATAR_AUDIO_QUEUE_MAX_FRAMES": "32"
+      }
+    ]
+  },
+  {
+    "worker": "avatar-pasteback-main-security-5",
+    "settings": [
+      {
+        "AVATAR_VIDEO_FPS": "25",
+        "AVATAR_SPEECH_PREFETCH_ENABLED": "true",
+        "AVATAR_SILENCE_GATE_ENABLED": "false",
+        "AVATAR_AUDIO_QUEUE_MAX_FRAMES": "32"
+      }
+    ]
+  },
+  {
+    "worker": "avatar-pasteback-main-security-6",
+    "settings": [
+      {
+        "AVATAR_VIDEO_FPS": "25",
+        "AVATAR_SPEECH_PREFETCH_ENABLED": "true",
+        "AVATAR_SILENCE_GATE_ENABLED": "false",
+        "AVATAR_AUDIO_QUEUE_MAX_FRAMES": "32"
+      }
+    ]
+  },
+  {
+    "worker": "avatar-pasteback-main-security-7",
+    "settings": [
+      {
+        "AVATAR_VIDEO_FPS": "25",
+        "AVATAR_SPEECH_PREFETCH_ENABLED": "true",
+        "AVATAR_SILENCE_GATE_ENABLED": "false",
+        "AVATAR_AUDIO_QUEUE_MAX_FRAMES": "32"
+      }
+    ]
+  },
+  {
+    "worker": "avatar-pasteback-main-security-8",
+    "settings": [
+      {
+        "AVATAR_VIDEO_FPS": "25",
+        "AVATAR_SPEECH_PREFETCH_ENABLED": "true",
+        "AVATAR_SILENCE_GATE_ENABLED": "false",
+        "AVATAR_AUDIO_QUEUE_MAX_FRAMES": "32"
+      }
+    ]
+  },
+  {
+    "worker": "avatar-pasteback-main-security-9",
+    "settings": [
+      {
+        "AVATAR_VIDEO_FPS": "25",
+        "AVATAR_SPEECH_PREFETCH_ENABLED": "true",
+        "AVATAR_SILENCE_GATE_ENABLED": "false",
+        "AVATAR_AUDIO_QUEUE_MAX_FRAMES": "32"
+      }
+    ]
+  }
+]
