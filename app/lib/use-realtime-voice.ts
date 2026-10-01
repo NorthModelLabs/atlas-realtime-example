@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { captionEvent, emptyCaptions, type Captions } from "./voice-captions";
 
 type Output = { context: AudioContext; destination: MediaStreamAudioDestinationNode };
 type Options = {
@@ -18,6 +19,7 @@ type Connection = {
   abort: AbortController;
   ready: boolean;
   responding: boolean;
+  captions: Captions;
 };
 
 export function useRealtimeVoice(options: Options) {
@@ -25,14 +27,14 @@ export function useRealtimeVoice(options: Options) {
   const current = useRef<Connection | null>(null);
   const [isConnected, setConnected] = useState(false);
   const [isListening, setListening] = useState(false);
-  const [partialTranscript, setPartial] = useState("");
+  const [captions, setCaptions] = useState(emptyCaptions);
   const stop = useCallback(() => {
     const c = current.current; current.current = null;
     if (c) {
       c.abort.abort(); c.mic?.getTracks().forEach(t => t.stop());
       c.source?.disconnect(); c.channel.close(); c.peer.close();
     }
-    setConnected(false); setListening(false); setPartial(""); opts.current.thinking(false);
+    setConnected(false); setListening(false); setCaptions(emptyCaptions()); opts.current.thinking(false);
   }, []);
   const start = useCallback(async () => {
     if (current.current || !opts.current.sessionId) return;
@@ -40,7 +42,7 @@ export function useRealtimeVoice(options: Options) {
     const id = opts.current.sessionId;
     const peer = new RTCPeerConnection();
     const channel = peer.createDataChannel("oai-events");
-    const c: Connection = {peer, channel, abort: new AbortController(), ready: false, responding: false};
+    const c: Connection = {peer, channel, abort: new AbortController(), ready: false, responding: false, captions: emptyCaptions()};
     current.current = c;
     const alive = () => current.current === c;
     try {
@@ -60,15 +62,19 @@ export function useRealtimeVoice(options: Options) {
       channel.onmessage = ({data}) => {
         if (!alive()) return;
         let event; try { event = JSON.parse(data); } catch { return; }
-        if (event.type === "input_audio_buffer.speech_started") {setPartial("Listening…"); opts.current.thinking(false);}
-        if (event.type === "input_audio_buffer.speech_stopped") {setPartial(""); opts.current.thinking(true);}
+        const previous = c.captions;
+        c.captions = captionEvent(previous, event);
+        setCaptions(c.captions);
+        if (event.type === "input_audio_buffer.speech_started") {opts.current.thinking(false);}
+        if (event.type === "input_audio_buffer.speech_stopped") {opts.current.thinking(true);}
         if (event.type === "conversation.item.input_audio_transcription.completed") {
-          setPartial(""); if (event.transcript?.trim()) opts.current.user(event.transcript.trim());
+          if (event.transcript?.trim()) opts.current.user(event.transcript.trim());
         }
+        if (event.type === "conversation.item.input_audio_transcription.failed") opts.current.error("Could not transcribe that turn. Please try again.");
         if (event.type === "response.created") { c.responding = true; opts.current.thinking(true); }
-        if (event.type === "response.output_audio_transcript.delta") opts.current.thinking(false);
-        if (event.type === "response.output_audio_transcript.done" && event.transcript?.trim()) opts.current.assistant(event.transcript.trim());
-        if (event.type === "response.done") {
+        if (event.type === "response.output_audio_transcript.delta" && event.response_id === previous.responseId) opts.current.thinking(false);
+        if (event.type === "response.output_audio_transcript.done" && event.response_id === previous.responseId && event.transcript?.trim()) opts.current.assistant(event.transcript.trim());
+        if (event.type === "response.done" && event.response?.id === previous.responseId) {
           c.responding = false; opts.current.thinking(false);
           if (event.response?.status === "failed") opts.current.error("Voice response failed. Please try again.");
         }
@@ -115,8 +121,9 @@ export function useRealtimeVoice(options: Options) {
     if (c.responding) c.channel.send(JSON.stringify({type: "response.cancel"}));
     c.channel.send(JSON.stringify({type: "output_audio_buffer.clear"}));
     c.channel.send(JSON.stringify({type: "conversation.item.create", item: {type: "message", role: "user", content: [{type: "input_text", text}]}}));
+    c.captions = {...emptyCaptions(), user: text}; setCaptions(c.captions);
     c.channel.send(JSON.stringify({type: "response.create"}));
   }, []);
   useEffect(() => stop, [stop]);
-  return {start, stop, toggleMicrophone, sendText, isConnected, isListening, partialTranscript};
+  return {start, stop, toggleMicrophone, sendText, isConnected, isListening, partialTranscript: captions.partial, captions};
 }

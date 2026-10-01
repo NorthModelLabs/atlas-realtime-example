@@ -1,0 +1,44 @@
+{
+  "input_lag_ms": {
+    "n": 545,
+    "median": 1320,
+    "p95": 1402,
+    "max": 1460
+  },
+  "queue_delay_ms": {
+    "n": 545,
+    "median": 1222,
+    "p95": 1318,
+    "max": 1339
+  },
+  "inference_ms": {
+    "n": 546,
+    "median": 1316.0,
+    "p95": 1333,
+    "max": 1941
+  },
+  "fps_equiv": {
+    "n": 273,
+    "median": 24.316,
+    "p95": 24.559,
+    "max": 24.672
+  },
+  "render_q": {
+    "n": 877,
+    "median": 7,
+    "p95": 8,
+    "max": 32
+  },
+  "stages": {
+    "gpu_runner_started": 1,
+    "gpu_render_batch_timing": 273,
+    "gpu_warmup_batch_done": 1,
+    "gpu_startup_warmup_done": 1,
+    "gpu_batch_submitted": 273,
+    "gpu_first_speaking_frame": 1,
+    "audio_queue_silence_drop": 3,
+    "gpu_batch_done": 272,
+    "audio_queue_speech_backpressure": 1,
+    "audio_queue_speech_backpressure_released": 57
+  }
+}

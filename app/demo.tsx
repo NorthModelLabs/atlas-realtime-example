@@ -751,6 +751,8 @@ export default function DemoPage({
     : overlayMessages;
   const showTiktokDialogue = isConnected || session.status === "connecting";
   const latestAtlasMessage = [...localMessages].reverse().find((msg) => msg.role === "atlas");
+  const userCaption = voice.partialTranscript || voice.captions.user;
+  const assistantCaption = voice.captions.assistant;
   const voiceInputActive = voiceMode === "mirror" ? mirrorInputActive : voice.isListening;
   const activeFormatMode: UiMode = uiMode;
   const activeFormatIndex = Math.max(0, UI_FORMATS.findIndex((format) => format.id === activeFormatMode));
@@ -802,11 +804,7 @@ export default function DemoPage({
           ? "Listening"
           : "Connected"
         : "Ready";
-    const appleCaption = voice.partialTranscript
-      ? `${voice.partialTranscript}…`
-      : aiThinking
-        ? "Thinking…"
-        : latestAtlasMessage?.text || (isConnected ? "Say something." : "Ready when you are.");
+    const appleCaption = assistantCaption || (aiThinking ? "Thinking…" : voice.captions.speechActive ? "Listening…" : userCaption ? "" : isConnected ? "Say something." : "Ready when you are.");
 
     return (
       <div className="apple-ui h-screen w-screen overflow-hidden text-white">
@@ -845,9 +843,9 @@ export default function DemoPage({
               {session.status === "connecting" && <div className="apple-loading-ring" aria-hidden="true" />}
             </div>
 
-            <div className="apple-caption" aria-live="polite">
-              <strong>Atlas</strong>
-              <p>{appleCaption}</p>
+            <div className="apple-caption voice-dialogue" aria-live="polite" aria-label="Conversation captions">
+              {userCaption && <p><strong>You</strong> {userCaption}{voice.partialTranscript ? "…" : ""}</p>}
+              {appleCaption && <p><strong>Atlas</strong> {appleCaption}</p>}
             </div>
           </section>
 
@@ -1056,7 +1054,7 @@ export default function DemoPage({
               <h2>Ask Atlas</h2>
               <p>
                 {isConnected
-                  ? latestAtlasMessage?.text || `Let’s work through step ${teacherStep + 1}: ${TEACHER_STEPS[teacherStep].label.toLowerCase()}.`
+                  ? assistantCaption || latestAtlasMessage?.text || `Let’s work through step ${teacherStep + 1}: ${TEACHER_STEPS[teacherStep].label.toLowerCase()}.`
                   : "Start a short guided explanation, or ask a question about the graph."}
               </p>
             </div>
@@ -1200,13 +1198,13 @@ export default function DemoPage({
             </div>
             {meetCaptions && (
               <div className="meet-floating-caption" aria-live="polite">
-                <strong>Atlas</strong>
+                <strong>{voice.partialTranscript || (userCaption && !assistantCaption) ? "You" : "Atlas"}</strong>
                 <span>
                   {voice.partialTranscript
                     ? `${voice.partialTranscript}…`
                     : aiThinking
                       ? "Thinking…"
-                      : latestAtlasMessage?.text || (isConnected ? "Listening — say something." : "Join when you’re ready.")}
+                      : assistantCaption || userCaption || (isConnected ? "Listening — say something." : "Join when you’re ready.")}
                 </span>
               </div>
             )}

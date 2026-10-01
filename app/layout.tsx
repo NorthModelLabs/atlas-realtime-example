@@ -16,9 +16,9 @@ export const metadata: Metadata = {
   title: "Atlas Realtime — Example App",
   description: "Interactive realtime avatar demo powered by North Model Labs",
   icons: {
-    icon: "/nml_logo.webp",
-    shortcut: "/nml_logo.webp",
-    apple: "/nml_logo.webp",
+    icon: "/nml-icon.png",
+    shortcut: "/nml-icon.png",
+    apple: "/nml-icon.png",
   },
 };
 

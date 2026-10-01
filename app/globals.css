@@ -3911,3 +3911,8 @@ textarea::-webkit-scrollbar-thumb,
     top: 60px;
   }
 }
+
+/* Keep both sides visible; partial text must not be labelled as Atlas. */
+.apple-caption.voice-dialogue { height: auto; min-height: 38px; width: min(100%, 640px); }
+.apple-caption.voice-dialogue p { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin: 4px 0; }
+.apple-caption.voice-dialogue strong { display: inline; margin-right: 6px; }
