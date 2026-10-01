@@ -1,0 +1,36 @@
+{
+  "project": "atlas-stg-isolated-20260831",
+  "vm": "atlas-stg-mouth-tail-20261001",
+  "zone": "us-central1-c",
+  "maximum_gpus": 1,
+  "maximum_runtime_seconds": 1200,
+  "external_ip": false,
+  "model_digest": "sha256:f853fbd1dc92ae7a514e93107e3696e8009f74e929180ac361e2e28e9d52e7e4",
+  "runner_digest": "sha256:830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee",
+  "startup_sha256": "a5d4886dddbd32f1446bfe9b003ad983f70aa7bba2f5b3944186089d6f6bfa7a",
+  "probe_sha256": "b748711ce5fd5fbec275a1ac76525dcc009cf5cd8140618e084215bd9ff289d4",
+  "production_changes": false,
+  "purpose": "Isolate post-speech mouth motion in generated frames before browser/transport, preserving all live image digests.",
+  "startup_bytes": 18398,
+  "fixture": "existing digest-pinned question.pcm, resampled 24 kHz to 16 kHz",
+  "change": "One isolated VM; exact images; baseline visual silence RMS 0.0001 then candidate 0.0003, identical four input trials each. No changes to audio, timing, weights, production or LiveKit.",
+  "hypothesis": "Noise below browser quiet threshold (32.768 PCM16 units) but above mouth-gate threshold (3.2768 units) may delay the mouth closing.",
+  "conditions": [
+    "baseline",
+    "candidate"
+  ],
+  "noise_levels_pcm16": [
+    0,
+    6,
+    2,
+    6
+  ],
+  "limitation": "Candidate is a diagnostic comparison, not approved or established as a production fix.",
+  "machine_type": "g2-standard-12",
+  "vcpu": 12,
+  "memory_gib": 48,
+  "prior_attempt": "Both zone-a shapes failed for capacity; instance and boot disk confirmed absent. One attempt in zone c on the same private regional subnet.",
+  "model_cpu_limit": 10,
+  "runner_cpu_limit": 2,
+  "harness_correction": "Stop the owned initial zone-c boot before model launch; correct model CPU cap from 14 to 10 for 12-vCPU host, preserve cached image layers, use a fresh attempt directory. No inference result accepted from initial boot."
+}

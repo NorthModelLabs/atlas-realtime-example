@@ -1,0 +1,996 @@
+{
+  "observed_at": "2026-10-01T08:57:05.337314+00:00",
+  "instance_id": "5959909932501542277",
+  "status": "TERMINATED",
+  "serial_next": 2170445,
+  "phases": [
+    {
+      "dashboard_worker_phase": "one-l4-ready"
+    },
+    {
+      "dashboard_worker_phase": "private-google-proxy-ready"
+    },
+    {
+      "dashboard_worker_phase": "model-image-ready"
+    },
+    {
+      "dashboard_worker_phase": "fixture-image-ready"
+    },
+    {
+      "dashboard_worker_phase": "controller-image-ready"
+    },
+    {
+      "dashboard_worker_phase": "images-ready"
+    },
+    {
+      "dashboard_worker_phase": "condition-baseline-start"
+    },
+    {
+      "dashboard_worker_phase": "model-egress-denied"
+    },
+    {
+      "dashboard_worker_phase": "model-healthy"
+    },
+    {
+      "dashboard_worker_phase": "mouth-tail-complete"
+    },
+    {
+      "dashboard_worker_phase": "condition-candidate-start"
+    }
+  ],
+  "results": [
+    {
+      "condition": "baseline",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "leading_frames": 32,
+      "frames": 256,
+      "last_voiced_frame": 126,
+      "selected_frames": 10,
+      "paired_audio_exact": true
+    },
+    {
+      "condition": "baseline",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "leading_frames": 32,
+      "frames": 256,
+      "last_voiced_frame": 126,
+      "selected_frames": 10,
+      "paired_audio_exact": true
+    },
+    {
+      "condition": "baseline",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "leading_frames": 32,
+      "frames": 256,
+      "last_voiced_frame": 126,
+      "selected_frames": 10,
+      "paired_audio_exact": true
+    },
+    {
+      "condition": "baseline",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "leading_frames": 32,
+      "frames": 256,
+      "last_voiced_frame": 126,
+      "selected_frames": 10,
+      "paired_audio_exact": true
+    },
+    {
+      "condition": "candidate",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "leading_frames": 32,
+      "frames": 256,
+      "last_voiced_frame": 126,
+      "selected_frames": 10,
+      "paired_audio_exact": true
+    },
+    {
+      "condition": "candidate",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "leading_frames": 32,
+      "frames": 256,
+      "last_voiced_frame": 126,
+      "selected_frames": 10,
+      "paired_audio_exact": true
+    },
+    {
+      "condition": "candidate",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "leading_frames": 32,
+      "frames": 256,
+      "last_voiced_frame": 126,
+      "selected_frames": 10,
+      "paired_audio_exact": true
+    },
+    {
+      "condition": "candidate",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "leading_frames": 32,
+      "frames": 256,
+      "last_voiced_frame": 126,
+      "selected_frames": 10,
+      "paired_audio_exact": true
+    }
+  ],
+  "frames": [
+    {
+      "condition": "baseline",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 126,
+      "after_last_voiced_frame_ms": 0,
+      "paired_audio_rms": 157.447,
+      "jpeg_sha256": "c82188abfa7ea00e491bd1a07fa935299cdeb6e5b8d5fa53939f4b00bb8f7faa",
+      "parts": 12,
+      "file": "baseline-trial-0-frame-126.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 128,
+      "after_last_voiced_frame_ms": 80,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "bdcb4b377603634e1fe0ab9ebf09f823b3f88e0f124d4ecc063407b9159cd64a",
+      "parts": 12,
+      "file": "baseline-trial-0-frame-128.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 131,
+      "after_last_voiced_frame_ms": 200,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "190ab56d67dc76bdedd558d84122d7fcb139711c58031c55bdbb3c79a45e01a4",
+      "parts": 12,
+      "file": "baseline-trial-0-frame-131.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 136,
+      "after_last_voiced_frame_ms": 400,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "1d6b3fdd75f963cb667260ce560405c9828708b143002c7dc351768f2b116452",
+      "parts": 12,
+      "file": "baseline-trial-0-frame-136.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 141,
+      "after_last_voiced_frame_ms": 600,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "a0c13af0ebaa6464a022c8001b70ea91086668872d12e0c7e3c5d51e70d19e0f",
+      "parts": 12,
+      "file": "baseline-trial-0-frame-141.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 146,
+      "after_last_voiced_frame_ms": 800,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "94f613f6ce819baa4883cfa012e013b6102031582978ebc4c20bca7eeb81c70c",
+      "parts": 12,
+      "file": "baseline-trial-0-frame-146.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 151,
+      "after_last_voiced_frame_ms": 1000,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "6b7a89967b16edb5cd165a472fb053a65d919bda7cf21ccddbea1533b1d9176d",
+      "parts": 12,
+      "file": "baseline-trial-0-frame-151.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 158,
+      "after_last_voiced_frame_ms": 1280,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "46e0eebd7648c2bbbc3810d947b0e1cb2d611dd3d35538ed8ae8058a82927bf8",
+      "parts": 12,
+      "file": "baseline-trial-0-frame-158.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 166,
+      "after_last_voiced_frame_ms": 1600,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "1d04f4d8917a9ba9237abfc635f5a1c34f7cde15d701beeef507767b094d0801",
+      "parts": 12,
+      "file": "baseline-trial-0-frame-166.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 176,
+      "after_last_voiced_frame_ms": 2000,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "067875f575e2b5acca18a689fa2ddbe4421da5ab5dbe5c57b77f74c47cf125e5",
+      "parts": 12,
+      "file": "baseline-trial-0-frame-176.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 126,
+      "after_last_voiced_frame_ms": 0,
+      "paired_audio_rms": 157.447,
+      "jpeg_sha256": "8608009c7ee99aee401338bf63f556f0ce327ccd35851ed13635efa35fc6121d",
+      "parts": 12,
+      "file": "baseline-trial-1-frame-126.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 128,
+      "after_last_voiced_frame_ms": 80,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "6830cfeb1b0ae051e6c4e8fe6aabf1a8ee7ba3d3d0df5f8bab140440a594108c",
+      "parts": 12,
+      "file": "baseline-trial-1-frame-128.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 131,
+      "after_last_voiced_frame_ms": 200,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "b754bf9d9a82ec57cf3e05e11591bae624fd2a7ccc5970ff8d1a4b3abfa6056a",
+      "parts": 12,
+      "file": "baseline-trial-1-frame-131.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 136,
+      "after_last_voiced_frame_ms": 400,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "ae09c09f67b00ce79ccfa2a77b91bbf6228755164d9d2d8d8e9170202a8554b4",
+      "parts": 12,
+      "file": "baseline-trial-1-frame-136.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 141,
+      "after_last_voiced_frame_ms": 600,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "b0c20fd47368ef1d352112663bee00b5060f17b825ca47522d0677c1a311be40",
+      "parts": 12,
+      "file": "baseline-trial-1-frame-141.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 146,
+      "after_last_voiced_frame_ms": 800,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "7f4309ab25495cfc8523ac41276e607aac3a004c6c50a97d792a5fb839f95e6b",
+      "parts": 12,
+      "file": "baseline-trial-1-frame-146.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 151,
+      "after_last_voiced_frame_ms": 1000,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "7d8eed5a2fd7559113e61121d51a92950800a4120f842f6ec2a42a1f8f904acb",
+      "parts": 12,
+      "file": "baseline-trial-1-frame-151.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 158,
+      "after_last_voiced_frame_ms": 1280,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "b7022e402588874bce07f3df2d01ea36fc76dae82f345dc6f191b51d57d76538",
+      "parts": 12,
+      "file": "baseline-trial-1-frame-158.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 166,
+      "after_last_voiced_frame_ms": 1600,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "f38f06c77beeb06aa9375b000f27c143188c4efeae269ac2672772811fb1ba3e",
+      "parts": 12,
+      "file": "baseline-trial-1-frame-166.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 176,
+      "after_last_voiced_frame_ms": 2000,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "cffad64bb2c5de12ce7680b90d3127c5097ba0674901364d71847c1f2646f522",
+      "parts": 12,
+      "file": "baseline-trial-1-frame-176.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 126,
+      "after_last_voiced_frame_ms": 0,
+      "paired_audio_rms": 157.447,
+      "jpeg_sha256": "c28bb2f1c5356edaa96fc3d1a253b10e907c5bc8f8f9fab6539402dde6c3d830",
+      "parts": 12,
+      "file": "baseline-trial-2-frame-126.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 128,
+      "after_last_voiced_frame_ms": 80,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "91affe2776483b3befc6a1e448fb41ff2820d2dfa99bae561b0bf0ee2850ef9d",
+      "parts": 12,
+      "file": "baseline-trial-2-frame-128.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 131,
+      "after_last_voiced_frame_ms": 200,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "a2c7ce56d34b9b677fe07ffc47a5a62c0d9f69a29d860aa2819e7eaab03928e7",
+      "parts": 12,
+      "file": "baseline-trial-2-frame-131.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 136,
+      "after_last_voiced_frame_ms": 400,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "457dc2bc3987c6e5d83b2a89df61ac08b5fb2a81742b7a9ec0257a3aa9b950f2",
+      "parts": 12,
+      "file": "baseline-trial-2-frame-136.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 141,
+      "after_last_voiced_frame_ms": 600,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "51bf264e4a634065078e2d9281dd74553acbd5c97a180ee4438db29aeb966d15",
+      "parts": 12,
+      "file": "baseline-trial-2-frame-141.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 146,
+      "after_last_voiced_frame_ms": 800,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "90fbb8c13ff916e52bea63daa8ac9bded61316f4a1a800f17e5dcc46baa1b902",
+      "parts": 12,
+      "file": "baseline-trial-2-frame-146.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 151,
+      "after_last_voiced_frame_ms": 1000,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "242ff149b56cf46ca461149c3ad952bb538361caac547369c1121b772985615e",
+      "parts": 12,
+      "file": "baseline-trial-2-frame-151.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 158,
+      "after_last_voiced_frame_ms": 1280,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "762794c4e789c5e8b75603a58b48a499ef1e304f135b1d01ba64fa4e0115625b",
+      "parts": 12,
+      "file": "baseline-trial-2-frame-158.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 166,
+      "after_last_voiced_frame_ms": 1600,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "de9e85573f43576e81f7758c3fa8953f9b8b7bf61908d9e067d785689057251e",
+      "parts": 12,
+      "file": "baseline-trial-2-frame-166.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 176,
+      "after_last_voiced_frame_ms": 2000,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "d412ea2290de10fbe852dc844e56ff27087a702e81e59becf3e683ffac5465cf",
+      "parts": 12,
+      "file": "baseline-trial-2-frame-176.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 126,
+      "after_last_voiced_frame_ms": 0,
+      "paired_audio_rms": 157.447,
+      "jpeg_sha256": "81209b76ed9dceb3d6cc32b15bef22df213adecf42038af1d50fd2e31d3bc18e",
+      "parts": 12,
+      "file": "baseline-trial-3-frame-126.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 128,
+      "after_last_voiced_frame_ms": 80,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "688b34b5c04df9bb06e62374cd8ac63d3471ab8a1d51eb29d63f901d53f3fdc4",
+      "parts": 12,
+      "file": "baseline-trial-3-frame-128.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 131,
+      "after_last_voiced_frame_ms": 200,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "5eb75ba36191bf0f1e43711eb408d8763dfce057a63425236b2c223fe3985951",
+      "parts": 12,
+      "file": "baseline-trial-3-frame-131.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 136,
+      "after_last_voiced_frame_ms": 400,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "c30aa60ec90b04fb50cc936077370b9191ce092f55f12811b1f6cb44e19f4d74",
+      "parts": 12,
+      "file": "baseline-trial-3-frame-136.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 141,
+      "after_last_voiced_frame_ms": 600,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "96ec688d0eeee6bb88d4216238006c8041454c2ccf6a4ccc755155fd7659bbe6",
+      "parts": 12,
+      "file": "baseline-trial-3-frame-141.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 146,
+      "after_last_voiced_frame_ms": 800,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "bb229fd4cefe574085c475d346953bf92f9e5022ab094745137d41914810c3e8",
+      "parts": 12,
+      "file": "baseline-trial-3-frame-146.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 151,
+      "after_last_voiced_frame_ms": 1000,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "3968472137503fefb6f70298bb8d78b65d5e241035c4705ba7eeb80783ea4a1b",
+      "parts": 12,
+      "file": "baseline-trial-3-frame-151.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 158,
+      "after_last_voiced_frame_ms": 1280,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "6b18cc6ae179c83ab2811af91cc9b39549bb2fe0896e646ac6f47d7fd2a82f06",
+      "parts": 12,
+      "file": "baseline-trial-3-frame-158.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 166,
+      "after_last_voiced_frame_ms": 1600,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "2e174ccc4407a440a9f1dd357591120a1fb3589e43247208eafeb1b7cf102396",
+      "parts": 12,
+      "file": "baseline-trial-3-frame-166.jpg"
+    },
+    {
+      "condition": "baseline",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 176,
+      "after_last_voiced_frame_ms": 2000,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "6e0ef0b8f63384be6dbdc49893ede12216cfaf468d3d38b536e3102913b47ef0",
+      "parts": 12,
+      "file": "baseline-trial-3-frame-176.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 126,
+      "after_last_voiced_frame_ms": 0,
+      "paired_audio_rms": 157.447,
+      "jpeg_sha256": "e332e7348fa44a463fb84d5d60c04f90b3ef09001557acff4742cf9b43229d60",
+      "parts": 12,
+      "file": "candidate-trial-0-frame-126.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 128,
+      "after_last_voiced_frame_ms": 80,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "f15b8d7525733ca4a34172d9db8a3964d07ba97e87f6d96549c2598c68905700",
+      "parts": 12,
+      "file": "candidate-trial-0-frame-128.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 131,
+      "after_last_voiced_frame_ms": 200,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "1247f9a43f8710e0de2b66a260c32e07130836ecf3eccfdc7c841bd4efbb095a",
+      "parts": 12,
+      "file": "candidate-trial-0-frame-131.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 136,
+      "after_last_voiced_frame_ms": 400,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "4e4ecb5515fd4a788ef5d8f18477d0fa811dbd861cac870b7f3852bd114eedb7",
+      "parts": 12,
+      "file": "candidate-trial-0-frame-136.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 141,
+      "after_last_voiced_frame_ms": 600,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "c609307add80f68bce61da6464df54ce536b8e830ee6aabef16606f85283198b",
+      "parts": 12,
+      "file": "candidate-trial-0-frame-141.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 146,
+      "after_last_voiced_frame_ms": 800,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "ce60e6dcbb4a0f07d1d1b7f423d5b2611f56affe340690807641aa720dc014ea",
+      "parts": 12,
+      "file": "candidate-trial-0-frame-146.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 151,
+      "after_last_voiced_frame_ms": 1000,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "867dc2b86ea4c3d6512f3df1ffec74511137fcbd3a9fd5854ae6ff083ebfbb16",
+      "parts": 12,
+      "file": "candidate-trial-0-frame-151.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 158,
+      "after_last_voiced_frame_ms": 1280,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "e23d821bf13b82b7965356375c22acf2d0d99ec85565668cd11e8231108fd4e9",
+      "parts": 12,
+      "file": "candidate-trial-0-frame-158.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 166,
+      "after_last_voiced_frame_ms": 1600,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "fe04179f51e5b73efc8f698869652445278155384befc7fa32234cd8b3e248e8",
+      "parts": 12,
+      "file": "candidate-trial-0-frame-166.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 0,
+      "noise_level_pcm16": 0,
+      "audio_frame": 176,
+      "after_last_voiced_frame_ms": 2000,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "b3757e002019707b843df7dadbe0c204681febb4a5cec5d8ff4766a1f3db7b2f",
+      "parts": 12,
+      "file": "candidate-trial-0-frame-176.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 126,
+      "after_last_voiced_frame_ms": 0,
+      "paired_audio_rms": 157.447,
+      "jpeg_sha256": "bef76f8e18b4deba47392997c933d6a37096b2d36093edda6dfd599cebab6774",
+      "parts": 12,
+      "file": "candidate-trial-1-frame-126.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 128,
+      "after_last_voiced_frame_ms": 80,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "5e6cb9d63c5a28eb8840648a408986cdc94e42b041e507178c232e5d2d74645b",
+      "parts": 12,
+      "file": "candidate-trial-1-frame-128.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 131,
+      "after_last_voiced_frame_ms": 200,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "00199d8999a700aa7f1b1dfae60b538aaae34d2026382c40566e2a0f4e0f1804",
+      "parts": 12,
+      "file": "candidate-trial-1-frame-131.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 141,
+      "after_last_voiced_frame_ms": 600,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "936360f65afeb14374f5b8b861aae12a18709f5de0fce61e055a923ee81d24b7",
+      "parts": 12,
+      "file": "candidate-trial-1-frame-141.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 146,
+      "after_last_voiced_frame_ms": 800,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "54558a4a47a106de51e7341fcab4ba6fb02bfe7b0f1685e7da07d03a8d0857d7",
+      "parts": 12,
+      "file": "candidate-trial-1-frame-146.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 151,
+      "after_last_voiced_frame_ms": 1000,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "f8f59b976d0f8f4a9258f5363f3f9ce4dd00d780fb75f3b974889df13ffde2d7",
+      "parts": 12,
+      "file": "candidate-trial-1-frame-151.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 158,
+      "after_last_voiced_frame_ms": 1280,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "2b85de22a6b77d58ba8899765b2a2c0330ac689234627c40c955947cabdacf4e",
+      "parts": 12,
+      "file": "candidate-trial-1-frame-158.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 166,
+      "after_last_voiced_frame_ms": 1600,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "35d26c1ebb6c8db104c7bd4011731a8b48f0f8510af85997b4441273149ef98e",
+      "parts": 12,
+      "file": "candidate-trial-1-frame-166.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 1,
+      "noise_level_pcm16": 6,
+      "audio_frame": 176,
+      "after_last_voiced_frame_ms": 2000,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "ab53a49e2a546ba66549aabf2048e56f3c18cd515c08a068e75df2adc3f7b781",
+      "parts": 12,
+      "file": "candidate-trial-1-frame-176.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 126,
+      "after_last_voiced_frame_ms": 0,
+      "paired_audio_rms": 157.447,
+      "jpeg_sha256": "0a8333e3da4d88828f3908f9afe9e4302b0fe335ee522ec87d0e8fee265f9508",
+      "parts": 12,
+      "file": "candidate-trial-2-frame-126.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 131,
+      "after_last_voiced_frame_ms": 200,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "c15cbadf77fa710e5b9e081b0b3c53fadd2d9585428c4c9d0af8f94b50f3008b",
+      "parts": 12,
+      "file": "candidate-trial-2-frame-131.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 136,
+      "after_last_voiced_frame_ms": 400,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "098d071e0521e1bd863836d09691a1dec1596106146058d8d332a66971102281",
+      "parts": 12,
+      "file": "candidate-trial-2-frame-136.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 141,
+      "after_last_voiced_frame_ms": 600,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "636916fe54e646423772f8471fed6cb610e298860a23d368f119484a7498870e",
+      "parts": 12,
+      "file": "candidate-trial-2-frame-141.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 146,
+      "after_last_voiced_frame_ms": 800,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "0db78bf09ff46d08b38b553ae130b01ef04ded52c6e793b6592628824f2b1edc",
+      "parts": 12,
+      "file": "candidate-trial-2-frame-146.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 151,
+      "after_last_voiced_frame_ms": 1000,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "0646a70b912c28fad07f1b8859e83cc07efa11a8503ff17a7bfb155adf3803a3",
+      "parts": 12,
+      "file": "candidate-trial-2-frame-151.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 158,
+      "after_last_voiced_frame_ms": 1280,
+      "paired_audio_rms": 2.0,
+      "jpeg_sha256": "01452389a39194a6756802e90f05c24f547d2cef73d747ef3c7a8a43c672e121",
+      "parts": 12,
+      "file": "candidate-trial-2-frame-158.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 166,
+      "after_last_voiced_frame_ms": 1600,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "acc9f58af3561e4ec45e32e5f9b1a0cc27e5e3a96f66f0da4be137fd053983b8",
+      "parts": 12,
+      "file": "candidate-trial-2-frame-166.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 2,
+      "noise_level_pcm16": 2,
+      "audio_frame": 176,
+      "after_last_voiced_frame_ms": 2000,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "6a6ced95c2010b97ab594410554eb3df62e9e726503a1ff4a7808288c0104fbb",
+      "parts": 12,
+      "file": "candidate-trial-2-frame-176.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 126,
+      "after_last_voiced_frame_ms": 0,
+      "paired_audio_rms": 157.447,
+      "jpeg_sha256": "343eab4b0065c6df85da52920bf30795b48dd20c0d20bdcba9522fc6b938a2a4",
+      "parts": 12,
+      "file": "candidate-trial-3-frame-126.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 128,
+      "after_last_voiced_frame_ms": 80,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "2f4c718fc453740a36b7ad40aa52c2b318a2def76a119c23cf2b0b5f3bf6de13",
+      "parts": 12,
+      "file": "candidate-trial-3-frame-128.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 131,
+      "after_last_voiced_frame_ms": 200,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "f2de34acc3e770c6658d226440c6f6f8bff48d5e6154f9d1fe44195e83dc4089",
+      "parts": 12,
+      "file": "candidate-trial-3-frame-131.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 136,
+      "after_last_voiced_frame_ms": 400,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "17b9863b1480ed18daf83ba224dd189a3e68de3c0c05e709eab89197db1b6e91",
+      "parts": 12,
+      "file": "candidate-trial-3-frame-136.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 141,
+      "after_last_voiced_frame_ms": 600,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "f96cc911a0711e82cad1d0225dbd4e5c039eb938fe2432b7a2a90caf670b1ae8",
+      "parts": 12,
+      "file": "candidate-trial-3-frame-141.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 146,
+      "after_last_voiced_frame_ms": 800,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "1aa0be5231fb058f09661e13600b51400489519814523131bd3c35883c67e8b8",
+      "parts": 12,
+      "file": "candidate-trial-3-frame-146.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 151,
+      "after_last_voiced_frame_ms": 1000,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "c48eabaf03c0cf1e9b677b2a85c95416cf0855412e45eb41f076fb360ebd2566",
+      "parts": 12,
+      "file": "candidate-trial-3-frame-151.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 158,
+      "after_last_voiced_frame_ms": 1280,
+      "paired_audio_rms": 6.0,
+      "jpeg_sha256": "724fd8a737687c2af2c8c45ba251854b52591cc79cb80c9ecf47f011ac082e6b",
+      "parts": 12,
+      "file": "candidate-trial-3-frame-158.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 166,
+      "after_last_voiced_frame_ms": 1600,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "36c04f5aa97de8915af2223de653d86ca7e51849f7d937c6f8f259fe5908f24c",
+      "parts": 12,
+      "file": "candidate-trial-3-frame-166.jpg"
+    },
+    {
+      "condition": "candidate",
+      "trial": 3,
+      "noise_level_pcm16": 6,
+      "audio_frame": 176,
+      "after_last_voiced_frame_ms": 2000,
+      "paired_audio_rms": 0.0,
+      "jpeg_sha256": "182d159176c1b6b703df45d508a6e302ef8964981c029f4b3a3adf778041d3f8",
+      "parts": 12,
+      "file": "candidate-trial-3-frame-176.jpg"
+    }
+  ],
+  "complete": [
+    {
+      "condition": "baseline",
+      "passed": true,
+      "scope": "Exact model and runner digests; same spoken fixture followed by controlled low-level noise and then zeros; raw generated frames paired with exact input audio before LiveKit/browser; no playback pacing or latency benchmark"
+    },
+    {
+      "condition": "candidate",
+      "passed": true,
+      "scope": "Exact model and runner digests; same spoken fixture followed by controlled low-level noise and then zeros; raw generated frames paired with exact input audio before LiveKit/browser; no playback pacing or latency benchmark"
+    }
+  ],
+  "incomplete_frames": 2
+}

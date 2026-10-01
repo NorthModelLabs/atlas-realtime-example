@@ -14,6 +14,18 @@ This proves a mechanism capable of producing a long mouth tail. It does **not** 
 
 The actual image calls its head-pose/translation smoothers without the mouth envelope. Do not treat the differently patched local root checkout as the deployed runtime. The two helper functions were exercised from the exact image; the whole local runtime was not substituted.
 
+An additional speech-envelope control uses local copies of only the two helper functions after verifying their AST hashes against the exact-image result. At normal fixture gain, the candidate changes 14 low-level frames but no frame above the observer's 0.001 quiet threshold. At 0.1 gain, it changes 12 frames, including three above that threshold; at 0.01 gain, it changes 36 frames, including three above it. The envelope carries history, so a higher threshold can affect the opening after quiet speech. This is a regression risk requiring visual acceptance, not a reason to deploy the threshold immediately. See speech-envelope.json.
+
+### The rendered comparison reproduces the trigger and improves it in staging
+
+The exact-image GPU comparison completed both conditions and all eight trials. Each trial contains 256 paired frames; output audio is byte-for-byte identical to input throughout. The only condition difference is visual silence threshold 0.0001 versus 0.0003. Both repeated 6-unit-noise baseline trials show lingering mouth articulation during the 1.28-second faint tail, whereas zero/2-unit controls settle earlier. The candidate is closed at all retained 600–2000 ms samples, including both repeated 6-unit trials. This demonstrates that the noise-threshold mechanism can cause and remedy this visible symptom on the deployed model, independently of browser transport.
+
+![Production-setting control](paired-render/baseline-contact.jpg)
+
+![Candidate visual-gate control](paired-render/candidate-contact.jpg)
+
+The serial transport retained 78 of 80 selected images with verified JPEG hashes. Candidate trial 2 at 400 ms and trial 3 at 80 ms are missing and intentionally blank; they are not inferred or fabricated. The probe's completion records report all 80 generated samples and exact audio assertions passing. This is controlled-input acceptance only, not proof that every reported conversational tail has the same cause or that quiet speech remains unaffected. The candidate is **not promoted**. Model/runner digests, weights, audio and batch/timing controls remain unchanged.
+
 ### Another owned browser call reproduced the mouth tail
 
 The protected diagnostic preview produced 6192 numeric events, 2983 video callbacks, and six complete screenshot triplets. Tail 4 is visibly open at 426 ms and slightly open at 830 ms after returned audio quiet, then closed at 1435 ms. Its video advances by 36 presented frames in the first 1.5 seconds; returned-audio peak RMS after 200 ms is 0.00012. Other tails settle earlier. This again rules out treating the symptom as only a stale “Listening” label or a completely frozen video element.
@@ -45,8 +57,10 @@ There are 31 callback gaps over 100 ms in this call; five occur while returned a
 
 ## Staging and cleanup
 
-Two new zone-a GPU creation attempts failed conclusively for capacity before startup; subsequent reads verified no VM or boot disk remained. A single one-L4 alternative in zone c is running the paired visual comparison on the same private staging subnet, with the same model/runner hashes, no external IP and no production connections. Its first boot was stopped before model launch to correct the model container CPU cap from 14 to 10 on the 12-vCPU host; the corrected boot has a shorter 20-minute cloud stop deadline. This is a harness correction, not a product defect or accepted inference result. The baseline and candidate differ only in the visual gate threshold. The paired result and final cleanup receipt must be attached before claiming that comparison passed.
+Two new zone-a GPU creation attempts failed conclusively for capacity before startup; subsequent reads verified no VM or boot disk remained. The alternative zone-c probe completed on one L4 with the same private subnet and image digests. Its initial boot was stopped before inference to correct a 14-core model limit on a 12-vCPU test host. The corrected boot used 10 model cores plus two runner cores, isolated model filesystems per condition, a 20-minute cloud stop limit, no external IP and no production connections. This was a harness correction; no initial-boot inference result was accepted. The completed VM stopped itself. The final owned-VM/boot-disk cleanup receipt is retained with paired-render evidence.
 
-The owned browser session was deleted successfully (HTTP 200). There were no page JavaScript errors. The CPU build completed successfully and owns no persistent GPU. Production health and image pins were rechecked; see production-health.json. Neither symptom is yet claimed fixed.
+The owned browser session was deleted successfully (HTTP 200). There were no page JavaScript errors. The CPU build completed successfully and owns no persistent GPU. Production health and image pins were rechecked; see production-health.json. Neither symptom is claimed fixed in production. The mouth candidate has passed the narrow rendered control; quiet-speech visual regression and conversational acceptance remain outstanding. Delivery robustness still needs a targeted fix validated against the observed loss/jitter conditions, without changing normal response speed.
 
 Validation: TypeScript (`tsc --noEmit`), ESLint on the changed preview diagnostic module, and `git diff --check` passed. The extra diagnostics have not been promoted to the public demo.
+
+ICE timing context: the Atlas candidate-pair RTT was 98 ms shortly before the largest stall (9 ms median for the call); provider RTT stayed around 55–56 ms (57 ms median). These are sampled round-trip estimates, not exact incoming-packet delays. The outgoing bitrate estimate is not a measurement of download capacity. See path-timing.json.

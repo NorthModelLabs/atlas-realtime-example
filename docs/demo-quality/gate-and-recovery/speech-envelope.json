@@ -1,0 +1,406 @@
+{
+  "fixture_sha256": "962289ba66028ad5b6de2b50b0f9152b16f2ba83c3b88e970aec006910b48b0b",
+  "functions_verified_against_exact_model_ast": true,
+  "cases": [
+    {
+      "gain": 1,
+      "speech_frames": 103,
+      "changed_envelope_frames": 14,
+      "changed_frames_above_observer_quiet_threshold": 0,
+      "max_additional_close_weight": 0.18359375,
+      "changed_frame_details": [
+        {
+          "frame": 38,
+          "rms": 6.331708020285733e-05,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.04296875
+        },
+        {
+          "frame": 39,
+          "rms": 3.61491630263737e-05,
+          "baseline_weight": 0.04296875,
+          "candidate_weight": 0.15625
+        },
+        {
+          "frame": 40,
+          "rms": 3.462770299655218e-05,
+          "baseline_weight": 0.15625,
+          "candidate_weight": 0.31640625
+        },
+        {
+          "frame": 41,
+          "rms": 3.435346161627022e-05,
+          "baseline_weight": 0.31640625,
+          "candidate_weight": 0.5
+        },
+        {
+          "frame": 42,
+          "rms": 3.51697710315433e-05,
+          "baseline_weight": 0.5,
+          "candidate_weight": 0.68359375
+        },
+        {
+          "frame": 43,
+          "rms": 3.6269727551283916e-05,
+          "baseline_weight": 0.68359375,
+          "candidate_weight": 0.84375
+        },
+        {
+          "frame": 44,
+          "rms": 3.4332275390625e-05,
+          "baseline_weight": 0.84375,
+          "candidate_weight": 0.95703125
+        },
+        {
+          "frame": 45,
+          "rms": 3.366889063051793e-05,
+          "baseline_weight": 0.95703125,
+          "candidate_weight": 1.0
+        },
+        {
+          "frame": 97,
+          "rms": 7.338708214678229e-05,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.04296875
+        },
+        {
+          "frame": 98,
+          "rms": 3.539660861102919e-05,
+          "baseline_weight": 0.04296875,
+          "candidate_weight": 0.15625
+        },
+        {
+          "frame": 99,
+          "rms": 3.2925942424072396e-05,
+          "baseline_weight": 0.15625,
+          "candidate_weight": 0.31640625
+        },
+        {
+          "frame": 100,
+          "rms": 3.6589290796758416e-05,
+          "baseline_weight": 0.31640625,
+          "candidate_weight": 0.5
+        },
+        {
+          "frame": 101,
+          "rms": 3.4395794918365024e-05,
+          "baseline_weight": 0.5,
+          "candidate_weight": 0.68359375
+        },
+        {
+          "frame": 102,
+          "rms": 2.0329151297720684e-05,
+          "baseline_weight": 0.68359375,
+          "candidate_weight": 0.84375
+        }
+      ]
+    },
+    {
+      "gain": 0.1,
+      "speech_frames": 103,
+      "changed_envelope_frames": 12,
+      "changed_frames_above_observer_quiet_threshold": 3,
+      "max_additional_close_weight": 0.34375,
+      "changed_frame_details": [
+        {
+          "frame": 37,
+          "rms": 2.1980072465344136e-05,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.04296875
+        },
+        {
+          "frame": 38,
+          "rms": 2.9548517961177193e-06,
+          "baseline_weight": 0.04296875,
+          "candidate_weight": 0.15625
+        },
+        {
+          "frame": 39,
+          "rms": 0.0,
+          "baseline_weight": 0.15625,
+          "candidate_weight": 0.31640625
+        },
+        {
+          "frame": 40,
+          "rms": 0.0,
+          "baseline_weight": 0.31640625,
+          "candidate_weight": 0.5
+        },
+        {
+          "frame": 41,
+          "rms": 0.0,
+          "baseline_weight": 0.5,
+          "candidate_weight": 0.68359375
+        },
+        {
+          "frame": 42,
+          "rms": 0.0,
+          "baseline_weight": 0.68359375,
+          "candidate_weight": 0.84375
+        },
+        {
+          "frame": 43,
+          "rms": 0.0,
+          "baseline_weight": 0.84375,
+          "candidate_weight": 0.95703125
+        },
+        {
+          "frame": 44,
+          "rms": 0.0,
+          "baseline_weight": 0.95703125,
+          "candidate_weight": 1.0
+        },
+        {
+          "frame": 48,
+          "rms": 0.00010152399497779941,
+          "baseline_weight": 0.84375,
+          "candidate_weight": 1.0
+        },
+        {
+          "frame": 49,
+          "rms": 0.0017483332302194493,
+          "baseline_weight": 0.5,
+          "candidate_weight": 0.84375
+        },
+        {
+          "frame": 50,
+          "rms": 0.016082494442114067,
+          "baseline_weight": 0.15625,
+          "candidate_weight": 0.5
+        },
+        {
+          "frame": 51,
+          "rms": 0.015186665072546282,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.15625
+        }
+      ]
+    },
+    {
+      "gain": 0.01,
+      "speech_frames": 103,
+      "changed_envelope_frames": 36,
+      "changed_frames_above_observer_quiet_threshold": 3,
+      "max_additional_close_weight": 0.80078125,
+      "changed_frame_details": [
+        {
+          "frame": 10,
+          "rms": 2.2341233008340946e-05,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.04296875
+        },
+        {
+          "frame": 18,
+          "rms": 8.12987078416639e-05,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.04296875
+        },
+        {
+          "frame": 19,
+          "rms": 0.00012122097177305933,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.15625
+        },
+        {
+          "frame": 24,
+          "rms": 0.00018636660448445694,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.04296875
+        },
+        {
+          "frame": 25,
+          "rms": 7.579641239636104e-05,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.15625
+        },
+        {
+          "frame": 26,
+          "rms": 0.00016121327674190855,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.31640625
+        },
+        {
+          "frame": 27,
+          "rms": 0.0002954556296162371,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.5
+        },
+        {
+          "frame": 28,
+          "rms": 0.0006606676826452298,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.15625
+        },
+        {
+          "frame": 34,
+          "rms": 0.0002503586716356047,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.04296875
+        },
+        {
+          "frame": 35,
+          "rms": 0.0001086284864051906,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.15625
+        },
+        {
+          "frame": 36,
+          "rms": 1.9187585967955464e-05,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.31640625
+        },
+        {
+          "frame": 37,
+          "rms": 0.0,
+          "baseline_weight": 0.04296875,
+          "candidate_weight": 0.5
+        },
+        {
+          "frame": 38,
+          "rms": 0.0,
+          "baseline_weight": 0.15625,
+          "candidate_weight": 0.68359375
+        },
+        {
+          "frame": 39,
+          "rms": 0.0,
+          "baseline_weight": 0.31640625,
+          "candidate_weight": 0.84375
+        },
+        {
+          "frame": 40,
+          "rms": 0.0,
+          "baseline_weight": 0.5,
+          "candidate_weight": 0.95703125
+        },
+        {
+          "frame": 41,
+          "rms": 0.0,
+          "baseline_weight": 0.68359375,
+          "candidate_weight": 1.0
+        },
+        {
+          "frame": 42,
+          "rms": 0.0,
+          "baseline_weight": 0.84375,
+          "candidate_weight": 1.0
+        },
+        {
+          "frame": 43,
+          "rms": 0.0,
+          "baseline_weight": 0.95703125,
+          "candidate_weight": 1.0
+        },
+        {
+          "frame": 49,
+          "rms": 0.00017459898972189308,
+          "baseline_weight": 0.84375,
+          "candidate_weight": 1.0
+        },
+        {
+          "frame": 50,
+          "rms": 0.0016082317592218077,
+          "baseline_weight": 0.5,
+          "candidate_weight": 0.84375
+        },
+        {
+          "frame": 51,
+          "rms": 0.00151874495813775,
+          "baseline_weight": 0.15625,
+          "candidate_weight": 0.5
+        },
+        {
+          "frame": 52,
+          "rms": 0.001369186732030077,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.15625
+        },
+        {
+          "frame": 80,
+          "rms": 0.00011973532011477241,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.04296875
+        },
+        {
+          "frame": 87,
+          "rms": 0.0002350144554049099,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.04296875
+        },
+        {
+          "frame": 90,
+          "rms": 0.00023820333301288635,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.04296875
+        },
+        {
+          "frame": 91,
+          "rms": 0.00014406228340095408,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.15625
+        },
+        {
+          "frame": 92,
+          "rms": 0.0002282770431576108,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.31640625
+        },
+        {
+          "frame": 93,
+          "rms": 0.00016940863972473514,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.5
+        },
+        {
+          "frame": 94,
+          "rms": 4.856815271881633e-05,
+          "baseline_weight": 0.0,
+          "candidate_weight": 0.68359375
+        },
+        {
+          "frame": 95,
+          "rms": 7.0339542063086605e-06,
+          "baseline_weight": 0.04296875,
+          "candidate_weight": 0.84375
+        },
+        {
+          "frame": 96,
+          "rms": 0.0,
+          "baseline_weight": 0.15625,
+          "candidate_weight": 0.95703125
+        },
+        {
+          "frame": 97,
+          "rms": 0.0,
+          "baseline_weight": 0.31640625,
+          "candidate_weight": 1.0
+        },
+        {
+          "frame": 98,
+          "rms": 0.0,
+          "baseline_weight": 0.5,
+          "candidate_weight": 1.0
+        },
+        {
+          "frame": 99,
+          "rms": 0.0,
+          "baseline_weight": 0.68359375,
+          "candidate_weight": 1.0
+        },
+        {
+          "frame": 100,
+          "rms": 0.0,
+          "baseline_weight": 0.84375,
+          "candidate_weight": 1.0
+        },
+        {
+          "frame": 101,
+          "rms": 0.0,
+          "baseline_weight": 0.95703125,
+          "candidate_weight": 1.0
+        }
+      ]
+    }
+  ],
+  "limitation": "Envelope regression control only. Quiet speech and visual articulation still require rendered acceptance; 0.01 gain is deliberately far quieter than normal fixture."
+}

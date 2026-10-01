@@ -1,0 +1,125 @@
+{
+  "provider_rtc": {
+    "samples": 127,
+    "overall_rtt_ms_median": 57.0,
+    "around_stall": [
+      {
+        "at_s": 94.161,
+        "rtt_ms": 56.0,
+        "availableOutgoingBitrate": 58000
+      },
+      {
+        "at_s": 95.16,
+        "rtt_ms": 56.0,
+        "availableOutgoingBitrate": 76972
+      },
+      {
+        "at_s": 96.16,
+        "rtt_ms": 56.0,
+        "availableOutgoingBitrate": 76972
+      },
+      {
+        "at_s": 97.161,
+        "rtt_ms": 56.0,
+        "availableOutgoingBitrate": 76972
+      },
+      {
+        "at_s": 98.16,
+        "rtt_ms": 55.0,
+        "availableOutgoingBitrate": 76972
+      },
+      {
+        "at_s": 99.16,
+        "rtt_ms": 55.0,
+        "availableOutgoingBitrate": 40000
+      },
+      {
+        "at_s": 100.16,
+        "rtt_ms": 55.0,
+        "availableOutgoingBitrate": 45800
+      }
+    ]
+  },
+  "atlas_outgoing_rtc": {
+    "samples": 128,
+    "overall_rtt_ms_median": 9.0,
+    "around_stall": [
+      {
+        "at_s": 94.899,
+        "rtt_ms": 98.0,
+        "availableOutgoingBitrate": 272973199
+      },
+      {
+        "at_s": 95.9,
+        "rtt_ms": 30.0,
+        "availableOutgoingBitrate": 294812055
+      },
+      {
+        "at_s": 96.9,
+        "rtt_ms": 30.0,
+        "availableOutgoingBitrate": 318398019
+      },
+      {
+        "at_s": 97.9,
+        "rtt_ms": 18.0,
+        "availableOutgoingBitrate": 343870861
+      },
+      {
+        "at_s": 98.901,
+        "rtt_ms": 18.0,
+        "availableOutgoingBitrate": 371381530
+      },
+      {
+        "at_s": 99.901,
+        "rtt_ms": 18.0,
+        "availableOutgoingBitrate": 401093052
+      },
+      {
+        "at_s": 100.901,
+        "rtt_ms": 18.0,
+        "availableOutgoingBitrate": 433181496
+      }
+    ]
+  },
+  "atlas_return_video_rtc": {
+    "samples": 128,
+    "overall_rtt_ms_median": 9.0,
+    "around_stall": [
+      {
+        "at_s": 94.899,
+        "rtt_ms": 98.0,
+        "availableOutgoingBitrate": 272973199
+      },
+      {
+        "at_s": 95.901,
+        "rtt_ms": 30.0,
+        "availableOutgoingBitrate": 294812055
+      },
+      {
+        "at_s": 96.901,
+        "rtt_ms": 30.0,
+        "availableOutgoingBitrate": 318398019
+      },
+      {
+        "at_s": 97.9,
+        "rtt_ms": 18.0,
+        "availableOutgoingBitrate": 343870861
+      },
+      {
+        "at_s": 98.901,
+        "rtt_ms": 18.0,
+        "availableOutgoingBitrate": 371381530
+      },
+      {
+        "at_s": 99.901,
+        "rtt_ms": 18.0,
+        "availableOutgoingBitrate": 401093052
+      },
+      {
+        "at_s": 100.901,
+        "rtt_ms": 18.0,
+        "availableOutgoingBitrate": 433181496
+      }
+    ]
+  }
+}
