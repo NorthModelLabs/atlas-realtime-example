@@ -79,3 +79,16 @@ describe streamed audio and asynchronous clearing. OpenAI's
 supports short-lived browser credentials; provider connection/microphone
 integration is not implemented here. Preserve `gpt-realtime-2.1` and the existing
 prompt when that integration is tested.
+
+`pcm_frames.py` is the experimental CPU-side 24→16-kHz adapter. It flushes
+resampler state at every turn boundary and pads only the final partial 40-ms
+frame. The full simulated-model WebRTC test reproduced a missing 10-ms tail
+without it and received that tail with it, preserving longer-turn durations.
+The adapter requires a native-16-kHz downstream sink with the same explicit end
+and verified clear contract; it does not make the standard SDK clear a barrier.
+See [rendered-path evidence](../../docs/voice-stage-probe/RENDERED-PATH.md).
+
+Additional conversion checks require the pinned LiveKit SDK (1.1.5); run
+`python3 experiments/pcm-bridge/sdk-tests/frames_contract.py` in that environment.
+They check exact sample counts and padding, and tolerate at most two PCM16 LSBs
+between independent resamplers. They are separate from the no-SDK local suite.

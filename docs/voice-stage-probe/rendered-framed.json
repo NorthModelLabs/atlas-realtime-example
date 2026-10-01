@@ -1,0 +1,95 @@
+{
+  "build_id": "db8cc3ad-e973-42a8-a355-b76401245288",
+  "records": [
+    {
+      "kind": "RENDERED_RESULT",
+      "data": {
+        "case": 0,
+        "mode": "ahead",
+        "input_ms": 10.0,
+        "voiced_samples_16khz": 640,
+        "duration_within_one_frame": true,
+        "input_to_first_pre_encode_ms": 623.1,
+        "max_pre_encode_gap_ms": 0,
+        "remote_audio_frames": 88,
+        "remote_nonzero_frames": 5,
+        "remote_video_frames": 13,
+        "rooms_connected": true
+      }
+    },
+    {
+      "kind": "RENDERED_RESULT",
+      "data": {
+        "case": 1,
+        "mode": "ahead",
+        "input_ms": 400.0,
+        "voiced_samples_16khz": 6400,
+        "duration_within_one_frame": true,
+        "input_to_first_pre_encode_ms": 754.9,
+        "max_pre_encode_gap_ms": 80.5,
+        "remote_audio_frames": 157,
+        "remote_nonzero_frames": 49,
+        "remote_video_frames": 24,
+        "rooms_connected": true
+      }
+    },
+    {
+      "kind": "RENDERED_RESULT",
+      "data": {
+        "case": 2,
+        "mode": "paced",
+        "input_ms": 2000.0,
+        "voiced_samples_16khz": 32000,
+        "duration_within_one_frame": true,
+        "input_to_first_pre_encode_ms": 1618.1,
+        "max_pre_encode_gap_ms": 119.1,
+        "remote_audio_frames": 394,
+        "remote_nonzero_frames": 202,
+        "remote_video_frames": 60,
+        "rooms_connected": true
+      }
+    },
+    {
+      "kind": "RENDERED_RESULT",
+      "data": {
+        "case": 3,
+        "mode": "ahead",
+        "input_ms": 2000.0,
+        "voiced_samples_16khz": 32000,
+        "duration_within_one_frame": true,
+        "input_to_first_pre_encode_ms": 836.0,
+        "max_pre_encode_gap_ms": 80.1,
+        "remote_audio_frames": 318,
+        "remote_nonzero_frames": 203,
+        "remote_video_frames": 48,
+        "rooms_connected": true
+      }
+    },
+    {
+      "kind": "RENDERED_RESULT",
+      "data": {
+        "case": 4,
+        "mode": "ahead",
+        "input_ms": 2000.0,
+        "voiced_samples_16khz": 32000,
+        "duration_within_one_frame": true,
+        "input_to_first_pre_encode_ms": 730.6,
+        "max_pre_encode_gap_ms": 40.7,
+        "remote_audio_frames": 298,
+        "remote_nonzero_frames": 201,
+        "remote_video_frames": 45,
+        "rooms_connected": true
+      }
+    },
+    {
+      "kind": "RENDERED_COMPLETE",
+      "data": {
+        "cases": 5,
+        "duration_checks_passed": true,
+        "actual_media_received": true,
+        "per_turn_resampling": true,
+        "scope": "pinned runner and SDK, 24-to-16kHz resampling and real WebRTC media; simulated model, private local network, no browser/provider/production"
+      }
+    }
+  ]
+}
