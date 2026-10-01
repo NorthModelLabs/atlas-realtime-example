@@ -1,0 +1,15 @@
+{
+  "observed_at": "2026-10-01T09:59:41.165604+00:00",
+  "command": "python3 -B tests/diagnostics/test_renderer_input_capture.py",
+  "tests": 4,
+  "result": "passed",
+  "actual_image_execution": false,
+  "production_changes": false,
+  "active_owned_sessions": 0,
+  "new_staging_resources": 0,
+  "cloud_read_status": "gcloud refresh requires interactive reauthentication",
+  "artifacts": {
+    "scripts/diagnostics/renderer_input_capture.py": "3886cc0e2ea288559fc1a84eef523d4a5f282c0e2ad7fcf8582c2925aa4dc9e6",
+    "tests/diagnostics/test_renderer_input_capture.py": "131ed9e8321b7f96cfe59d2c1fdace75ff343c34ad5773fb7289f3e1b3729100"
+  }
+}
