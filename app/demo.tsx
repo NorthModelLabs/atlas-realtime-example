@@ -6,7 +6,7 @@ import { flushSync } from "react-dom";
 import { useAtlasSession } from "@northmodellabs/atlas-react";
 import { LocalAudioTrack, Track, RoomEvent, type RemoteTrack } from "livekit-client";
 import { useRealtimeVoice } from "@/app/lib/use-realtime-voice";
-import { probeAudio, probeStats } from "@/app/lib/voice-diagnostics";
+import { probeAudio, probeScheduler, probeStats } from "@/app/lib/voice-diagnostics";
 import { observeReturnedSpeech } from "@/app/lib/returned-speech";
 
 const DEFAULT_FACE_ID = "enterprise-b1450303";
@@ -606,7 +606,7 @@ export default function DemoPage({
     const destination = audioCtx.createMediaStreamDestination();
     const mediaTrack = destination.stream.getAudioTracks()[0];
     const livekitTrack = new LocalAudioTrack(mediaTrack);
-    const probes = [probeAudio(audioCtx, destination.stream, "atlas_outgoing_audio"), probeStats(() => livekitTrack.getRTCStatsReport(), "atlas_outgoing_rtc")];
+    const probes = [probeScheduler(audioCtx), probeAudio(audioCtx, destination.stream, "atlas_outgoing_audio"), probeStats(() => livekitTrack.getRTCStatsReport(), "atlas_outgoing_rtc")];
     const observed = new Set<RemoteTrack>();
     const speechObservers = new Map<RemoteTrack, () => void>();
     const speakingTracks = new Set<RemoteTrack>();

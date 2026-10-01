@@ -1,0 +1,8 @@
+{
+  "deployment_id": "dpl_4LtUQMcH16Dut7BtEHp899jt6NLB",
+  "url": "https://demo-atlas-m10lsid08-north-model-labs.vercel.app",
+  "target": "preview",
+  "diagnostics": true,
+  "production_promoted": false,
+  "owned_session_delete_http_status": 200
+}

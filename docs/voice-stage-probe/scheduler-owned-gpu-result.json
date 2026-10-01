@@ -1,0 +1,38 @@
+{
+  "scope": "one completed owned synthetic browser session on pinned main worker 5; read-only logs; metrics are whole batch wall time, not pure GPU execution",
+  "render_batches": 76,
+  "batch_wall_ms": {
+    "min": 1296,
+    "median": 1316.0,
+    "max": 1351
+  },
+  "frames_per_batch": {
+    "32": 76
+  },
+  "submission_queue_delay_ms": {
+    "min": 0,
+    "median": 1224,
+    "max": 1322
+  },
+  "submission_input_lag_ms": {
+    "min": 1200,
+    "median": 1315,
+    "max": 1403
+  },
+  "speech_backpressure_wait_ms": {
+    "min": 1,
+    "median": 25.0,
+    "max": 132
+  },
+  "event_counts": {
+    "gpu_render_batch_timing": 77,
+    "gpu_warmup_batch_done": 1,
+    "gpu_startup_warmup_done": 1,
+    "gpu_batch_submitted": 77,
+    "gpu_first_speaking_frame": 1,
+    "audio_queue_silence_drop": 1,
+    "gpu_batch_done": 76,
+    "audio_queue_speech_backpressure": 1,
+    "audio_queue_speech_backpressure_released": 10
+  }
+}

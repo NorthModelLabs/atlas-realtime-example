@@ -1,0 +1,149 @@
+{
+  "scheduler": {
+    "samples": 87,
+    "max_delay_ms": 9,
+    "max_long_task_ms": 0,
+    "hidden_samples": 0,
+    "suspended_samples": 0,
+    "stalls": []
+  },
+  "scope": "owned instrumented preview, synthetic microphone fixture, actual provider and public Atlas path; small sample, not user network",
+  "turns": [
+    {
+      "turn": 1,
+      "provider_ms": 1392,
+      "bridge_ms": 19,
+      "atlas_ms": 2099,
+      "e2e_ms": 3510
+    },
+    {
+      "turn": 2,
+      "provider_ms": 1274,
+      "bridge_ms": 18,
+      "atlas_ms": 2162,
+      "e2e_ms": 3454
+    },
+    {
+      "turn": 3,
+      "provider_ms": 1373,
+      "bridge_ms": 40,
+      "atlas_ms": 2137,
+      "e2e_ms": 3550
+    },
+    {
+      "turn": 4,
+      "provider_ms": 1254,
+      "bridge_ms": 20,
+      "atlas_ms": 2120,
+      "e2e_ms": 3394
+    }
+  ],
+  "warm_turn_median_e2e_ms": 3454,
+  "transport": {
+    "provider_rtc:audio": {
+      "insertedSamplesForDeceleration_delta": 480,
+      "removedSamplesForAcceleration_delta": 0,
+      "packetsReceived_delta": 4346,
+      "packetsLost_delta": 4,
+      "concealedSamples_delta": 7290,
+      "silentConcealedSamples_delta": 360,
+      "concealmentEvents_delta": 8,
+      "totalSamplesReceived_delta": 4176000,
+      "mean_jitter_buffer_ms": 138.1,
+      "jitterBufferTargetDelay_mean_ms": 132.4,
+      "jitterBufferMinimumDelay_mean_ms": 132.4,
+      "max_jitter_ms": 20.0,
+      "interruption_increments": [
+        {
+          "since_first_s": 2.07,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 30.07,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 34.07,
+          "field": "concealmentEvents",
+          "increment": 2
+        },
+        {
+          "since_first_s": 48.07,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 49.07,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 63.07,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 65.07,
+          "field": "concealmentEvents",
+          "increment": 1
+        }
+      ]
+    },
+    "atlas_return_audio_rtc:audio": {
+      "insertedSamplesForDeceleration_delta": 1113,
+      "removedSamplesForAcceleration_delta": 214,
+      "packetsReceived_delta": 1699,
+      "packetsLost_delta": 2,
+      "concealedSamples_delta": 21490,
+      "silentConcealedSamples_delta": 10843,
+      "concealmentEvents_delta": 4,
+      "totalSamplesReceived_delta": 4224000,
+      "mean_jitter_buffer_ms": 117.9,
+      "jitterBufferTargetDelay_mean_ms": 117.7,
+      "jitterBufferMinimumDelay_mean_ms": 117.7,
+      "max_jitter_ms": 24.0,
+      "interruption_increments": [
+        {
+          "since_first_s": 2.0,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 18.0,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 54.01,
+          "field": "concealmentEvents",
+          "increment": 1
+        },
+        {
+          "since_first_s": 74.01,
+          "field": "concealmentEvents",
+          "increment": 1
+        }
+      ]
+    },
+    "atlas_return_video_rtc:video": {
+      "packetsReceived_delta": 5091,
+      "packetsLost_delta": 2,
+      "framesDecoded_delta": 2187,
+      "framesDropped_delta": 0,
+      "freezeCount_delta": 0,
+      "totalFreezesDuration_delta": 0,
+      "mean_jitter_buffer_ms": 33.5,
+      "jitterBufferTargetDelay_mean_ms": 43.0,
+      "jitterBufferMinimumDelay_mean_ms": 43.0,
+      "max_jitter_ms": 28.0,
+      "interruption_increments": []
+    },
+    "atlas_outgoing_rtc:audio": {
+      "packetsSent_delta": 4379,
+      "interruption_increments": []
+    }
+  },
+  "provider_errors": 0
+}
