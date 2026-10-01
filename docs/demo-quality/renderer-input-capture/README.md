@@ -40,3 +40,13 @@ This strengthens the causal evidence that very low residual audio can hold the m
 No production remedy was promoted. Previous higher-threshold candidates remain rejected because of quiet-speech regressions. The next comparison must preserve quiet articulation and existing response/audio timing. The goal remains active.
 
 Production safeguards: the staging visual settings match all 53 baseline fields; the original human model hash remains pinned. The public health watcher recorded only HTTP 200 responses through 17:42:48 UTC. A bounded production log sample contained no generation timing events, so no latency or stutter conclusion is drawn from it. No owned staging VM or disk remains.
+
+## Inference outcome accounting — follow-up
+
+The recorder now saves a private outcome for each captured call: requested and returned frame counts, completion time and exception type (without exception text). Cancellation and original return values remain unchanged. Closing while a call is pending makes that capture incomplete even if the call finishes later. A recorder write failure still forwards the original media operation and is explicit in the manifest.
+
+`python3 -B scripts/diagnostics/verify_renderer_capture.py PRIVATE_CAPTURE_DIRECTORY` checks retained PCM hashes and byte counts, normalized/paired correspondence, requested/returned frame counts (including idle), omitted calls, cancellation and incomplete outcomes. It exits nonzero on incomplete evidence. Passing this check **does not prove full transport drain**: input before the inference boundary, segment-end delivery and final playout still require separate accounting. Earlier archived captures lack the new outcome fields and cannot retroactively pass this stricter check.
+
+Ten local recorder tests pass, including partial returns, missing idle frames, cancellation, close during inference, PCM corruption and outcome-write failure. This is isolated test infrastructure only; no application integration, new live capture, production instrumentation or mouth remedy is claimed by these tests. The next runtime capture must retain private PCM and its new outcome receipts before cleanup.
+
+The 18:36:25 UTC read-only release guard again reported ten ready main workers with original image digests, unchanged public demo alias/dashboard snapshot and HTTP 200 for demo, dashboard and API health (`outcome-release-health.json`).

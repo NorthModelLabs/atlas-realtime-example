@@ -44,6 +44,9 @@ class RendererInputCapture:
         self.max_bytes, self.max_calls = max_bytes, max_calls
         self.bytes_written = 0
         self.calls = 0
+        self.calls_observed = 0
+        self.completed_calls = 0
+        self.pending_calls = set()
         self.disabled_reason = None
         self.closed = False
         self.wrapper = self._invoke
@@ -52,6 +55,8 @@ class RendererInputCapture:
     async def _invoke(self, pcm_bytes, generation, *args, **kwargs):
         # Capture failures disable further recording, never alter the delegated
         # media call. The manifest makes incomplete evidence explicit.
+        index = None
+        self.calls_observed += 1
         if not self.disabled_reason and not self.closed:
             try:
                 if type(pcm_bytes) is not bytes:
@@ -66,6 +71,7 @@ class RendererInputCapture:
                 else:
                     index = self.calls
                     self.calls += 1
+                    self.pending_calls.add(index)
                     pcm_name = f"{index:04d}-model-input.pcm"
                     _private_write(self.directory / pcm_name, pcm_bytes)
                     self.bytes_written += len(pcm_bytes)
@@ -77,6 +83,7 @@ class RendererInputCapture:
                         "sample_rate": self.generator._options.audio_sample_rate,
                         "channels": self.generator._options.audio_channels,
                         "sample_format": "signed PCM16 little-endian",
+                        "requested_frames": self.generator._context_window if chunks is None else len(chunks),
                         "paired_audio": None,
                     }
                     if paired is not None:
@@ -96,7 +103,33 @@ class RendererInputCapture:
             except Exception as error:
                 # Avoid putting arguments or private payloads in error text.
                 self.disabled_reason = "capture_error:" + type(error).__name__
-        return await self.original(pcm_bytes, generation, *args, **kwargs)
+        try:
+            result = await self.original(pcm_bytes, generation, *args, **kwargs)
+        except BaseException as error:
+            # Includes cancellation. Record only the type, never private exception
+            # text, and preserve the original exception/traceback for the caller.
+            self._record_outcome(index, None, type(error).__name__)
+            raise
+        else:
+            self._record_outcome(index, result, None)
+            return result
+
+    def _record_outcome(self, index, result, exception_type):
+        if index is None:
+            return
+        try:
+            _private_write(self.directory / f"{index:04d}-outcome.json", (json.dumps({
+                "index": index,
+                "completed_monotonic_ns": time.monotonic_ns(),
+                "returned_frames": result if type(result) is int else None,
+                "exception_type": exception_type,
+                "closed_before_outcome": self.closed,
+            }, indent=2) + "\n").encode())
+            self.completed_calls += 1
+        except Exception as error:
+            self.disabled_reason = self.disabled_reason or "outcome_error:" + type(error).__name__
+        finally:
+            self.pending_calls.discard(index)
 
     def close(self):
         if self.closed:
@@ -109,7 +142,10 @@ class RendererInputCapture:
                 del self.generator._run_inference_streaming
         _private_write(self.directory / "manifest.json", (json.dumps({
             "runner_sha256": EXPECTED_RUNNER_SHA256,
+            "calls_observed": self.calls_observed,
             "calls_reserved": self.calls,
+            "outcomes_written": self.completed_calls,
+            "pending_calls_at_close": sorted(self.pending_calls),
             "pcm_bytes_written": self.bytes_written,
             "max_pcm_bytes": self.max_bytes,
             "max_calls": self.max_calls,
