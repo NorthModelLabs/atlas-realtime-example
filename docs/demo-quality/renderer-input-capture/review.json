@@ -31,5 +31,11 @@
     "The initial collector failure was damaged serial JSON, not excessive generated frame count. The original <500 bound was restored; invalid rows were counted and rejected.",
     "Runtime instrumentation and synthetic consumer pacing make this unsuitable for latency measurement.",
     "No production model, image, configuration, account, key or deployment was changed."
-  ]
+  ],
+  "input_drain_limit": {
+    "input_frame_equivalents_per_trial": 270,
+    "retained_paired_output_frames_per_trial": 256,
+    "unaccounted_trailing_frame_equivalents": 14,
+    "interpretation": "The test stops synthetic input without an explicit segment-end marker. It does not prove full-input drain; the selected tail comparisons are within returned paired frames."
+  }
 }
