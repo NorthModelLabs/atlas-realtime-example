@@ -640,6 +640,9 @@ export default function DemoPage({
       .publishTrack(livekitTrack, {
         name: "tts-audio",
         source: Track.Source.Unknown,
+        // Preview-only comparison: keep quiet synthesized audio continuous.
+        // Do not change the model's gate to mask codec-generated silence tails.
+        ...(process.env.NEXT_PUBLIC_TTS_CONTINUOUS_AUDIO === "true" ? { dtx: false } : {}),
       })
       .then(() => undefined);
 
