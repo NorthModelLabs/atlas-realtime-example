@@ -1,0 +1,66 @@
+{
+  "observed_at": "2026-10-01T17:29:39.474123+00:00",
+  "workers": [
+    {
+      "pod": "avatar-pasteback-main-security-0",
+      "stage_counts": {},
+      "render_batches": [],
+      "limits": "Last 1200 container log lines within ten minutes; only numeric timing and stage counts retained."
+    },
+    {
+      "pod": "avatar-pasteback-main-security-1",
+      "stage_counts": {},
+      "render_batches": [],
+      "limits": "Last 1200 container log lines within ten minutes; only numeric timing and stage counts retained."
+    },
+    {
+      "pod": "avatar-pasteback-main-security-2",
+      "stage_counts": {},
+      "render_batches": [],
+      "limits": "Last 1200 container log lines within ten minutes; only numeric timing and stage counts retained."
+    },
+    {
+      "pod": "avatar-pasteback-main-security-3",
+      "stage_counts": {},
+      "render_batches": [],
+      "limits": "Last 1200 container log lines within ten minutes; only numeric timing and stage counts retained."
+    },
+    {
+      "pod": "avatar-pasteback-main-security-4",
+      "stage_counts": {},
+      "render_batches": [],
+      "limits": "Last 1200 container log lines within ten minutes; only numeric timing and stage counts retained."
+    },
+    {
+      "pod": "avatar-pasteback-main-security-5",
+      "stage_counts": {},
+      "render_batches": [],
+      "limits": "Last 1200 container log lines within ten minutes; only numeric timing and stage counts retained."
+    },
+    {
+      "pod": "avatar-pasteback-main-security-6",
+      "stage_counts": {},
+      "render_batches": [],
+      "limits": "Last 1200 container log lines within ten minutes; only numeric timing and stage counts retained."
+    },
+    {
+      "pod": "avatar-pasteback-main-security-7",
+      "stage_counts": {},
+      "render_batches": [],
+      "limits": "Last 1200 container log lines within ten minutes; only numeric timing and stage counts retained."
+    },
+    {
+      "pod": "avatar-pasteback-main-security-8",
+      "stage_counts": {},
+      "render_batches": [],
+      "limits": "Last 1200 container log lines within ten minutes; only numeric timing and stage counts retained."
+    },
+    {
+      "pod": "avatar-pasteback-main-security-9",
+      "stage_counts": {},
+      "render_batches": [],
+      "limits": "Last 1200 container log lines within ten minutes; only numeric timing and stage counts retained."
+    }
+  ],
+  "scope": "Read-only aggregate; no account, session, transcript or raw logs retained; batching time is not user response latency."
+}

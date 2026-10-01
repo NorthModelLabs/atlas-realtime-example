@@ -1,0 +1,19 @@
+{
+  "observed_at": "2026-10-01T17:19:51.629964+00:00",
+  "checks": [
+    {
+      "url": "https://demo.northmodellabs.com",
+      "status": 200
+    },
+    {
+      "url": "https://dashboard.northmodellabs.com",
+      "status": 200
+    },
+    {
+      "url": "https://api.atlasv1.com/health",
+      "status": 200
+    }
+  ],
+  "scope": "Public HTTP availability only; not full signed-in generation acceptance",
+  "vercel_metadata_check": "403 with saved session"
+}

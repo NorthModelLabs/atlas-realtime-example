@@ -1,0 +1,35 @@
+{
+  "accepted_fix": false,
+  "recorder_runtime_verified": true,
+  "trials": 3,
+  "inference_calls": 24,
+  "paired_audio_frames": 768,
+  "all_full_length_input_pair_hashes_equal": true,
+  "recorder_errors": 0,
+  "retained_frames": 22,
+  "expected_selected_frames": 24,
+  "invalid_serial_records": 1,
+  "missing_frames": [
+    {
+      "trial": 1,
+      "after_last_voiced_frame_ms": 800
+    },
+    {
+      "trial": 2,
+      "after_last_voiced_frame_ms": 400
+    }
+  ],
+  "visual_review": {
+    "clean_trial_0": "Mouth settled by 400 ms and remains closed at later selected frames.",
+    "residual_trial_1": "Mouth visibly open at 200, 400, 1280 and 2000 ms; closed at 3000 ms. The 800 ms frame is missing.",
+    "clean_repeat_trial_2": "Open at 200 ms; closed at 800 ms and later selected frames. The 400 ms frame is missing."
+  },
+  "causal_scope": "Adding a two-second six-unit synthetic PCM tail caused sustained mouth opening through the exact runner queue/resampler and unchanged model. Does not establish actual provider/codec tail provenance.",
+  "notes": [
+    "Raw PCM captures were ephemeral in the private runner container; retained artifacts contain their hashes and RMS envelopes.",
+    "All 24 full-length input hashes equal the corresponding paired audio hashes; these calls show no normalization divergence.",
+    "The initial collector failure was damaged serial JSON, not excessive generated frame count. The original <500 bound was restored; invalid rows were counted and rejected.",
+    "Runtime instrumentation and synthetic consumer pacing make this unsuitable for latency measurement.",
+    "No production model, image, configuration, account, key or deployment was changed."
+  ]
+}
