@@ -987,8 +987,7 @@ export default function DemoPage({
       <div className="teacher-ui min-h-screen w-screen bg-[#edf1f5] text-[#111827]">
         {voiceAlert}
         {hiddenFaceInputs}
-        {voiceAlert}
-      {formatPicker("global-format-picker")}
+        {formatPicker("global-format-picker")}
         <header className="teacher-topbar">
           <div className="teacher-heading">
             <span>Interactive lesson · Calculus</span>
