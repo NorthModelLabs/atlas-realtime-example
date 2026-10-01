@@ -1,0 +1,9 @@
+{
+  "startup_bytes": 14140,
+  "startup_sha256": "e34518cfd200840613f267ec85e7e0d4e7d4e4f59353d4e5eda45a14a5420016",
+  "face_sha256": "650077d085e32b8d8834a5b5320a0fd1d379d1346f5ef4d9e8f476b7cf123e4f",
+  "pcm_sha256": "962289ba66028ad5b6de2b50b0f9152b16f2ba83c3b88e970aec006910b48b0b",
+  "fixture_image": "us-central1-docker.pkg.dev/atlas-stg-isolated-20260831/atlas-stg-runtime/voice-probe-fixtures@sha256:278221fd11b58e73e27a71d24441be3f228e676ae700361dbd52a1380883a82f",
+  "loopback_only": true,
+  "registration": false
+}

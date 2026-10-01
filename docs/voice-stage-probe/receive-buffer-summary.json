@@ -1,0 +1,27 @@
+{
+  "source": "warm-events.json",
+  "results": [
+    {
+      "stage": "atlas_return_audio_rtc",
+      "kind": "audio",
+      "observations": 127,
+      "mean_jitter_buffer_ms": 157.7,
+      "max_network_jitter_ms": 83.0
+    },
+    {
+      "stage": "atlas_return_video_rtc",
+      "kind": "video",
+      "observations": 127,
+      "mean_jitter_buffer_ms": 98.4,
+      "max_network_jitter_ms": 38.0
+    },
+    {
+      "stage": "provider_rtc",
+      "kind": "audio",
+      "observations": 126,
+      "mean_jitter_buffer_ms": 239.6,
+      "max_network_jitter_ms": 28.0
+    }
+  ],
+  "limits": "Whole-session receive buffering averages, not per-response or end-to-end latency. Does not cover sender queues, GPU processing or browser scheduling."
+}

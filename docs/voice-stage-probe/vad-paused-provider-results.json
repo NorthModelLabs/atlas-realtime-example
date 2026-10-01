@@ -1,0 +1,255 @@
+[
+  {
+    "mode": "server_vad",
+    "trial": 1,
+    "pause_ms": 900,
+    "events": [
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -5878,
+        "status": null
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": -4319,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": -4297,
+        "status": "in_progress"
+      },
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -3894,
+        "status": null
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": -3894,
+        "status": "cancelled"
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": -2243,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": -2237,
+        "status": "in_progress"
+      },
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -2126,
+        "status": null
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": -2118,
+        "status": "cancelled"
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": 637,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": 653,
+        "status": "in_progress"
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": 1527,
+        "status": "completed"
+      }
+    ],
+    "responses": [
+      {
+        "created_before_full_question": true,
+        "status": "cancelled"
+      },
+      {
+        "created_before_full_question": true,
+        "status": "cancelled"
+      },
+      {
+        "created_before_full_question": false,
+        "first_audio_after_final_speech_ms": 1226,
+        "transcript": "Two plus two equals four.",
+        "status": "completed"
+      }
+    ],
+    "input_transcripts": [
+      "What is",
+      "Two plus two?",
+      "Please answer in one short sentence."
+    ]
+  },
+  {
+    "mode": "semantic_vad",
+    "trial": 1,
+    "pause_ms": 900,
+    "events": [
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -5800,
+        "status": null
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": 783,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": 789,
+        "status": "in_progress"
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": 1876,
+        "status": "completed"
+      }
+    ],
+    "responses": [
+      {
+        "created_before_full_question": false,
+        "first_audio_after_final_speech_ms": 1557,
+        "transcript": "Two plus two equals four.",
+        "status": "completed"
+      }
+    ],
+    "input_transcripts": [
+      "What is 2 plus 2? Please answer in one short sentence."
+    ]
+  },
+  {
+    "mode": "server_vad",
+    "trial": 2,
+    "pause_ms": 900,
+    "events": [
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -5813,
+        "status": null
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": -4291,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": -4286,
+        "status": "in_progress"
+      },
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -3961,
+        "status": null
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": -3787,
+        "status": "cancelled"
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": -2281,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": -2280,
+        "status": "in_progress"
+      },
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -2106,
+        "status": null
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": -2075,
+        "status": "cancelled"
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": 655,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": 663,
+        "status": "in_progress"
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": 1545,
+        "status": "completed"
+      }
+    ],
+    "responses": [
+      {
+        "created_before_full_question": true,
+        "transcript": "What is\u2026",
+        "status": "cancelled"
+      },
+      {
+        "created_before_full_question": true,
+        "status": "cancelled"
+      },
+      {
+        "created_before_full_question": false,
+        "first_audio_after_final_speech_ms": 1113,
+        "transcript": "Two plus two equals four.",
+        "status": "completed"
+      }
+    ],
+    "input_transcripts": [
+      "What is",
+      "2 plus 2?",
+      "Please answer in one short sentence."
+    ]
+  },
+  {
+    "mode": "semantic_vad",
+    "trial": 2,
+    "pause_ms": 900,
+    "events": [
+      {
+        "type": "input_audio_buffer.speech_started",
+        "relative_to_final_speech_ms": -5869,
+        "status": null
+      },
+      {
+        "type": "input_audio_buffer.speech_stopped",
+        "relative_to_final_speech_ms": 712,
+        "status": null
+      },
+      {
+        "type": "response.created",
+        "relative_to_final_speech_ms": 715,
+        "status": "in_progress"
+      },
+      {
+        "type": "response.done",
+        "relative_to_final_speech_ms": 1569,
+        "status": "completed"
+      }
+    ],
+    "responses": [
+      {
+        "created_before_full_question": false,
+        "first_audio_after_final_speech_ms": 1337,
+        "transcript": "Two plus two equals four.",
+        "status": "completed"
+      }
+    ],
+    "input_transcripts": [
+      "What is 2 plus 2? Please answer in one short sentence."
+    ]
+  }
+]

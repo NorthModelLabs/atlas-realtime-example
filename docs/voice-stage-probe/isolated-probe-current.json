@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-01T03:11:10.237844+00:00",
+  "status": "RUNNING",
+  "instance_id": "5752044785369117268",
+  "serial_next": 322292,
+  "phases": [
+    {
+      "dashboard_worker_phase": "model-image-ready"
+    },
+    {
+      "dashboard_worker_phase": "sidecar-image-ready"
+    },
+    {
+      "dashboard_worker_phase": "images-ready"
+    }
+  ],
+  "results": [],
+  "project": "atlas-stg-isolated-20260831",
+  "zone": "us-central1-a",
+  "name": "atlas-stg-voice-latency-20260930",
+  "native_create_operation": "operation-1790823610198-65cbe9d2428b0-47775863-ea2a3ad5",
+  "max_run_seconds": 3600,
+  "termination_action": "STOP",
+  "model_compressed_GiB": 19.29,
+  "results_pending": true
+}
