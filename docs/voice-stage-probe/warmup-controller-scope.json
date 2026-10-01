@@ -1,0 +1,9 @@
+{
+  "changed_workerlauncher_methods": [
+    "_run_avatar_service_warmup",
+    "_warmup_loop"
+  ],
+  "renderer_agent_and_model_files_modified": false,
+  "public_fixture_source": "demo public/faces/enterprise-b1450303.jpg",
+  "gcp_model_vm_created": false
+}

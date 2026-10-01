@@ -1,0 +1,6 @@
+{
+  "base_dispatcher_source_sha256": "37243fe60e0bc7760dc4c60d54a4f8caa7175b19fd039ae62a0bb6ecdac8599c",
+  "candidate_dispatcher_source_sha256": "bc4c608860e8910af60ae7a09469f563325b9e4a85a4ddc5327a73182eb96be3",
+  "warmup_face_sha256": "650077d085e32b8d8834a5b5320a0fd1d379d1346f5ef4d9e8f476b7cf123e4f",
+  "production_changes": false
+}

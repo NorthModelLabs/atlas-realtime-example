@@ -1,0 +1,57 @@
+[
+  {
+    "worker": "avatar-pasteback-main-security-0",
+    "fixture": {
+      "fixture_path": "/tmp/avatar.jpg",
+      "sha256": "2b1bfc8db7e1788f5372d6fbb564f0cf5ca6bb0343f11de4639427c64e37ed79",
+      "bytes": 1146169,
+      "format": "png"
+    },
+    "no_face_events_in_tail": 0,
+    "stream_requests_in_tail": 13
+  },
+  {
+    "worker": "avatar-pasteback-main-security-3",
+    "fixture": {
+      "fixture_path": "/tmp/avatar.jpg",
+      "sha256": "3a0d38dba0cfbcbf6b208afc58bb41f97f3219d5deaaebde9a481549b6120830",
+      "bytes": 3599,
+      "format": "png"
+    },
+    "no_face_events_in_tail": 12,
+    "stream_requests_in_tail": 12
+  },
+  {
+    "worker": "avatar-pasteback-main-security-4",
+    "fixture": {
+      "fixture_path": "/tmp/avatar.jpg",
+      "sha256": "3c6546f9b218f05ec1c353a5a954e09fa73ea47693687922d90cd4733d7f900b",
+      "bytes": 3868,
+      "format": "png"
+    },
+    "no_face_events_in_tail": 11,
+    "stream_requests_in_tail": 11
+  },
+  {
+    "worker": "avatar-pasteback-main-security-5",
+    "fixture": {
+      "fixture_path": "/tmp/avatar.jpg",
+      "sha256": "782bbedde5ffd45b1ef761ceb50b025247ff5a592a824a982faadc8c53dd5a97",
+      "bytes": 3404,
+      "format": "png"
+    },
+    "no_face_events_in_tail": 11,
+    "stream_requests_in_tail": 11
+  },
+  {
+    "worker": "avatar-pasteback-main-security-9",
+    "fixture": {
+      "fixture_path": "/tmp/avatar.jpg",
+      "sha256": "6f35181f8ca1e667192bc153872e3d9ef946dabd08c1d52ee1e3ba753dd17018",
+      "bytes": 3720,
+      "format": "png"
+    },
+    "no_face_events_in_tail": 0,
+    "stream_requests_in_tail": 0
+  }
+]
