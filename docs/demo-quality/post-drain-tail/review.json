@@ -1,0 +1,8 @@
+{
+  "reviewed": "2026-10-01",
+  "frames": 12,
+  "complete_sampled_tails": 4,
+  "finding": "Mouth appears closed in every sampled frame, including the first 403-476 ms samples. No persistent mouth opening reproduced in this run.",
+  "appearance": "Human appearance retained in the reviewed frames; no large-eye change observed in these samples.",
+  "limits": "Sparse screenshots cannot rule out intervening motion. Quiet timing is an RMS observer transition, not a manually verified final phoneme. This run does not invalidate earlier intermittent reproductions."
+}

@@ -1,0 +1,79 @@
+[
+  {
+    "at": 1790877088494,
+    "samples": 75,
+    "noisy": 4,
+    "peakRms": 0.00012114454144260759,
+    "meanToRms": 0.07921820400779137,
+    "derivativeToRms": 0.18111202074050248,
+    "stats_delta": {
+      "packetsReceived": 150,
+      "packetsLost": 0,
+      "concealedSamples": 2912,
+      "silentConcealedSamples": 0,
+      "totalSamplesReceived": 144000,
+      "jitterBufferEmittedCount": 141120,
+      "bytesReceived": 12927
+    }
+  },
+  {
+    "at": 1790877106672,
+    "samples": 75,
+    "noisy": 8,
+    "peakRms": 0.00024085180434065117,
+    "meanToRms": 0.0626407912342675,
+    "derivativeToRms": 0.15303289440305345,
+    "stats_delta": {
+      "packetsReceived": 150,
+      "packetsLost": 0,
+      "concealedSamples": 0,
+      "silentConcealedSamples": 0,
+      "totalSamplesReceived": 144000,
+      "jitterBufferEmittedCount": 144960,
+      "bytesReceived": 13221
+    }
+  },
+  {
+    "at": 1790877124650,
+    "samples": 75,
+    "noisy": 4,
+    "peakRms": 0.0004561940297793382,
+    "meanToRms": 0.03157252484174908,
+    "derivativeToRms": 0.2287633575367526,
+    "stats_delta": {
+      "packetsReceived": 150,
+      "packetsLost": 0,
+      "concealedSamples": 0,
+      "silentConcealedSamples": 0,
+      "totalSamplesReceived": 144000,
+      "jitterBufferEmittedCount": 144000,
+      "bytesReceived": 13251
+    }
+  },
+  {
+    "at": 1790877143269,
+    "samples": 75,
+    "noisy": 3,
+    "peakRms": 0.00024499080394085605,
+    "meanToRms": 0.0769056627671586,
+    "derivativeToRms": 0.14148397274056554,
+    "stats_delta": {
+      "packetsReceived": 105,
+      "packetsLost": 0,
+      "concealedSamples": 480,
+      "silentConcealedSamples": 0,
+      "totalSamplesReceived": 96000,
+      "jitterBufferEmittedCount": 95040,
+      "bytesReceived": 8432
+    }
+  },
+  {
+    "at": 1790877173208,
+    "samples": 18,
+    "noisy": 8,
+    "peakRms": 0.00022582877122806006,
+    "meanToRms": 0.10645143621565419,
+    "derivativeToRms": 0.15016233225452663,
+    "stats_delta": null
+  }
+]

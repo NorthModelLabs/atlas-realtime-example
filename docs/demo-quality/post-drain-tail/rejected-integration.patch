@@ -1,0 +1,73 @@
+diff --git a/app/lib/use-realtime-voice.ts b/app/lib/use-realtime-voice.ts
+index eafe5f8..29811e7 100644
+--- a/app/lib/use-realtime-voice.ts
++++ b/app/lib/use-realtime-voice.ts
+@@ -18,6 +18,9 @@ type Connection = {
+   channel: RTCDataChannel;
+   mic?: MediaStream;
+   source?: MediaStreamAudioSourceNode;
++  tail?: AudioWorkletNode;
++  tailResponseId?: string;
++  tailDrainedId?: string;
+   abort: AbortController;
+   ready: boolean;
+   turns: VoiceResponseQueue;
+@@ -36,7 +39,7 @@ export function useRealtimeVoice(options: Options) {
+     if (c) {
+       c.probes.forEach(cleanup => cleanup());
+       c.abort.abort(); c.mic?.getTracks().forEach(t => t.stop());
+-      c.source?.disconnect(); c.channel.close(); c.peer.close();
++      c.source?.disconnect(); c.tail?.disconnect(); c.channel.close(); c.peer.close();
+     }
+     setConnected(false); setListening(false); setCaptions(emptyCaptions()); opts.current.thinking(false);
+   }, []);
+@@ -52,6 +55,25 @@ export function useRealtimeVoice(options: Options) {
+     try {
+       const output = await opts.current.output();
+       if (!alive()) return;
++      if (process.env.NEXT_PUBLIC_POST_DRAIN_TAIL_EXPERIMENT === "true") {
++        try {
++          await output.context.audioWorklet.addModule("/voice-tail-worklet.js");
++          if (!alive()) return;
++          c.tail = new AudioWorkletNode(output.context, "post-drain-tail", { outputChannelCount: [2] });
++          c.tail.port.onmessage = ({ data }) => voiceProbe("post_drain_tail", data);
++          c.tail.onprocessorerror = () => {
++            if (!alive()) return;
++            c.source?.disconnect(); c.tail?.disconnect(); c.tail = undefined;
++            c.source?.connect(output.destination);
++            voiceProbe("post_drain_tail_unavailable");
++          };
++          c.tail.connect(output.destination);
++        } catch {
++          c.tail?.disconnect(); c.tail = undefined;
++          voiceProbe("post_drain_tail_unavailable");
++        }
++      }
++      if (!alive()) return;
+       c.mic = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true, autoGainControl: true}});
+       if (!alive()) { c.mic.getTracks().forEach(t => t.stop()); return; }
+       c.mic.getAudioTracks().forEach(t => peer.addTrack(t, c.mic!));
+@@ -62,12 +84,22 @@ export function useRealtimeVoice(options: Options) {
+         c.source = output.context.createMediaStreamSource(new MediaStream([event.track]));
+         // Send streaming speech to Atlas. Only the avatar's synchronized return
+         // track plays locally, so users do not hear two voices.
+-        c.source.connect(output.destination);
++        c.source.connect(c.tail || output.destination);
+         c.probes.push(probeAudio(output.context, new MediaStream([event.track]), "provider_audio"));
+       };
+       channel.onmessage = ({data}) => {
+         if (!alive()) return;
+         let event; try { event = JSON.parse(data); } catch { return; }
++        if (event.type === "response.created" && typeof event.response?.id === "string") {
++          c.tailResponseId = event.response.id;
++          c.tailDrainedId = undefined;
++          c.tail?.port.postMessage("active");
++        }
++        if (event.type === "output_audio_buffer.started" && event.response_id === c.tailResponseId) c.tail?.port.postMessage("active");
++        if (event.type === "output_audio_buffer.stopped" && typeof event.response_id === "string" && event.response_id === c.tailResponseId && event.response_id !== c.tailDrainedId) {
++          c.tailDrainedId = event.response_id;
++          c.tail?.port.postMessage("drained");
++        }
+         if (["input_audio_buffer.speech_started", "input_audio_buffer.speech_stopped", "response.created", "response.done", "output_audio_buffer.started", "output_audio_buffer.stopped", "output_audio_buffer.cleared"].includes(event.type)) voiceProbe(event.type, {status: event.response?.status});
+         if (event.type === "response.created" && event.response?.id) c.turns.created(event.response.id);
+         if (event.type === "response.done" && event.response?.id) c.turns.done(event.response.id);
