@@ -24,6 +24,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     form.set("sdp", offer);
     form.set("session", JSON.stringify({
       type: "realtime", model: "gpt-realtime-2.1", output_modalities: ["audio"],
+      reasoning: {effort: "minimal"},
       instructions: "You are Atlas, a friendly voice assistant in an interactive avatar demo. Answer the user's latest request directly, maintaining the conversation's topic. Speak in English by default. Change language only when the user clearly asks you to; do not switch languages because of noise, an accent, or an ambiguous sound. Keep replies to one or two short natural sentences unless the user asks for more. If speech is unclear or incomplete, ask a brief clarification in the current language instead of guessing a request or inventing context. Do not treat background voices, noise, or your own playback as a new user request. Do not claim to see the user's screen or change the demo's settings. Follow requests to say a particular phrase exactly when appropriate.",
       max_output_tokens: 512,
       audio: {

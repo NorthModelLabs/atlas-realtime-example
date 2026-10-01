@@ -1,0 +1,49 @@
+{
+  "settings": [
+    {
+      "setting": "AVATAR_SILENCE_GATE_ENABLED",
+      "default": false
+    },
+    {
+      "setting": "AVATAR_SILENCE_TAIL_FLUSH_ENABLED",
+      "default": false
+    },
+    {
+      "setting": "AVATAR_SEGMENT_LIFECYCLE_ENABLED",
+      "default": false
+    },
+    {
+      "setting": "AVATAR_SPEECH_PREFETCH_ENABLED",
+      "default": false
+    },
+    {
+      "setting": "AVATAR_STARTUP_WARMUP_BATCHES",
+      "default": 1
+    },
+    {
+      "setting": "AVATAR_STARTUP_WARMUP_TIMEOUT",
+      "default": 30.0
+    },
+    {
+      "setting": "AVATAR_SILENCE_RMS_THRESHOLD",
+      "default": 200.0
+    },
+    {
+      "setting": "AVATAR_AUDIO_QUEUE_MAX_FRAMES",
+      "default": 4096
+    },
+    {
+      "setting": "AVATAR_SPEECH_END_SILENCE_FRAMES",
+      "default": 8
+    },
+    {
+      "setting": "AVATAR_SEGMENT_START_IDLE_BRIDGE_FRAMES",
+      "default": 4
+    },
+    {
+      "setting": "AVATAR_SPEECH_PREFETCH_FRAMES",
+      "default": 8
+    }
+  ],
+  "matching_image_sha256": "55807a14915bb9d3b8862fcf8f93d0b05ae939d4916f445d68dd87d5677a7bec"
+}

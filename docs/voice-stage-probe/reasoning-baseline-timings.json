@@ -1,0 +1,30 @@
+[
+  {
+    "turn": 1,
+    "provider_ms": 1568,
+    "bridge_ms": 21,
+    "atlas_ms": 2201,
+    "e2e_ms": 3790
+  },
+  {
+    "turn": 2,
+    "provider_ms": 1612,
+    "bridge_ms": 21,
+    "atlas_ms": 2160,
+    "e2e_ms": 3793
+  },
+  {
+    "turn": 3,
+    "provider_ms": 1486,
+    "bridge_ms": 25,
+    "atlas_ms": 2201,
+    "e2e_ms": 3712
+  },
+  {
+    "turn": 4,
+    "provider_ms": 1568,
+    "bridge_ms": 0,
+    "atlas_ms": 2201,
+    "e2e_ms": 3769
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "prefetch_flag_uses": [
+    {
+      "function": "_inference_loop",
+      "line": 1327,
+      "flag": "_SPEECH_PREFETCH_ENABLED",
+      "ancestor_flags": [
+        [
+          "_SEGMENT_LIFECYCLE_ENABLED",
+          "segment_active"
+        ]
+      ]
+    },
+    {
+      "function": "_inference_loop",
+      "line": 1388,
+      "flag": "_SPEECH_PREFETCH_FRAMES",
+      "ancestor_flags": []
+    }
+  ]
+}
