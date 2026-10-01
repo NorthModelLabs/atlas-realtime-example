@@ -1,0 +1,82 @@
+[
+  {
+    "attempt": "compact",
+    "status": "TERMINATED",
+    "phases": [
+      {
+        "dashboard_worker_phase": "one-l4-ready"
+      },
+      {
+        "dashboard_worker_phase": "private-google-proxy-ready"
+      },
+      {
+        "dashboard_worker_phase": "model-image-ready"
+      },
+      {
+        "dashboard_worker_phase": "fixture-image-ready"
+      },
+      {
+        "dashboard_worker_phase": "controller-image-ready"
+      },
+      {
+        "dashboard_worker_phase": "images-ready"
+      },
+      {
+        "dashboard_worker_phase": "model-egress-denied"
+      },
+      {
+        "dashboard_worker_phase": "model-healthy"
+      },
+      {
+        "dashboard_worker_phase": "failed-bounded-mouth-tail-probe"
+      },
+      {
+        "failure_type": "CalledProcessError",
+        "command": "docker",
+        "exit_code": 1,
+        "runner_error": "Traceback (most recent call last):\n  File \"/probe/runner_probe.py\", line 4, in <module>\n    from PIL import Image\nModuleNotFoundError: No module named 'PIL'\n"
+      }
+    ],
+    "complete": null
+  },
+  {
+    "attempt": "baseline-r2",
+    "status": "TERMINATED",
+    "phases": [
+      {
+        "dashboard_worker_phase": "one-l4-ready"
+      },
+      {
+        "dashboard_worker_phase": "private-google-proxy-ready"
+      },
+      {
+        "dashboard_worker_phase": "model-image-ready"
+      },
+      {
+        "dashboard_worker_phase": "fixture-image-ready"
+      },
+      {
+        "dashboard_worker_phase": "controller-image-ready"
+      },
+      {
+        "dashboard_worker_phase": "images-ready"
+      },
+      {
+        "dashboard_worker_phase": "model-egress-denied"
+      },
+      {
+        "dashboard_worker_phase": "model-healthy"
+      },
+      {
+        "dashboard_worker_phase": "failed-bounded-mouth-tail-probe"
+      },
+      {
+        "failure_type": "CalledProcessError",
+        "command": "docker",
+        "exit_code": 1,
+        "runner_error": "Traceback (most recent call last):\n  File \"/probe/runner_probe.py\", line 47, in <module>\n    asyncio.run(asyncio.wait_for(main(),480))\n  File \"/usr/local/lib/python3.11/asyncio/runners.py\", line 190, in run\n    return runner.run(main)\n           ^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/asyncio/runners.py\", line 118, in run\n    return self._loop.run_until_complete(task)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/asyncio/base_events.py\", line 654, in run_until_complete\n    return future.result()\n           ^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/asyncio/tasks.py\", line 489, in wait_for\n    return fut.result()\n           ^^^^^^^^^^^^\n  File \"/probe/runner_probe.py\", line 40, in main\n    rgb=vf.convert(r.rtc.VideoBufferType.RGB24)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.[OPAQUE].py\", line 199, in convert\n    raise Exception(resp.video_convert.error)\nException: invalid request: rgba to Rgb24 is not supported\n"
+      }
+    ],
+    "complete": null
+  }
+]

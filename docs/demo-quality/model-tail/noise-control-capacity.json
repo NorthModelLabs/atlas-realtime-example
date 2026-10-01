@@ -1,0 +1,18 @@
+[
+  {
+    "operation": "operation-1790842163189-65cc2eefc5730-cb2c7580-32e31930",
+    "status": "DONE",
+    "error_codes": [
+      "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS"
+    ],
+    "executed": false
+  },
+  {
+    "operation": "operation-1790842317974-65cc2f8362cc1-76f96b1e-3a78ad5d",
+    "status": "DONE",
+    "error_codes": [
+      "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS"
+    ],
+    "executed": false
+  }
+]

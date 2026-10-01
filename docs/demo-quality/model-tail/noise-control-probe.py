@@ -21,8 +21,14 @@ async def main():
   while not gen._render_queue.empty():gen._render_queue.get_nowait()
  async with r.httpx.AsyncClient(timeout=r.httpx.Timeout(120)) as client:
   gen._http_client=client
-  for trial,leading in enumerate([32,40,48]):
-   pcm=bytes(leading*1280)+speech+bytes(75*1280)
+  speech_frames=[speech[i:i+1280] for i in range(0,len(speech),1280)]
+  speech_rms=[float(np.sqrt(np.mean(np.frombuffer(x,dtype='<i2').astype(float)**2))) for x in speech_frames]
+  speech=speech[:(max(i for i,x in enumerate(speech_rms) if x>32)+1)*1280]
+  for trial,noise_level in enumerate([0,6,2,6]):
+   leading=32
+   signs=np.random.default_rng(71).choice([-1,1],size=32*640)
+   tail=(signs*noise_level).astype('<i2').tobytes()+bytes(75*1280)
+   pcm=bytes(leading*1280)+speech+tail
    pcm+=bytes((-len(pcm))%(32*1280))
    frames=[r.rtc.AudioFrame(data=pcm[i:i+1280],sample_rate=16000,num_channels=1,samples_per_channel=640) for i in range(0,len(pcm),1280)]
    rms=[float(np.sqrt(np.mean(np.frombuffer(bytes(f.data),dtype='<i2').astype(float)**2))) for f in frames]
@@ -38,10 +44,10 @@ async def main():
      pos=offset+index;audio_out.append(bytes(af.data));frame_count+=1
      if pos in selected:
       assert vf.type==r.rtc.VideoBufferType.RGBA
-      pixels=np.frombuffer(bytes(vf.data),dtype=np.uint8).reshape(vf.height,vf.width,4)[:,:,:3];pixels=cv2.resize(pixels,(256,256),interpolation=cv2.INTER_AREA);ok,jpeg=cv2.imencode('.jpg',cv2.cvtColor(pixels,cv2.COLOR_RGB2BGR),[cv2.IMWRITE_JPEG_QUALITY,75]);assert ok
-      row={'trial':trial,'audio_frame':pos,'after_last_voiced_frame_ms':(pos-last)*40,'paired_audio_rms':round(rms[pos],3),'jpeg_b64':base64.b64encode(jpeg.tobytes()).decode()}
+      pixels=np.frombuffer(bytes(vf.data),dtype=np.uint8).reshape(vf.height,vf.width,4)[:,:,:3];pixels=cv2.resize(pixels,(256,256),interpolation=cv2.INTER_AREA);ok,jpeg=cv2.imencode('.jpg',cv2.cvtColor(pixels,cv2.COLOR_RGB2BGR),[cv2.IMWRITE_JPEG_QUALITY,60]);assert ok
+      row={'trial':trial,'noise_level_pcm16':noise_level,'audio_frame':pos,'after_last_voiced_frame_ms':(pos-last)*40,'paired_audio_rms':round(rms[pos],3),'jpeg_b64':base64.b64encode(jpeg.tobytes()).decode()}
       print('TAIL_MODEL_FRAME '+json.dumps(row),flush=True);seen.append(pos)
    assert b''.join(audio_out)==pcm and set(seen)==selected
-   print('TAIL_MODEL_RESULT '+json.dumps({'trial':trial,'leading_frames':leading,'frames':frame_count,'last_voiced_frame':last,'selected_frames':len(seen),'paired_audio_exact':True}),flush=True)
- print('TAIL_MODEL_COMPLETE '+json.dumps({'passed':True,'scope':'Exact model and runner digests; real spoken fixture followed by zeros; raw generated frames paired with exact input audio before LiveKit/browser; no playback pacing or latency benchmark'}),flush=True)
+   print('TAIL_MODEL_RESULT '+json.dumps({'trial':trial,'noise_level_pcm16':noise_level,'leading_frames':leading,'frames':frame_count,'last_voiced_frame':last,'selected_frames':len(seen),'paired_audio_exact':True}),flush=True)
+ print('TAIL_MODEL_COMPLETE '+json.dumps({'passed':True,'scope':'Exact model and runner digests; same spoken fixture followed by controlled low-level noise and then zeros; raw generated frames paired with exact input audio before LiveKit/browser; no playback pacing or latency benchmark'}),flush=True)
 asyncio.run(asyncio.wait_for(main(),480))
