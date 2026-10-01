@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { VoiceResponseQueue } from "./voice-response";
 import { captionEvent, emptyCaptions, type Captions } from "./voice-captions";
 import { probeAudio, probeStats, voiceProbe } from "./voice-diagnostics";
 
@@ -19,7 +20,7 @@ type Connection = {
   source?: MediaStreamAudioSourceNode;
   abort: AbortController;
   ready: boolean;
-  responding: boolean;
+  turns: VoiceResponseQueue;
   captions: Captions;
   probes: Array<() => void>;
 };
@@ -45,7 +46,7 @@ export function useRealtimeVoice(options: Options) {
     const id = opts.current.sessionId;
     const peer = new RTCPeerConnection();
     const channel = peer.createDataChannel("oai-events");
-    const c: Connection = {peer, channel, abort: new AbortController(), ready: false, responding: false, captions: emptyCaptions(), probes: []};
+    const c: Connection = {peer, channel, abort: new AbortController(), ready: false, turns: new VoiceResponseQueue(event => channel.send(JSON.stringify(event))), captions: emptyCaptions(), probes: []};
     current.current = c;
     const alive = () => current.current === c;
     try {
@@ -68,8 +69,11 @@ export function useRealtimeVoice(options: Options) {
         if (!alive()) return;
         let event; try { event = JSON.parse(data); } catch { return; }
         if (["input_audio_buffer.speech_started", "input_audio_buffer.speech_stopped", "response.created", "response.done", "output_audio_buffer.started", "output_audio_buffer.stopped", "output_audio_buffer.cleared"].includes(event.type)) voiceProbe(event.type, {status: event.response?.status});
+        if (event.type === "response.created" && event.response?.id) c.turns.created(event.response.id);
+        if (event.type === "response.done" && event.response?.id) c.turns.done(event.response.id);
+        const superseded = c.turns.ignores(event.response_id || event.response?.id);
         const previous = c.captions;
-        c.captions = captionEvent(previous, event);
+        c.captions = superseded ? previous : captionEvent(previous, event);
         setCaptions(c.captions);
         if (event.type === "input_audio_buffer.speech_started") {opts.current.thinking(false);}
         if (event.type === "input_audio_buffer.speech_stopped") {opts.current.thinking(true);}
@@ -77,14 +81,19 @@ export function useRealtimeVoice(options: Options) {
           if (event.transcript?.trim()) opts.current.user(event.transcript.trim());
         }
         if (event.type === "conversation.item.input_audio_transcription.failed") opts.current.error("Could not transcribe that turn. Please try again.");
-        if (event.type === "response.created") { c.responding = true; opts.current.thinking(true); }
-        if (event.type === "response.output_audio_transcript.delta" && event.response_id === previous.responseId) opts.current.thinking(false);
-        if (event.type === "response.output_audio_transcript.done" && event.response_id === previous.responseId && event.transcript?.trim()) opts.current.assistant(event.transcript.trim());
-        if (event.type === "response.done" && event.response?.id === previous.responseId) {
-          c.responding = false; opts.current.thinking(false);
+        if (event.type === "response.created") opts.current.thinking(true);
+        if (!superseded && event.type === "response.output_audio_transcript.delta" && event.response_id === previous.responseId) opts.current.thinking(false);
+        if (!superseded && event.type === "response.output_audio_transcript.done" && event.response_id === previous.responseId && event.transcript?.trim()) opts.current.assistant(event.transcript.trim());
+        if (event.type === "response.done") {
+          opts.current.thinking(c.turns.busy);
           if (event.response?.status === "failed") opts.current.error("Voice response failed. Please try again.");
         }
-        if (event.type === "error") {opts.current.thinking(false); opts.current.error("Voice request failed. Please try again.");}
+        if (event.type === "error") {
+          c.turns.failed(event.error?.event_id);
+          voiceProbe("provider_error", {code: typeof event.error?.code === "string" && /^[a-z_]{1,80}$/.test(event.error.code) ? event.error.code : "unknown"});
+          // A completion may race with a cancellation already sent in flight.
+          if (event.error?.code !== "response_cancel_not_active") {opts.current.thinking(false); opts.current.error("Voice request failed. Please try again.");}
+        }
       };
       peer.onconnectionstatechange = () => {
         if (alive() && peer.connectionState === "failed") {stop(); opts.current.error("Voice disconnected. Tap the microphone to reconnect.");}
@@ -125,11 +134,10 @@ export function useRealtimeVoice(options: Options) {
     const c = current.current;
     if (!c?.ready || c.channel.readyState !== "open") {opts.current.error("Voice is connecting. Try again in a moment."); return;}
     voiceProbe("typed_input");
-    if (c.responding) c.channel.send(JSON.stringify({type: "response.cancel"}));
-    c.channel.send(JSON.stringify({type: "output_audio_buffer.clear"}));
-    c.channel.send(JSON.stringify({type: "conversation.item.create", item: {type: "message", role: "user", content: [{type: "input_text", text}]}}));
+    opts.current.error("");
+    opts.current.thinking(true);
+    c.turns.submit(text);
     c.captions = {...emptyCaptions(), user: text}; setCaptions(c.captions);
-    c.channel.send(JSON.stringify({type: "response.create"}));
   }, []);
   useEffect(() => stop, [stop]);
   return {start, stop, toggleMicrophone, sendText, isConnected, isListening, partialTranscript: captions.partial, captions};

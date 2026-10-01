@@ -1,0 +1,16 @@
+{
+  "source": "candidate-events.json; four-turn minimal-reasoning preview, same run as reasoning-candidate-timings.json",
+  "method": "1000 * delta(jitterBufferDelay) / delta(jitterBufferEmittedCount), first to last available inbound-rtp sample",
+  "means": {
+    "provider_rtc": {
+      "mean_receive_buffer_ms": 98.9
+    },
+    "atlas_return_audio_rtc": {
+      "mean_receive_buffer_ms": 94.6
+    },
+    "atlas_return_video_rtc": {
+      "mean_receive_buffer_ms": 69.1
+    }
+  },
+  "limitation": "whole sampled interval, including silence; these are browser receive buffers only, not server-side queues or exact end-to-end stage attribution"
+}
