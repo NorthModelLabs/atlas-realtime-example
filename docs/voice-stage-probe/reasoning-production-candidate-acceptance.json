@@ -1,0 +1,26 @@
+{
+  "url": "https://demo-atlas-qaahh5h3r-north-model-labs.vercel.app",
+  "english_answer": true,
+  "speaking_observed": true,
+  "returned_to_listening": true,
+  "javascript_errors": [],
+  "diagnostic_messages": 0,
+  "requests": [
+    {
+      "path": "/api/config",
+      "status": 200
+    },
+    {
+      "path": "/api/session",
+      "status": 200
+    },
+    {
+      "path": "/api/session/owned-session/share",
+      "status": 200
+    },
+    {
+      "path": "/api/session/owned-session/voice",
+      "status": 200
+    }
+  ]
+}
