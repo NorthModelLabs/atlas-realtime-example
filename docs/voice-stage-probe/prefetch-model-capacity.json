@@ -1,0 +1,29 @@
+{
+  "operations": [
+    {
+      "zone": "us-central1-a",
+      "operation": "operation-1790830497157-65cc037a2d08b-8a7bbd32-0d662736",
+      "status": "DONE",
+      "errors": [
+        "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS"
+      ]
+    },
+    {
+      "zone": "us-central1-b",
+      "operation": "operation-1790830589717-65cc03d272a5a-0fbe6973-1fd3a1c4",
+      "status": "DONE",
+      "errors": [
+        "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS"
+      ]
+    }
+  ],
+  "instances_after": [],
+  "disks_after": [],
+  "real_model_test_ran": false,
+  "prepared_corrected_source": {
+    "startup_sha256": "94ca815ff4f068390c4120bf68295e584eb05139d6d7fe97c5eca5f4dc7dd706",
+    "client_sha256": "c935a923ec44f19253e9128974e2b8e6e516e6470df8d22bb9c0078f48f59630",
+    "reason": "await asynchronous push_audio in harness",
+    "executed_on_gpu": false
+  }
+}

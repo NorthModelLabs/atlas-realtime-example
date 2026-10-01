@@ -46,3 +46,34 @@ CPU build `7b3f3e79-fd93-4d07-b04c-c041cf80c1a4` succeeded using the same exact 
 The short cases closed the response before the synthetic server's end record. The 32-frame case reached the end. The server generator started yielding the next record before the short-case decoder exited; this is not evidence that an extra video frame was enqueued. Thus the client can consume a prefix correctly, but we still must validate how early response closure interacts with the real model's request lifecycle and motion cache. The synthetic test cannot prove that cache continuity or GPU scheduling remains correct.
 
 At 04:48:32 UTC, a fresh read confirmed all ten main workers ready with the original three image hashes, unchanged dashboard snapshot and demo deployment alias, and HTTP 200 from demo, dashboard and API health. All CPU builds are terminal SUCCESS. No new browser call was made in this investigation, and no staging GPU exists as a result of these CPU tests.
+
+## Bounded real-model rehearsal plan
+
+One new disposable staging VM, `atlas-stg-voice-prefetch-20261001`, in `atlas-stg-isolated-20260831/us-central1-a`, reuses the previously validated credential-free golden image and existing restricted staging worker identity/private network. One L4, g2-standard-16, no external IP, no IAM/firewall changes, no sidecar registration or production routes. Compute stops it after at most one hour; the guest also schedules shutdown at 55 minutes and powers off immediately after completion/error. The model container cannot initiate network/metadata connections and exposes its service only on host loopback. The runner test shares that isolated container network. Delete the owned VM and auto-delete boot disk after collecting results.
+
+The unchanged production model digest and unchanged runner/dispatcher image run four counterbalanced cases: current settings, the complete candidate flag combination, candidate again, then current settings. Each uses four completed warmups before measurement and the same public face. Synthetic identifiable 40-ms PCM frames permit checking missing/duplicated/reordered audio. The real runner consumes the real model's stream; a local consumer is paced at 25 FPS. Measure first returned speech, voiced frame preservation, intra-speech gaps and per-request duration. No browser/LiveKit/provider is included, so even a pass still requires a transport rehearsal. The test does not promote any configuration.
+
+Startup SHA-256: `90e02b713e0aced135f3e8153510f2a61e85bbe3a1c0ceecae8eb4bd013c95ac`. Client and startup are prepared in `/private/tmp/atlas-prefetch-model-20261001`. Preflight found no running staging GPU. The native request ID and returned operation will be saved before further observation; a timeout does not authorize recreating the VM.
+
+## Real-GPU allocation unavailable; paced simulation rejects simple rollout
+
+Both native Compute inserts ended with `ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS`: first us-central1-a, then one bounded alternate attempt in us-central1-b. Follow-up instance/disk lists for the exact owned probe name were empty. No real-model test ran. The pending plan above is not an acceptance result.
+
+A CPU-only dry run caught that the first prepared full-loop harness did not await asynchronous `push_audio`; its zero-output results are invalid and excluded. The corrected harness awaits submission. Corrected startup SHA-256 is `94ca815ff4f068390c4120bf68295e584eb05139d6d7fe97c5eca5f4dc7dd706`, not the initial plan's hash. No version of this new harness ran on a GPU.
+
+Corrected CPU build `200eb42c-47f6-4621-bdf5-682c8da91e72` completed successfully. The real runner's input queue, inference loop, decoder and output generator were used with a synthetic binary response and a local consumer paced at 25 FPS. The response generator sleeps 400 ms initially and 29 ms between frames; decoding/queue work adds to those intervals. Observed synthetic request durations were approximately 1.6 seconds, so this is **not** a calibrated reproduction of the real model's approximately 1.3-second full-stream duration. It is useful as a continuity stress case and harness validation, not a production latency estimate.
+
+| Counterbalanced case | First returned speech after input onset | Largest intra-speech gap | All 100 identifiable input frames preserved in order |
+| --- | --- | --- | --- |
+| Current settings, first | 1671.2 ms | 420.3 ms | Yes |
+| Candidate, first | 716.0 ms | 999.0 ms | Yes |
+| Candidate, second | 719.8 ms | 996.4 ms | Yes |
+| Current settings, second | 1661.7 ms | 373.3 ms | Yes |
+
+The candidate moves speech forward but leaves a roughly one-second gap after the initial eight-frame portion while waiting for the next 32-frame batch. This rejects promoting the simple flag combination on the strength of the earlier 280-ms submission result. It does not establish that current live production has these gap durations. The approximately 1.3-second whole-conversation target remains unproven.
+
+Reproduction: `runner-paced-model-probe.py` is the corrected full-loop harness. The CPU wrapper `runner-paced-simulation-wrapper.py` loads it from `/probe/runner_probe.py`, substitutes only the model HTTP client, and uses the same pinned image and `/probe/face.jpg` as the earlier CPU jobs. Results are in `runner-paced-simulation.json`; allocation receipts are in `prefetch-model-capacity.json`.
+
+Next direction: investigate whether provider audio can reach the existing avatar stream ahead of realtime playback, avoiding the demo's paced media bridge without shrinking model batches. This is a hypothesis, not an implemented or measured improvement. LiveKit documents that its avatar DataStream output accepts frames faster than realtime, but the receiver defaults to the first agent participant, so a browser cannot simply replace that sender. Any experiment must preserve authenticated session routing and test the appropriate agent path rather than impersonate an agent or change production GPU settings. [LiveKit DataStreamAudioOutput](https://docs.livekit.io/reference/agents-js/classes/agents.voice.DataStreamAudioOutput.html), [LiveKit Python avatar interfaces](https://docs.livekit.io/reference/python/livekit/agents/voice/avatar/index.html).
+
+At 05:06:34 UTC, demo, dashboard and API health returned HTTP 200; all ten main-security workers were ready with unchanged avatar/dispatcher/sidecar hashes. Dashboard configuration and the public demo alias were unchanged. No staging VM or disk remained from either failed allocation. All CPU jobs for this investigation are terminal; the goal remains active.
