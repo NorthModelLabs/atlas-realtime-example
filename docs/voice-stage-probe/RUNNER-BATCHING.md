@@ -126,3 +126,23 @@ This is approximately 1.11–1.13 seconds earlier onset in a speech-only fixture
 Reproduction: substitute `runner-ahead-onset-probe.py` for `/probe/runner_probe.py` in the same isolated CPU configuration. Numerical results: `runner-ahead-onset.json`. The wrapper, immutable image and public face remain identical. These results justify investigating an isolated speech-only PCM transport; they do not approve promotion or a model/configuration replacement.
 
 Final 05:26:43 UTC verification again found demo, dashboard and API health HTTP 200, ten ready main-security GPU workers on the original image hashes, and unchanged dashboard snapshot/public demo alias. Both new CPU builds are terminal SUCCESS. No staging GPU was allocated, no user session was started, and no production configuration, model or customer data was changed in these experiments.
+
+
+## Idle transition and bounded transport prototype
+
+Build `0489826c-8191-4a88-a5ae-185cf0db9a70` completed SUCCESS at 05:32:12 UTC. After warmup, the consumer ran for 800 ms with no input before speech started. This exercises idle-to-speech scheduling in the exact runner with the same synthetic model; it is still not a real-model/LiveKit test. Results (`runner-ahead-idle.json`, harness `runner-ahead-idle-probe.py`):
+
+| Case | First returned speech | Speech frames returned | Largest gap |
+| --- | --- | --- | --- |
+| Paced baseline before | 1693.6 ms | 100/100, ordered | 372.8 ms |
+| Ahead 100 ms, first | 572.7 ms | 100/100, ordered | 368.9 ms |
+| Ahead 100 ms, second | 572.0 ms | 100/100, ordered | 334.3 ms |
+| Paced baseline after | 1661.7 ms | 96/100; last four absent | 417.7 ms |
+
+The final baseline did not return the last 160 ms of voiced input within the measurement window. It is a failed tail-preservation case, despite the Cloud Build job itself completing successfully. Finite trailing silence and silence dropping under backpressure are a plausible explanation, not proven from these counters alone. Do not claim a live production truncation or an accepted faster transport from this simulation. A future segment/tail test must establish how the exact runner and SDK finish a finite utterance while staying connected. The earlier historical agent comment about ordinary stream closure must also be verified against the exact current runner/SDK rather than assumed to describe it.
+
+The next implementation is in `experiments/pcm-bridge/`, not imported by any production entrypoint. It includes an opt-in authenticated Python ingress, a browser-compatible windowed sender, a LiveKit registration adapter and local tests. Four 200-ms chunks may be in flight; the sender caps each turn at 30 seconds; the ingress orders chunks, handles acknowledged retries without replay, rejects unauthorized callers, and paces forwarding to at most 1.28 seconds ahead. Cancellation waits for the injected sink barrier and rejects stale generations. Clear failure closes the bridge. The SDK adapter requires a PCM-only session and stays inert by default.
+
+Fourteen Python tests and three Node tests pass. The Node suite includes a cross-language test with the real Python ingress in a local subprocess: arbitrary synthetic provider chunk boundaries preserve every PCM byte plus the explicit zero-padding tail. These tests exclude SDK wire transport, GPU resampling, remote clear semantics and actual playout. The sink's injected clear callback is a contract, not evidence that the existing SDK fulfils it. In particular, the public SDK documentation schedules clearing asynchronously, so simply returning from `clear_buffer()` is insufficient. Current experimental batch-boundary padding is also not accepted as a solution to the failed runner tail case.
+
+Before promotion: integrate with a verified owned staging session, prove actual receiver cancellation/tail handling and bounded downstream buffering, preserve original GPU/model digests, then measure real warm spoken turns and playback continuity. No new token endpoint, microphone path, server runtime or production routing change has been deployed. Public health at 05:42:51 UTC remained 200 for demo/dashboard/API; all ten main workers retained the original image hashes and the demo alias/dashboard snapshot were unchanged (`pcm-prototype-health.json`).
