@@ -1,0 +1,16 @@
+{
+  "owned_sessions": [
+    {
+      "id": "ses_95aa89b8c3ae446c85fe",
+      "delete_http_status": 200
+    },
+    {
+      "id": "ses_eb8a23a8cf5448ecab45",
+      "delete_http_status": 200
+    }
+  ],
+  "browser_processes_terminal": true,
+  "local_loopback_processes_terminal": true,
+  "gpu_created": false,
+  "production_changes": false
+}
