@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-01T01:06:41.751504+00:00",
+  "deployment": "dpl_iLh3eTfxsdSYdr1NEJdhDCYNMqhw",
+  "source": "3a1faa4c035c8243389a1071b52a51a8b26c5de2",
+  "rollback": "dpl_G1ETQfSzE72KJjiCojRGsmh8We11",
+  "public_config": {
+    "llm": true,
+    "tts": true,
+    "voice": "openai-realtime"
+  },
+  "dashboard_unchanged": true
+}
