@@ -1,0 +1,34 @@
+{
+  "owned_lines": 205,
+  "stages": [
+    "audio_queue_silence_drop",
+    "audio_queue_speech_backpressure",
+    "audio_queue_speech_backpressure_released",
+    "gpu_batch_done",
+    "gpu_batch_submitted",
+    "gpu_first_speaking_frame",
+    "gpu_render_batch_timing",
+    "gpu_runner_started"
+  ],
+  "workers": [
+    "pod/avatar-pasteback-main-security-6/dispatcher"
+  ],
+  "inference_ms": {
+    "min": 1291,
+    "median": 1311.5,
+    "max": 1659,
+    "n": 64
+  },
+  "fps_equiv": {
+    "min": 19.289,
+    "median": 24.3995,
+    "max": 24.787,
+    "n": 64
+  },
+  "render_q": {
+    "min": 6,
+    "median": 7.0,
+    "max": 8,
+    "n": 64
+  }
+}

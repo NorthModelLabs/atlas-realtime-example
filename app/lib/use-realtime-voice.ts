@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { captionEvent, emptyCaptions, type Captions } from "./voice-captions";
+import { probeAudio, probeStats, voiceProbe } from "./voice-diagnostics";
 
 type Output = { context: AudioContext; destination: MediaStreamAudioDestinationNode };
 type Options = {
@@ -20,6 +21,7 @@ type Connection = {
   ready: boolean;
   responding: boolean;
   captions: Captions;
+  probes: Array<() => void>;
 };
 
 export function useRealtimeVoice(options: Options) {
@@ -31,6 +33,7 @@ export function useRealtimeVoice(options: Options) {
   const stop = useCallback(() => {
     const c = current.current; current.current = null;
     if (c) {
+      c.probes.forEach(cleanup => cleanup());
       c.abort.abort(); c.mic?.getTracks().forEach(t => t.stop());
       c.source?.disconnect(); c.channel.close(); c.peer.close();
     }
@@ -42,7 +45,7 @@ export function useRealtimeVoice(options: Options) {
     const id = opts.current.sessionId;
     const peer = new RTCPeerConnection();
     const channel = peer.createDataChannel("oai-events");
-    const c: Connection = {peer, channel, abort: new AbortController(), ready: false, responding: false, captions: emptyCaptions()};
+    const c: Connection = {peer, channel, abort: new AbortController(), ready: false, responding: false, captions: emptyCaptions(), probes: []};
     current.current = c;
     const alive = () => current.current === c;
     try {
@@ -51,6 +54,7 @@ export function useRealtimeVoice(options: Options) {
       c.mic = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true, autoGainControl: true}});
       if (!alive()) { c.mic.getTracks().forEach(t => t.stop()); return; }
       c.mic.getAudioTracks().forEach(t => peer.addTrack(t, c.mic!));
+      c.probes.push(probeAudio(output.context, c.mic, "microphone_audio"), probeStats(() => peer.getStats(), "provider_rtc"));
       peer.ontrack = event => {
         if (!alive()) return;
         c.source?.disconnect();
@@ -58,10 +62,12 @@ export function useRealtimeVoice(options: Options) {
         // Send streaming speech to Atlas. Only the avatar's synchronized return
         // track plays locally, so users do not hear two voices.
         c.source.connect(output.destination);
+        c.probes.push(probeAudio(output.context, new MediaStream([event.track]), "provider_audio"));
       };
       channel.onmessage = ({data}) => {
         if (!alive()) return;
         let event; try { event = JSON.parse(data); } catch { return; }
+        if (["input_audio_buffer.speech_started", "input_audio_buffer.speech_stopped", "response.created", "response.done", "output_audio_buffer.started", "output_audio_buffer.stopped", "output_audio_buffer.cleared"].includes(event.type)) voiceProbe(event.type, {status: event.response?.status});
         const previous = c.captions;
         c.captions = captionEvent(previous, event);
         setCaptions(c.captions);
@@ -118,6 +124,7 @@ export function useRealtimeVoice(options: Options) {
   const sendText = useCallback((text: string) => {
     const c = current.current;
     if (!c?.ready || c.channel.readyState !== "open") {opts.current.error("Voice is connecting. Try again in a moment."); return;}
+    voiceProbe("typed_input");
     if (c.responding) c.channel.send(JSON.stringify({type: "response.cancel"}));
     c.channel.send(JSON.stringify({type: "output_audio_buffer.clear"}));
     c.channel.send(JSON.stringify({type: "conversation.item.create", item: {type: "message", role: "user", content: [{type: "input_text", text}]}}));

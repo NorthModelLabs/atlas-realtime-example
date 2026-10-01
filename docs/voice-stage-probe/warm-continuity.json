@@ -1,0 +1,162 @@
+[
+  {
+    "turn": 1,
+    "provider_audio": {
+      "span_ms": 1701,
+      "gaps_ms": []
+    },
+    "atlas_return_audio": {
+      "span_ms": 1720,
+      "gaps_ms": []
+    },
+    "provider_rtc": {
+      "packetsLost": 7,
+      "concealedSamples": 6775
+    },
+    "atlas_return_audio_rtc": {
+      "packetsLost": 10,
+      "concealedSamples": 991
+    },
+    "atlas_return_video_rtc": {
+      "packetsLost": 23,
+      "framesDropped": 0,
+      "freezeCount": 0,
+      "totalFreezesDuration": 0.0
+    }
+  },
+  {
+    "turn": 2,
+    "provider_audio": {
+      "span_ms": 2220,
+      "gaps_ms": []
+    },
+    "atlas_return_audio": {
+      "span_ms": 2301,
+      "gaps_ms": []
+    },
+    "provider_rtc": {
+      "packetsLost": 4,
+      "concealedSamples": 7320
+    },
+    "atlas_return_audio_rtc": {
+      "packetsLost": 0,
+      "concealedSamples": 0
+    },
+    "atlas_return_video_rtc": {
+      "packetsLost": 23,
+      "framesDropped": 0,
+      "freezeCount": 0,
+      "totalFreezesDuration": 0.0
+    }
+  },
+  {
+    "turn": 3,
+    "provider_audio": {
+      "span_ms": 2122,
+      "gaps_ms": []
+    },
+    "atlas_return_audio": {
+      "span_ms": 2241,
+      "gaps_ms": []
+    },
+    "provider_rtc": {
+      "packetsLost": 3,
+      "concealedSamples": 960
+    },
+    "atlas_return_audio_rtc": {
+      "packetsLost": 2,
+      "concealedSamples": 0
+    },
+    "atlas_return_video_rtc": {
+      "packetsLost": 11,
+      "framesDropped": 0,
+      "freezeCount": 0,
+      "totalFreezesDuration": 0.0
+    }
+  },
+  {
+    "turn": 4,
+    "provider_audio": {
+      "span_ms": 3377,
+      "gaps_ms": [
+        703,
+        703
+      ]
+    },
+    "atlas_return_audio": {
+      "span_ms": 3260,
+      "gaps_ms": [
+        541,
+        760
+      ]
+    },
+    "provider_rtc": {
+      "packetsLost": 18,
+      "concealedSamples": 16752
+    },
+    "atlas_return_audio_rtc": {
+      "packetsLost": 2,
+      "concealedSamples": 1331
+    },
+    "atlas_return_video_rtc": {
+      "packetsLost": 46,
+      "framesDropped": 0,
+      "freezeCount": 1,
+      "totalFreezesDuration": 0.204
+    }
+  },
+  {
+    "turn": 5,
+    "provider_audio": {
+      "span_ms": 2759,
+      "gaps_ms": [
+        421
+      ]
+    },
+    "atlas_return_audio": {
+      "span_ms": 2760,
+      "gaps_ms": [
+        399
+      ]
+    },
+    "provider_rtc": {
+      "packetsLost": 6,
+      "concealedSamples": 45668
+    },
+    "atlas_return_audio_rtc": {
+      "packetsLost": 3,
+      "concealedSamples": 26499
+    },
+    "atlas_return_video_rtc": {
+      "packetsLost": 25,
+      "framesDropped": 15,
+      "freezeCount": 1,
+      "totalFreezesDuration": 0.909
+    }
+  },
+  {
+    "turn": 6,
+    "provider_audio": {
+      "span_ms": 1960,
+      "gaps_ms": []
+    },
+    "atlas_return_audio": {
+      "span_ms": 2001,
+      "gaps_ms": []
+    },
+    "provider_rtc": {
+      "packetsLost": 2,
+      "concealedSamples": 240
+    },
+    "atlas_return_audio_rtc": {
+      "packetsLost": 4,
+      "concealedSamples": 1486
+    },
+    "atlas_return_video_rtc": {
+      "packetsLost": 19,
+      "framesDropped": 0,
+      "freezeCount": 0,
+      "totalFreezesDuration": 0.0
+    }
+  }
+]

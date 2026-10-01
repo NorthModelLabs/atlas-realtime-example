@@ -1,0 +1,23 @@
+{
+  "checked_at": "2026-10-01T02:03:14.173597+00:00",
+  "main_pool_pods": 10,
+  "ready": 10,
+  "digests": {
+    "avatar": [
+      "sha256:f853fbd1dc92ae7a514e93107e3696e8009f74e929180ac361e2e28e9d52e7e4"
+    ],
+    "dispatcher": [
+      "sha256:830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee"
+    ],
+    "sidecar": [
+      "sha256:b69fd39d00c132c6d96cbbc3fd4fdaa8a8bb3640c1260430c33db020b07bd991"
+    ]
+  },
+  "warmup": {
+    "AVATAR_DISPATCHER_WARMUP_ENABLED": "true",
+    "AVATAR_DISPATCHER_WARMUP_INTERVAL_SECONDS": "45",
+    "AVATAR_DISPATCHER_WARMUP_TIMEOUT_SECONDS": "12",
+    "AVATAR_DISPATCHER_WARMUP_FRESH_SECONDS": "135",
+    "AVATAR_DISPATCHER_WARMUP_MAX_FRAMES": "32"
+  }
+}

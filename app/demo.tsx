@@ -4,8 +4,10 @@ import Image from "next/image";
 import { useState, useRef, useCallback, useEffect, type CSSProperties, type DragEvent, type ChangeEvent } from "react";
 import { flushSync } from "react-dom";
 import { useAtlasSession } from "@northmodellabs/atlas-react";
-import { LocalAudioTrack, Track } from "livekit-client";
+import { LocalAudioTrack, Track, RoomEvent, type RemoteTrack } from "livekit-client";
 import { useRealtimeVoice } from "@/app/lib/use-realtime-voice";
+import { probeAudio, probeStats } from "@/app/lib/voice-diagnostics";
+import { observeReturnedSpeech } from "@/app/lib/returned-speech";
 
 const DEFAULT_FACE_ID = "enterprise-b1450303";
 const DEFAULT_FACE_URL = "/faces/enterprise-b1450303.jpg";
@@ -331,6 +333,7 @@ export default function DemoPage({
   const [localMessages, setLocalMessages] = useState<ChatMsg[]>([]);
   const [swapping, setSwapping] = useState(false);
   const [aiThinking, setAiThinking] = useState(false);
+  const [avatarSpeaking, setAvatarSpeaking] = useState(false);
   const [voiceError, setVoiceError] = useState("");
   const [faceLoading, setFaceLoading] = useState(false);
 
@@ -603,6 +606,30 @@ export default function DemoPage({
     const destination = audioCtx.createMediaStreamDestination();
     const mediaTrack = destination.stream.getAudioTracks()[0];
     const livekitTrack = new LocalAudioTrack(mediaTrack);
+    const probes = [probeAudio(audioCtx, destination.stream, "atlas_outgoing_audio"), probeStats(() => livekitTrack.getRTCStatsReport(), "atlas_outgoing_rtc")];
+    const observed = new Set<RemoteTrack>();
+    const speechObservers = new Map<RemoteTrack, () => void>();
+    const speakingTracks = new Set<RemoteTrack>();
+    const observeReturn = (track: RemoteTrack) => {
+      if (observed.has(track)) return;
+      observed.add(track);
+      probes.push(probeStats(() => track.getRTCStatsReport(), `atlas_return_${track.kind}_rtc`));
+      if (track.kind === Track.Kind.Audio) {
+        probes.push(probeAudio(audioCtx, new MediaStream([track.mediaStreamTrack]), "atlas_return_audio"));
+        speechObservers.set(track, observeReturnedSpeech(audioCtx, track.mediaStreamTrack, speaking => {
+          if (speaking) speakingTracks.add(track); else speakingTracks.delete(track);
+          setAvatarSpeaking(speakingTracks.size > 0);
+        }));
+      }
+    };
+    const forgetReturn = (track: RemoteTrack) => {
+      speechObservers.get(track)?.();
+      speechObservers.delete(track);
+      observed.delete(track);
+    };
+    room.remoteParticipants.forEach(participant => participant.trackPublications.forEach(publication => {if (publication.track) observeReturn(publication.track);}));
+    room.on(RoomEvent.TrackSubscribed, observeReturn);
+    room.on(RoomEvent.TrackUnsubscribed, forgetReturn);
 
     audioCtxRef.current = audioCtx;
     audioDestRef.current = destination;
@@ -618,6 +645,11 @@ export default function DemoPage({
     });
 
     return () => {
+      room.off(RoomEvent.TrackSubscribed, observeReturn);
+      room.off(RoomEvent.TrackUnsubscribed, forgetReturn);
+      speechObservers.forEach(stop => stop());
+      setAvatarSpeaking(false);
+      probes.forEach(cleanup => cleanup());
       ttsTrackReadyRef.current = null;
       try {
         room.localParticipant.unpublishTrack(livekitTrack);
@@ -800,9 +832,13 @@ export default function DemoPage({
     const appleStatus = session.status === "connecting"
       ? "Connecting"
       : isConnected
-        ? voiceInputActive
-          ? "Listening"
-          : "Connected"
+        ? avatarSpeaking
+          ? "Speaking"
+          : aiThinking
+            ? "Thinking"
+            : voiceInputActive
+              ? "Listening"
+              : "Connected"
         : "Ready";
     const appleCaption = assistantCaption || (aiThinking ? "Thinking…" : voice.captions.speechActive ? "Listening…" : userCaption ? "" : isConnected ? "Say something." : "Ready when you are.");
 
