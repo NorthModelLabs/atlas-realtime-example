@@ -1,0 +1,129 @@
+{
+  "build": {
+    "finishTime": "2026-10-01T07:05:30.885552Z",
+    "id": "0195ab4e-2eaf-4ad7-8927-6e72125abbeb",
+    "status": "SUCCESS"
+  },
+  "results": [
+    {
+      "event": "IDLE_METHODS",
+      "data": [
+        "_enqueue_idle_results",
+        "_idle_canvas",
+        "_idle_replay_cursor",
+        "_idle_replay_frames",
+        "_last_video_frame",
+        "_make_idle_frame",
+        "_remember_idle_frame",
+        "_submit_idle_inference",
+        "_trim_idle_for_segment_start"
+      ]
+    },
+    {
+      "event": "IDLE_STRUCTURE",
+      "data": {
+        "method": "_make_idle_frame",
+        "attributes": [
+          "VideoFrame",
+          "_clone_video_frame",
+          "_idle_canvas",
+          "_idle_replay_cursor",
+          "_idle_replay_frames",
+          "_last_video_frame",
+          "_video_frame_from_rgba",
+          "tobytes"
+        ],
+        "calls": [
+          "_clone_video_frame",
+          "_video_frame_from_rgba",
+          "len",
+          "tobytes"
+        ]
+      }
+    },
+    {
+      "event": "IDLE_STRUCTURE",
+      "data": {
+        "method": "_enqueue_idle_results",
+        "attributes": [
+          "_generation",
+          "_last_video_frame",
+          "_numpy_to_rtc",
+          "_remember_idle_frame",
+          "_render_queue",
+          "ndarray",
+          "put"
+        ],
+        "calls": [
+          "_numpy_to_rtc",
+          "_remember_idle_frame",
+          "put"
+        ]
+      }
+    },
+    {
+      "event": "IDLE_BEHAVIOR",
+      "data": {
+        "state": "fresh",
+        "frames": [
+          {
+            "first_byte": 200,
+            "width": 64,
+            "height": 64
+          },
+          {
+            "first_byte": 200,
+            "width": 64,
+            "height": 64
+          },
+          {
+            "first_byte": 200,
+            "width": 64,
+            "height": 64
+          },
+          {
+            "first_byte": 200,
+            "width": 64,
+            "height": 64
+          }
+        ]
+      }
+    },
+    {
+      "event": "IDLE_BEHAVIOR",
+      "data": {
+        "state": "last_frame_marked_77",
+        "frames": [
+          {
+            "first_byte": 77,
+            "width": 64,
+            "height": 64
+          },
+          {
+            "first_byte": 77,
+            "width": 64,
+            "height": 64
+          },
+          {
+            "first_byte": 77,
+            "width": 64,
+            "height": 64
+          },
+          {
+            "first_byte": 77,
+            "width": 64,
+            "height": 64
+          }
+        ]
+      }
+    },
+    {
+      "event": "IDLE_COMPLETE",
+      "data": {
+        "source_verified": true,
+        "model_calls": 0,
+        "scope": "Actual pinned runner idle fallback with synthetic frame markers; not model or browser acceptance"
+      }
+    }
+  ]
+}
