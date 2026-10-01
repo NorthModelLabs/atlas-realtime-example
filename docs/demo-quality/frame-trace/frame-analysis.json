@@ -1,0 +1,97 @@
+{
+  "video_callbacks": 2773,
+  "gaps_over_100ms": [
+    {
+      "at": 1790838917885,
+      "since_start_s": 1.781,
+      "display_gap_ms": 150,
+      "receive_gap_ms": 145.0,
+      "media_delta_ms": 90,
+      "rtp_delta_ms": 80.0,
+      "capture_gap_ms": null,
+      "capture_to_receive_ms": null,
+      "previous_capture_to_receive_ms": null,
+      "presented_delta": 1,
+      "processing_ms": 1.8,
+      "arrival_to_display_ms": 16.5
+    },
+    {
+      "at": 1790838925751,
+      "since_start_s": 9.647,
+      "display_gap_ms": 100.1,
+      "receive_gap_ms": 131.1,
+      "media_delta_ms": 42,
+      "rtp_delta_ms": 40.0,
+      "capture_gap_ms": 40.0,
+      "capture_to_receive_ms": 97.1,
+      "previous_capture_to_receive_ms": 6.0,
+      "presented_delta": 1,
+      "processing_ms": 1.9,
+      "arrival_to_display_ms": 17.6
+    },
+    {
+      "at": 1790838950099,
+      "since_start_s": 33.995,
+      "display_gap_ms": 133.3,
+      "receive_gap_ms": 176.1,
+      "media_delta_ms": 121,
+      "rtp_delta_ms": 120.0,
+      "capture_gap_ms": 120.0,
+      "capture_to_receive_ms": 86.3,
+      "previous_capture_to_receive_ms": 30.2,
+      "presented_delta": 1,
+      "processing_ms": 0.3,
+      "arrival_to_display_ms": 14.3
+    },
+    {
+      "at": 1790838990230,
+      "since_start_s": 74.126,
+      "display_gap_ms": 116.7,
+      "receive_gap_ms": 167.3,
+      "media_delta_ms": 37,
+      "rtp_delta_ms": 37.0,
+      "capture_gap_ms": 37.0,
+      "capture_to_receive_ms": 140.9,
+      "previous_capture_to_receive_ms": 10.6,
+      "presented_delta": 1,
+      "processing_ms": 0.5,
+      "arrival_to_display_ms": 11.5
+    },
+    {
+      "at": 1790839003364,
+      "since_start_s": 87.26,
+      "display_gap_ms": 166.6,
+      "receive_gap_ms": 236.7,
+      "media_delta_ms": 161,
+      "rtp_delta_ms": 160.0,
+      "capture_gap_ms": 160.0,
+      "capture_to_receive_ms": 81.7,
+      "previous_capture_to_receive_ms": 5.0,
+      "presented_delta": 1,
+      "processing_ms": 4.7,
+      "arrival_to_display_ms": 5.5
+    },
+    {
+      "at": 1790839014995,
+      "since_start_s": 98.891,
+      "display_gap_ms": 150.1,
+      "receive_gap_ms": 220.2,
+      "media_delta_ms": 161,
+      "rtp_delta_ms": 160.0,
+      "capture_gap_ms": 160.0,
+      "capture_to_receive_ms": 65.5,
+      "previous_capture_to_receive_ms": 5.3,
+      "presented_delta": 1,
+      "processing_ms": 3.9,
+      "arrival_to_display_ms": 14.6
+    }
+  ],
+  "arrival_to_display_ms": {
+    "median": 72.2,
+    "max": 111.9
+  },
+  "max_decode_processing_ms": 47.8,
+  "max_scheduler_delay_ms": 5,
+  "capture_metadata_frames": 2647,
+  "root_cause": "unproven; receive time is last frame packet arrival; optional captureTime is a browser estimate, present after initial RTCP synchronization on most frames"
+}

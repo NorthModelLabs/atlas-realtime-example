@@ -1,0 +1,84 @@
+[
+  {
+    "at": 1790838917885,
+    "since_start_s": 1.781,
+    "states": {}
+  },
+  {
+    "at": 1790838925751,
+    "since_start_s": 9.647,
+    "states": {}
+  },
+  {
+    "at": 1790838950099,
+    "since_start_s": 33.995,
+    "states": {
+      "provider_audio": {
+        "active": false,
+        "since_change_ms": 13575
+      },
+      "atlas_outgoing_audio": {
+        "active": false,
+        "since_change_ms": 13537
+      },
+      "atlas_return_audio": {
+        "active": false,
+        "since_change_ms": 11355
+      }
+    }
+  },
+  {
+    "at": 1790838990230,
+    "since_start_s": 74.126,
+    "states": {
+      "provider_audio": {
+        "active": false,
+        "since_change_ms": 890
+      },
+      "atlas_outgoing_audio": {
+        "active": false,
+        "since_change_ms": 849
+      },
+      "atlas_return_audio": {
+        "active": true,
+        "since_change_ms": 209
+      }
+    }
+  },
+  {
+    "at": 1790839003364,
+    "since_start_s": 87.26,
+    "states": {
+      "provider_audio": {
+        "active": false,
+        "since_change_ms": 14024
+      },
+      "atlas_outgoing_audio": {
+        "active": false,
+        "since_change_ms": 13983
+      },
+      "atlas_return_audio": {
+        "active": false,
+        "since_change_ms": 11743
+      }
+    }
+  },
+  {
+    "at": 1790839014995,
+    "since_start_s": 98.891,
+    "states": {
+      "provider_audio": {
+        "active": false,
+        "since_change_ms": 25655
+      },
+      "atlas_outgoing_audio": {
+        "active": false,
+        "since_change_ms": 25614
+      },
+      "atlas_return_audio": {
+        "active": false,
+        "since_change_ms": 23374
+      }
+    }
+  }
+]

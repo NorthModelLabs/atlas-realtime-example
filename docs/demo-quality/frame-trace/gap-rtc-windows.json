@@ -1,0 +1,225 @@
+[
+  {
+    "since_start_s": 1.781,
+    "streams": {
+      "atlas_return_audio_rtc": {
+        "window_ms": 1997,
+        "jitter_ms": 10.0,
+        "delta": {
+          "packetsLost": 0,
+          "concealedSamples": 1203,
+          "silentConcealedSamples": 0,
+          "jitterBufferDelay": 2803.2,
+          "jitterBufferEmittedCount": 35520
+        }
+      },
+      "atlas_return_video_rtc": {
+        "window_ms": 1997,
+        "jitter_ms": 15.0,
+        "delta": {
+          "packetsLost": 0,
+          "freezeCount": 0,
+          "framesDropped": 0,
+          "framesDecoded": 38,
+          "jitterBufferDelay": 0.449327,
+          "jitterBufferEmittedCount": 38
+        }
+      }
+    }
+  },
+  {
+    "since_start_s": 9.647,
+    "streams": {
+      "atlas_return_audio_rtc": {
+        "window_ms": 2001,
+        "jitter_ms": 6.0,
+        "delta": {
+          "packetsLost": 0,
+          "concealedSamples": 0,
+          "silentConcealedSamples": 0,
+          "jitterBufferDelay": 9542.4,
+          "jitterBufferEmittedCount": 96000
+        }
+      },
+      "atlas_return_video_rtc": {
+        "window_ms": 2001,
+        "jitter_ms": 10.0,
+        "delta": {
+          "packetsLost": 0,
+          "freezeCount": 0,
+          "framesDropped": 0,
+          "framesDecoded": 50,
+          "jitterBufferDelay": 1.780728,
+          "jitterBufferEmittedCount": 50
+        }
+      },
+      "provider_rtc": {
+        "window_ms": 2000,
+        "jitter_ms": 10.0,
+        "delta": {
+          "packetsLost": 0,
+          "concealedSamples": 0,
+          "silentConcealedSamples": 0,
+          "jitterBufferDelay": 10195.2,
+          "jitterBufferEmittedCount": 96000
+        }
+      }
+    }
+  },
+  {
+    "since_start_s": 33.995,
+    "streams": {
+      "atlas_return_audio_rtc": {
+        "window_ms": 2000,
+        "jitter_ms": 15.0,
+        "delta": {
+          "packetsLost": 0,
+          "concealedSamples": 0,
+          "silentConcealedSamples": 0,
+          "jitterBufferDelay": 1075.2,
+          "jitterBufferEmittedCount": 9600
+        }
+      },
+      "atlas_return_video_rtc": {
+        "window_ms": 2001,
+        "jitter_ms": 29.0,
+        "delta": {
+          "packetsLost": 0,
+          "freezeCount": 0,
+          "framesDropped": 0,
+          "framesDecoded": 50,
+          "jitterBufferDelay": 1.8756,
+          "jitterBufferEmittedCount": 50
+        }
+      },
+      "provider_rtc": {
+        "window_ms": 1999,
+        "jitter_ms": 7.0,
+        "delta": {
+          "packetsLost": 0,
+          "concealedSamples": 0,
+          "silentConcealedSamples": 0,
+          "jitterBufferDelay": 13574.4,
+          "jitterBufferEmittedCount": 96000
+        }
+      }
+    }
+  },
+  {
+    "since_start_s": 74.126,
+    "streams": {
+      "atlas_return_audio_rtc": {
+        "window_ms": 1999,
+        "jitter_ms": 9.0,
+        "delta": {
+          "packetsLost": 0,
+          "concealedSamples": 1891,
+          "silentConcealedSamples": 0,
+          "jitterBufferDelay": 8025.6,
+          "jitterBufferEmittedCount": 64320
+        }
+      },
+      "atlas_return_video_rtc": {
+        "window_ms": 1999,
+        "jitter_ms": 18.0,
+        "delta": {
+          "packetsLost": 0,
+          "freezeCount": 0,
+          "framesDropped": 0,
+          "framesDecoded": 50,
+          "jitterBufferDelay": 2.057405,
+          "jitterBufferEmittedCount": 50
+        }
+      },
+      "provider_rtc": {
+        "window_ms": 1998,
+        "jitter_ms": 5.0,
+        "delta": {
+          "packetsLost": 0,
+          "concealedSamples": 0,
+          "silentConcealedSamples": 0,
+          "jitterBufferDelay": 14889.6,
+          "jitterBufferEmittedCount": 96000
+        }
+      }
+    }
+  },
+  {
+    "since_start_s": 87.26,
+    "streams": {
+      "atlas_return_audio_rtc": {
+        "window_ms": 2000,
+        "jitter_ms": 9.0,
+        "delta": {
+          "packetsLost": 0,
+          "concealedSamples": 0,
+          "silentConcealedSamples": 0,
+          "jitterBufferDelay": 1142.4,
+          "jitterBufferEmittedCount": 7680
+        }
+      },
+      "atlas_return_video_rtc": {
+        "window_ms": 2000,
+        "jitter_ms": 19.0,
+        "delta": {
+          "packetsLost": 0,
+          "freezeCount": 0,
+          "framesDropped": 0,
+          "framesDecoded": 50,
+          "jitterBufferDelay": 1.90365,
+          "jitterBufferEmittedCount": 50
+        }
+      },
+      "provider_rtc": {
+        "window_ms": 2001,
+        "jitter_ms": 4.0,
+        "delta": {
+          "packetsLost": 0,
+          "concealedSamples": 1920,
+          "silentConcealedSamples": 360,
+          "jitterBufferDelay": 16272,
+          "jitterBufferEmittedCount": 94080
+        }
+      }
+    }
+  },
+  {
+    "since_start_s": 98.891,
+    "streams": {
+      "atlas_return_audio_rtc": {
+        "window_ms": 2000,
+        "jitter_ms": 22.0,
+        "delta": {
+          "packetsLost": 0,
+          "concealedSamples": 0,
+          "silentConcealedSamples": 0,
+          "jitterBufferDelay": 1219.2,
+          "jitterBufferEmittedCount": 9600
+        }
+      },
+      "atlas_return_video_rtc": {
+        "window_ms": 1999,
+        "jitter_ms": 16.0,
+        "delta": {
+          "packetsLost": 0,
+          "freezeCount": 0,
+          "framesDropped": 0,
+          "framesDecoded": 49,
+          "jitterBufferDelay": 2.204665,
+          "jitterBufferEmittedCount": 50
+        }
+      },
+      "provider_rtc": {
+        "window_ms": 2001,
+        "jitter_ms": 4.0,
+        "delta": {
+          "packetsLost": 0,
+          "concealedSamples": 0,
+          "silentConcealedSamples": 0,
+          "jitterBufferDelay": 17846.4,
+          "jitterBufferEmittedCount": 96000
+        }
+      }
+    }
+  }
+]

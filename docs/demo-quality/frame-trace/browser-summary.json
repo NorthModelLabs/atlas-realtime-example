@@ -1,0 +1,22 @@
+{
+  "javascript_errors": [],
+  "requests": [
+    {
+      "path": "/api/config",
+      "status": 200
+    },
+    {
+      "path": "/api/session",
+      "status": 200
+    },
+    {
+      "path": "/api/session/owned-session/share",
+      "status": 200
+    },
+    {
+      "path": "/api/session/owned-session/voice",
+      "status": 200
+    }
+  ],
+  "owned_session_cleanup_http_status": 200
+}

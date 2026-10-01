@@ -1,0 +1,17 @@
+{
+  "project": "atlas-stg-isolated-20260831",
+  "vm": "atlas-stg-mouth-tail-20261001",
+  "zone": "us-central1-a",
+  "maximum_gpus": 1,
+  "maximum_runtime_seconds": 1800,
+  "external_ip": false,
+  "model_digest": "sha256:f853fbd1dc92ae7a514e93107e3696e8009f74e929180ac361e2e28e9d52e7e4",
+  "runner_digest": "sha256:830547f2c1dbc0ce536db1df26c34a3b3a61bd57bb5e88aab26146c4b786c4ee",
+  "startup_sha256": "a0aead2717e56cb95a41c01ffe96276f7366ad0df30302c8c9e15b03ecd417b7",
+  "probe_sha256": "ee30a88de5be9b2d19e0958f982c0ac413e898fc843229d5bd1f55ac31692c48",
+  "production_changes": false,
+  "purpose": "Isolate post-speech mouth motion in generated frames before browser/transport, preserving all live image digests.",
+  "startup_bytes": 17314,
+  "fixture": "existing digest-pinned question.pcm, resampled 24 kHz to 16 kHz",
+  "supersedes": "Three large insertion requests timed out; exact VM and operations checks remain absent. Same unique VM name prevents duplicate resources even if an earlier request arrives late."
+}
