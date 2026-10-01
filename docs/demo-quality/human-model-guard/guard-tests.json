@@ -1,0 +1,10 @@
+{
+  "matching_fixture": "passed",
+  "failure_cases": {
+    "wrong_model": "rejected",
+    "changed_eyes": "rejected",
+    "missing_worker": "rejected",
+    "mutable_tag": "rejected",
+    "unready": "rejected"
+  }
+}

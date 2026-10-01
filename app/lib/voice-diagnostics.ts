@@ -86,17 +86,32 @@ export function probeAudio(context: AudioContext, stream: MediaStream, stage: st
   const source = context.createMediaStreamSource(stream);
   const analyser = context.createAnalyser(); analyser.fftSize = 1024; source.connect(analyser);
   const samples = new Float32Array(analyser.fftSize);
-  let active = false, peakRms = 0, reported = performance.now();
+  let active = false, peakRms = 0, minRms = Infinity, observations = 0;
+  let aboveVisualGate = 0, belowObserverQuiet = 0, reported = performance.now();
+  const recordWindow = ["provider_audio", "atlas_outgoing_audio", "atlas_return_audio"].includes(stage);
   const interval = setInterval(() => {
     analyser.getFloatTimeDomainData(samples);
     const rms = Math.sqrt(samples.reduce((sum, value) => sum + value * value, 0) / samples.length);
     const next = rms > (active ? 0.001 : 0.005);
     if (next !== active) {active = next; voiceProbe(stage, {active, rms: Math.round(rms * 100000) / 100000});}
-    if (stage === "atlas_return_audio") {
+    if (recordWindow) {
       peakRms = Math.max(peakRms, rms);
+      minRms = Math.min(minRms, rms); observations++;
+      if (rms > 0.0001) aboveVisualGate++;
+      if (rms <= 0.001) belowObserverQuiet++;
       if (performance.now() - reported >= 100) {
-        voiceProbe("atlas_return_audio_window", {peakRms: Math.round(peakRms * 100000) / 100000, intervalMs: Math.round(performance.now() - reported)});
-        peakRms = 0; reported = performance.now();
+        // These are browser-side sampled envelopes, not the model's decoded
+        // PCM. Comparing upstream/returned quiet windows can test a hypothesis
+        // but cannot prove the renderer received identical samples.
+        voiceProbe(`${stage}_window`, {
+          peakRms: Math.round(peakRms * 100000000) / 100000000,
+          minRms: Math.round(minRms * 100000000) / 100000000,
+          observations, aboveVisualGate, belowObserverQuiet,
+          sampleRate: context.sampleRate, fftSize: analyser.fftSize,
+          intervalMs: Math.round(performance.now() - reported),
+        });
+        peakRms = aboveVisualGate = belowObserverQuiet = observations = 0;
+        minRms = Infinity; reported = performance.now();
       }
     }
   }, 20);
