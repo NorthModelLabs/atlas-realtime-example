@@ -353,6 +353,8 @@ export default function DemoPage({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const faceSwapInFlightRef = useRef(false);
+  const currentFaceSessionRef = useRef({ id: session.sessionId, connected: session.status === "connected" });
+  currentFaceSessionRef.current = { id: session.sessionId, connected: session.status === "connected" };
   const swapInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const faceSelectionVersionRef = useRef(0);
@@ -477,53 +479,47 @@ export default function DemoPage({
     reader.readAsDataURL(file);
   }, []);
 
-  const handleDrop = useCallback(
-    (e: DragEvent) => {
-      e.preventDefault();
-      setDragOver(false);
-      const file = e.dataTransfer.files[0];
-      if (file) handleFile(file);
-    },
-    [handleFile],
-  );
-
-  const handleFileSelect = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) handleFile(file);
-      e.target.value = "";
-    },
-    [handleFile],
-  );
-
   const handleSwapFace = useCallback(
     async (file: File, faceId = "custom", version?: number) => {
-      if (!session.sessionId || !file.type.startsWith("image/") || faceSwapInFlightRef.current) return false;
+      if (!session.sessionId || !file.type.startsWith("image/")) return false;
+      if (faceSwapInFlightRef.current) {
+        addMsg("system", "A face swap is still in progress. Please wait for it to finish.");
+        return false;
+      }
+      const sessionId = session.sessionId;
       const selectionVersion = version ?? faceSelectionVersionRef.current + 1;
       faceSelectionVersionRef.current = selectionVersion;
       faceSwapInFlightRef.current = true;
       setSwapping(true);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 35_000);
+      const stillCurrent = () => currentFaceSessionRef.current.id === sessionId && currentFaceSessionRef.current.connected;
       try {
         const form = new FormData();
         form.append("face", file);
-        const res = await fetch(`/api/session/${session.sessionId}`, {
+        const res = await fetch(`/api/session/${sessionId}`, {
           method: "PATCH",
           body: form,
+          signal: controller.signal,
         });
         const data = await res.json();
+        if (!stillCurrent()) return false;
         if (!res.ok || data.face_updated === false || data.metadata_pushed === false) {
           addMsg("system", `Face swap failed: ${data.detail?.message || data.message || (data.metadata_pushed === false ? "The avatar worker did not receive the image. Please retry." : "Unknown error")}`);
           return false;
         } else {
           if (faceSelectionVersionRef.current !== selectionVersion) return false;
-          addMsg("system", "Face swapped");
+          addMsg("system", data.applied === false || data.status === "queued" ? "Image queued for the avatar; waiting for it to apply." : "Image sent to the avatar");
           handleFile(file, faceId, selectionVersion);
           return true;
         }
       } catch {
-        addMsg("system", "Face swap failed");
+        if (stillCurrent()) addMsg("system", controller.signal.aborted
+          ? "Face swap timed out. Check the current avatar before retrying; the image may have reached the worker."
+          : "Face swap failed. Please try again.");
         return false;
       } finally {
+        clearTimeout(timeout);
         faceSwapInFlightRef.current = false;
         setSwapping(false);
         if (faceSelectionVersionRef.current === selectionVersion) setFaceLoading(false);
@@ -533,9 +529,36 @@ export default function DemoPage({
     [session.sessionId, addMsg, handleFile],
   );
 
+  // All upload inputs and drag/drop use the same live-session update path.
+  const handleFileSelect = useCallback(
+    async (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      if (!file) return;
+      if (isConnected) await handleSwapFace(file);
+      else handleFile(file);
+    },
+    [handleFile, handleSwapFace, isConnected],
+  );
+
+  const handleDrop = useCallback(
+    async (e: DragEvent) => {
+      e.preventDefault();
+      setDragOver(false);
+      const file = e.dataTransfer.files[0];
+      if (!file) return;
+      if (isConnected) await handleSwapFace(file);
+      else handleFile(file);
+    },
+    [handleFile, handleSwapFace, isConnected],
+  );
+
   const selectPresetFace = useCallback(
     async (preset: (typeof FACE_PRESETS)[number]) => {
-      if (faceSwapInFlightRef.current) return;
+      if (faceSwapInFlightRef.current) {
+        addMsg("system", "A face swap is still in progress. Please wait for it to finish.");
+        return;
+      }
       const selectionVersion = faceSelectionVersionRef.current + 1;
       faceSelectionVersionRef.current = selectionVersion;
       setFaceLoading(true);
@@ -828,16 +851,15 @@ export default function DemoPage({
         ref={swapInputRef}
         type="file"
         accept="image/*"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) handleSwapFace(file);
-        }}
+        onChange={handleFileSelect}
         className="hidden"
       />
     </>
   );
 
   if (uiMode === "apple") {
+    const appleIdentity = selectedFaceId === DEFAULT_FACE_ID ? "John"
+      : FACE_PRESETS.find((preset) => preset.id === selectedFaceId)?.label || "Custom";
     const appleStatus = session.status === "connecting"
       ? "Connecting"
       : isConnected
@@ -881,8 +903,8 @@ export default function DemoPage({
                 {appleStatus}
                 {isConnected && <small>{formatTime(sessionTime)}</small>}
               </div>
-              <div className="apple-identity-pill" aria-label={`John is ${appleStatus.toLowerCase()}`}>
-                <strong>John</strong>
+              <div className="apple-identity-pill" aria-label={`${appleIdentity} is ${appleStatus.toLowerCase()}`}>
+                <strong>{appleIdentity}</strong>
                 <span>{appleStatus}</span>
               </div>
               {session.status === "connecting" && <div className="apple-loading-ring" aria-hidden="true" />}
@@ -1673,10 +1695,7 @@ export default function DemoPage({
               ref={swapInputRef}
               type="file"
               accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleSwapFace(file);
-              }}
+              onChange={handleFileSelect}
               className="hidden"
             />
 
@@ -2183,10 +2202,7 @@ export default function DemoPage({
               ref={swapInputRef}
               type="file"
               accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleSwapFace(file);
-              }}
+              onChange={handleFileSelect}
               className="hidden"
             />
 

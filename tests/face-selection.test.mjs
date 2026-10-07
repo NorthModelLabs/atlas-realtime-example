@@ -21,20 +21,22 @@ function callback(name) {
     compilerOptions: { target: ts.ScriptTarget.ES2020 },
   }).outputText;
 }
-function setup(fetch, connected = true) {
+function setup(fetch, connected = true, timers = { setTimeout, clearTimeout }) {
   const state = { id: 'old', preview: 'old.png', loading: false, swapping: false, messages: [], file: null };
   const readers = [];
   const context = vm.createContext({
     session: { sessionId: 'ses_0123456789abcdefabcd' }, isConnected: connected,
+    currentFaceSessionRef: { current: { id: 'ses_0123456789abcdefabcd', connected } },
     faceSelectionVersionRef: { current: 0 }, faceSwapInFlightRef: { current: false },
-    swapInputRef: { current: { value: 'chosen.png' } }, File, FormData, fetch,
+    swapInputRef: { current: { value: 'chosen.png' } }, File, FormData, fetch, AbortController,
+    ...timers, setDragOver: () => {},
     setFaceFile: x => { state.file = x; }, setSelectedFaceId: x => { state.id = x; },
     setFacePreview: x => { state.preview = x; }, setFaceUrl: () => {},
     setFaceLoading: x => { state.loading = x; }, setSwapping: x => { state.swapping = x; },
     addMsg: (_, x) => state.messages.push(x),
     FileReader: class { readAsDataURL(file) { readers.push(() => this.onload({ target: { result: `data:${file.name}` } })); } },
   });
-  for (const name of ['handleFile', 'handleFileSelect', 'handleSwapFace', 'selectPresetFace'])
+  for (const name of ['handleFile', 'handleSwapFace', 'handleFileSelect', 'handleDrop', 'selectPresetFace'])
     vm.runInContext(callback(name), context);
   return { context, state, readers };
 }
@@ -100,8 +102,62 @@ test('slow old preset fetch and stale reader cannot replace latest local image',
 test('reselecting same uploaded file clears the native input and nested API errors surface', async () => {
   const s = setup(async () => new Response(JSON.stringify({ detail: { message: 'Session ended' } }), { status: 409 }));
   const input = { files: [new File(['a'], 'a.png', { type: 'image/png' })], value: 'a.png' };
-  s.context.handleFileSelect({ target: input }); assert.equal(input.value, '');
-  await s.context.handleSwapFace(input.files[0]);
+  await s.context.handleFileSelect({ target: input }); assert.equal(input.value, '');
   assert.equal(s.state.messages[0], 'Face swap failed: Session ended');
   assert.equal(s.context.swapInputRef.current.value, '');
+});
+
+test('connected generic upload and drop update the live session, not just its preview', async () => {
+  const calls = [];
+  const s = setup(async (url, options) => { calls.push({ url, options }); return ok(); });
+  const input = { files: [new File(['a'], 'a.png', { type: 'image/png' })], value: 'a.png' };
+  await s.context.handleFileSelect({ target: input });
+  let prevented = false;
+  await s.context.handleDrop({ preventDefault() { prevented = true; }, dataTransfer: { files: [new File(['b'], 'b.png', { type: 'image/png' })] } });
+  assert.equal(prevented, true); assert.equal(input.value, '');
+  assert.equal(calls.length, 2); assert.ok(calls.every(c => c.options.method === 'PATCH'));
+  assert.equal(s.state.file.name, 'b.png');
+});
+
+test('swap timeout unlocks selections without an automatic ambiguous-write retry', async () => {
+  let expire; let cleared = false; let requests = 0;
+  const s = setup((_, options) => {
+    requests++;
+    return new Promise((resolve, reject) => options.signal.addEventListener('abort', () => reject(new Error('abort')), { once: true }));
+  }, true, { setTimeout(fn, ms) { assert.equal(ms, 35000); expire = fn; return 42; }, clearTimeout(id) { assert.equal(id, 42); cleared = true; } });
+  const pending = s.context.handleSwapFace(new File(['a'], 'a.png', { type: 'image/png' }));
+  assert.equal(s.state.swapping, true); expire(); assert.equal(await pending, false);
+  assert.equal(s.state.swapping, false); assert.equal(s.context.faceSwapInFlightRef.current, false);
+  assert.equal(cleared, true); assert.equal(requests, 1); assert.equal(s.state.id, 'old');
+  assert.match(s.state.messages[0], /timed out.*may have reached/);
+  s.context.fetch = async () => ok();
+  assert.equal(await s.context.handleSwapFace(new File(['b'], 'b.png', { type: 'image/png' })), true);
+});
+
+test('late response from a disconnected or different session cannot change preview', async () => {
+  for (const next of [{ id: 'ses_0123456789abcdefabcd', connected: false }, { id: 'ses_aaaaaaaaaaaaaaaaaaaa', connected: true }]) {
+    let release;
+    const s = setup(() => new Promise(resolve => { release = resolve; }));
+    const pending = s.context.handleSwapFace(new File(['a'], 'a.png', { type: 'image/png' }));
+    s.context.currentFaceSessionRef.current = next;
+    release(ok()); assert.equal(await pending, false);
+    assert.equal(s.state.id, 'old'); assert.equal(s.readers.length, 0); assert.equal(s.state.messages.length, 0);
+    assert.equal(s.state.swapping, false);
+  }
+});
+
+test('a busy upload clears the input and explains why it was not sent', async () => {
+  const s = setup(async () => { throw new Error('must not send'); });
+  s.context.faceSwapInFlightRef.current = true;
+  const input = { files: [new File(['a'], 'a.png', { type: 'image/png' })], value: 'a.png' };
+  await s.context.handleFileSelect({ target: input });
+  assert.equal(input.value, ''); assert.match(s.state.messages[0], /still in progress/);
+  assert.equal(s.state.file, null);
+});
+
+test('queued responses never claim the new image has already applied', async () => {
+  const s = setup(async () => new Response(JSON.stringify({ face_updated: true, metadata_pushed: true, applied: false, status: 'queued' })));
+  await s.context.handleSwapFace(new File(['a'], 'a.png', { type: 'image/png' }));
+  assert.match(s.state.messages[0], /queued.*waiting/);
+  assert.doesNotMatch(s.state.messages[0], /swapped/);
 });

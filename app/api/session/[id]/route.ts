@@ -82,6 +82,10 @@ export async function PATCH(
   const upstream = new FormData();
   upstream.append("face", face);
 
+  // Bound the entire update, including response parsing. Never retry an
+  // ambiguous image update automatically: the worker may already have it.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000);
   try {
     const res = await fetch(
       `${ATLAS_API_URL}/v1/realtime/session/${encodeURIComponent(sessionId)}`,
@@ -89,6 +93,7 @@ export async function PATCH(
         method: "PATCH",
         headers: { Authorization: `Bearer ${ATLAS_API_KEY}` },
         body: upstream,
+        signal: controller.signal,
       },
     );
 
@@ -96,9 +101,13 @@ export async function PATCH(
     return NextResponse.json(data, { status: res.status });
   } catch {
     return NextResponse.json(
-      { error: "upstream_error", message: "Failed to reach session service." },
-      { status: 502 },
+      controller.signal.aborted
+        ? { error: "upstream_timeout", message: "Face update timed out. Check the current avatar before retrying; the image may already have reached the worker." }
+        : { error: "upstream_error", message: "Failed to reach session service." },
+      { status: controller.signal.aborted ? 504 : 502 },
     );
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
