@@ -352,6 +352,7 @@ export default function DemoPage({
   const [mirrorInputActive, setMirrorInputActive] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const faceSwapInFlightRef = useRef(false);
   const swapInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const faceSelectionVersionRef = useRef(0);
@@ -466,6 +467,7 @@ export default function DemoPage({
     setFaceFile(file);
     setSelectedFaceId(faceId);
     setFaceUrl("");
+    setFaceLoading(false);
     const reader = new FileReader();
     reader.onload = (e) => {
       if (faceSelectionVersionRef.current === selectionVersion) {
@@ -489,13 +491,17 @@ export default function DemoPage({
     (e: ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) handleFile(file);
+      e.target.value = "";
     },
     [handleFile],
   );
 
   const handleSwapFace = useCallback(
-    async (file: File, faceId = "custom") => {
-      if (!session.sessionId || !file.type.startsWith("image/")) return false;
+    async (file: File, faceId = "custom", version?: number) => {
+      if (!session.sessionId || !file.type.startsWith("image/") || faceSwapInFlightRef.current) return false;
+      const selectionVersion = version ?? faceSelectionVersionRef.current + 1;
+      faceSelectionVersionRef.current = selectionVersion;
+      faceSwapInFlightRef.current = true;
       setSwapping(true);
       try {
         const form = new FormData();
@@ -504,44 +510,44 @@ export default function DemoPage({
           method: "PATCH",
           body: form,
         });
-        if (!res.ok) {
-          const data = await res.json();
-          addMsg("system", `Face swap failed: ${data.message || "Unknown error"}`);
+        const data = await res.json();
+        if (!res.ok || data.face_updated === false || data.metadata_pushed === false) {
+          addMsg("system", `Face swap failed: ${data.detail?.message || data.message || (data.metadata_pushed === false ? "The avatar worker did not receive the image. Please retry." : "Unknown error")}`);
           return false;
         } else {
+          if (faceSelectionVersionRef.current !== selectionVersion) return false;
           addMsg("system", "Face swapped");
-          faceSelectionVersionRef.current += 1;
-          setSelectedFaceId(faceId);
-          const reader = new FileReader();
-          reader.onload = (e) => setFacePreview(e.target?.result as string);
-          reader.readAsDataURL(file);
+          handleFile(file, faceId, selectionVersion);
           return true;
         }
       } catch {
         addMsg("system", "Face swap failed");
         return false;
       } finally {
+        faceSwapInFlightRef.current = false;
         setSwapping(false);
+        if (faceSelectionVersionRef.current === selectionVersion) setFaceLoading(false);
         if (swapInputRef.current) swapInputRef.current.value = "";
       }
     },
-    [session.sessionId, addMsg],
+    [session.sessionId, addMsg, handleFile],
   );
 
   const selectPresetFace = useCallback(
     async (preset: (typeof FACE_PRESETS)[number]) => {
+      if (faceSwapInFlightRef.current) return;
       const selectionVersion = faceSelectionVersionRef.current + 1;
       faceSelectionVersionRef.current = selectionVersion;
-      setSelectedFaceId(preset.id);
-      setFacePreview(preset.src);
       setFaceLoading(true);
       try {
         const res = await fetch(preset.src);
+        if (!res.ok) throw new Error("Avatar image unavailable");
         const blob = await res.blob();
+        if (!blob.type.startsWith("image/")) throw new Error("Invalid avatar image");
         const file = new File([blob], `${preset.id}.png`, { type: blob.type || "image/png" });
         if (faceSelectionVersionRef.current !== selectionVersion) return;
         if (isConnected) {
-          await handleSwapFace(file, preset.id);
+          await handleSwapFace(file, preset.id, selectionVersion);
         } else {
           handleFile(file, preset.id, selectionVersion);
         }
