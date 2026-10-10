@@ -504,12 +504,15 @@ export default function DemoPage({
         });
         const data = await res.json();
         if (!stillCurrent()) return false;
-        if (!res.ok || data.face_updated === false || data.metadata_pushed === false) {
+        if (!res.ok || data.face_updated === false || data.metadata_pushed === false || data.face_update_status === "notification_failed") {
           addMsg("system", `Face swap failed: ${data.detail?.message || data.message || (data.metadata_pushed === false ? "The avatar worker did not receive the image. Please retry." : "Unknown error")}`);
           return false;
         } else {
           if (faceSelectionVersionRef.current !== selectionVersion) return false;
-          addMsg("system", data.applied === false || data.status === "queued" ? "Image queued for the avatar; waiting for it to apply." : "Image sent to the avatar");
+          // Persisted revision / metadata delivery is not the renderer's ACK.
+          // Accept the current API contract as well as older queued responses.
+          const queued = data.face_applied === false || data.face_update_status === "queued" || data.applied === false || data.status === "queued";
+          addMsg("system", queued ? "Image queued for the avatar; waiting for it to apply." : "Image sent to the avatar");
           handleFile(file, faceId, selectionVersion);
           return true;
         }

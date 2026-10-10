@@ -161,3 +161,21 @@ test('queued responses never claim the new image has already applied', async () 
   assert.match(s.state.messages[0], /queued.*waiting/);
   assert.doesNotMatch(s.state.messages[0], /swapped/);
 });
+
+test('current API revision responses remain queued until an actual renderer ACK', async () => {
+  for (const flags of [{ face_applied: false }, { face_update_status: 'queued' }, { face_applied: false, face_update_status: 'queued' }]) {
+    const s = setup(async () => new Response(JSON.stringify({ face_updated: true, metadata_pushed: true, ...flags })));
+    assert.equal(await s.context.handleSwapFace(new File(['a'], 'a.png', { type: 'image/png' })), true);
+    assert.match(s.state.messages[0], /queued.*waiting/);
+    assert.equal(s.state.file.name, 'a.png');
+    assert.doesNotMatch(s.state.messages[0], /applied|swapped/);
+  }
+});
+
+test('current notification failure does not install a successful local preview', async () => {
+  const s = setup(async () => new Response(JSON.stringify({ face_updated: true, face_applied: false, face_update_status: 'notification_failed', message: 'Worker notification failed' })));
+  assert.equal(await s.context.handleSwapFace(new File(['a'], 'a.png', { type: 'image/png' })), false);
+  assert.equal(s.state.id, 'old'); assert.equal(s.readers.length, 0);
+  assert.equal(s.state.swapping, false); assert.equal(s.context.faceSwapInFlightRef.current, false);
+  assert.equal(s.state.messages[0], 'Face swap failed: Worker notification failed');
+});
