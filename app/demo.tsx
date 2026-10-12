@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useRef, useCallback, useEffect, type CSSProperties, type DragEvent, type ChangeEvent } from "react";
 import { flushSync } from "react-dom";
 import { useAtlasSession } from "@northmodellabs/atlas-react";
@@ -8,6 +9,7 @@ import { LocalAudioTrack, Track, RoomEvent, type RemoteTrack } from "livekit-cli
 import { useRealtimeVoice } from "@/app/lib/use-realtime-voice";
 import { probeAudio, probeScheduler, probeStats, probeVideo } from "@/app/lib/voice-diagnostics";
 import { observeReturnedSpeech } from "@/app/lib/returned-speech";
+import { startAnimeSession } from "@/app/lib/anime-start";
 
 const DEFAULT_FACE_ID = "enterprise-b1450303";
 const DEFAULT_FACE_URL = "/faces/enterprise-b1450303.jpg";
@@ -284,13 +286,29 @@ function formatTime(s: number) {
 export default function DemoPage({
   initialUiMode = "apple",
   initialVoiceMode = "ai",
+  animeDemo = false,
+  animeAvailable = false,
 }: {
   initialUiMode?: UiMode;
   initialVoiceMode?: VoiceMode;
+  animeDemo?: boolean;
+  animeAvailable?: boolean;
 }) {
+  const animeWaitRef = useRef<AbortController | null>(null);
+  const [animeProgress, setAnimeProgress] = useState("");
+  const facePresets = animeDemo ? [] : FACE_PRESETS;
+  useEffect(() => () => animeWaitRef.current?.abort(), []);
   const session = useAtlasSession({
     autoEnableMic: false,
     createSession: async (face, faceUrl) => {
+      if (animeDemo) {
+        if (!face) throw new Error("Upload an anime portrait before starting.");
+        const wait = new AbortController(); animeWaitRef.current = wait;
+        try {
+          const data = await startAnimeSession(face, setAnimeProgress, wait.signal);
+          return { sessionId: data.session_id as string, livekitUrl: data.livekit_url as string, token: data.token as string };
+        } finally { if (animeWaitRef.current === wait) animeWaitRef.current = null; }
+      }
       let res: Response;
       if (face) {
         const form = new FormData();
@@ -307,10 +325,11 @@ export default function DemoPage({
         throw new Error("No face image provided");
       }
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || data.error || "Failed to create session");
+      if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : data.detail?.message || data.message || data.error || "Failed to create session");
       return { sessionId: data.session_id, livekitUrl: data.livekit_url, token: data.token };
     },
     deleteSession: async (sessionId) => {
+      animeWaitRef.current?.abort();
       try {
         const res = await fetch(`/api/session/${sessionId}`, { method: "DELETE" });
         if (!res.ok) {
@@ -482,6 +501,10 @@ export default function DemoPage({
   const handleSwapFace = useCallback(
     async (file: File, faceId = "custom", version?: number) => {
       if (!session.sessionId || !file.type.startsWith("image/")) return false;
+      if (animeDemo) {
+        addMsg("system", "End this anime session before preparing another portrait. Human face refresh cannot activate an anime bank.");
+        return false;
+      }
       if (faceSwapInFlightRef.current) {
         addMsg("system", "A face swap is still in progress. Please wait for it to finish.");
         return false;
@@ -505,7 +528,9 @@ export default function DemoPage({
         const data = await res.json();
         if (!stillCurrent()) return false;
         if (!res.ok || data.face_updated === false || data.metadata_pushed === false || data.face_update_status === "notification_failed") {
-          addMsg("system", `Face swap failed: ${data.detail?.message || data.message || (data.metadata_pushed === false ? "The avatar worker did not receive the image. Please retry." : "Unknown error")}`);
+          // FastAPI returns both detail:string and detail:{message}. Dropping
+          // the string hid real upload/session errors behind "Unknown error".
+          addMsg("system", `Face swap failed: ${typeof data.detail === "string" ? data.detail : data.detail?.message || data.message || (data.metadata_pushed === false ? "The avatar worker did not receive the image. Please retry." : "Unknown error")}`);
           return false;
         } else {
           if (faceSelectionVersionRef.current !== selectionVersion) return false;
@@ -529,7 +554,7 @@ export default function DemoPage({
         if (swapInputRef.current) swapInputRef.current.value = "";
       }
     },
-    [session.sessionId, addMsg, handleFile],
+    [session.sessionId, addMsg, handleFile, animeDemo],
   );
 
   // All upload inputs and drag/drop use the same live-session update path.
@@ -538,10 +563,11 @@ export default function DemoPage({
       const file = e.target.files?.[0];
       e.target.value = "";
       if (!file) return;
+      if (animeDemo && session.status === "connecting") { addMsg("system", "Cancel preparation before choosing another portrait."); return; }
       if (isConnected) await handleSwapFace(file);
       else handleFile(file);
     },
-    [handleFile, handleSwapFace, isConnected],
+    [handleFile, handleSwapFace, isConnected, animeDemo, session.status, addMsg],
   );
 
   const handleDrop = useCallback(
@@ -550,10 +576,11 @@ export default function DemoPage({
       setDragOver(false);
       const file = e.dataTransfer.files[0];
       if (!file) return;
+      if (animeDemo && session.status === "connecting") { addMsg("system", "Cancel preparation before choosing another portrait."); return; }
       if (isConnected) await handleSwapFace(file);
       else handleFile(file);
     },
-    [handleFile, handleSwapFace, isConnected],
+    [handleFile, handleSwapFace, isConnected, animeDemo, session.status, addMsg],
   );
 
   const selectPresetFace = useCallback(
@@ -601,11 +628,20 @@ export default function DemoPage({
   }, [facePreview, selectedFaceId]);
 
   useEffect(() => {
+    // Anime selection is not a hidden billable enrollment, and human presets
+    // are not published anime examples. Reuse only the user's explicit upload.
+    if (animeDemo) return;
     fetch(DEFAULT_FACE_URL)
-      .then((r) => r.blob())
+      .then((r) => {
+        // A missing preset is HTML, not a JPEG. Never manufacture a valid
+        // MIME type for an error body and enable Start with that invalid face.
+        if (!r.ok) throw new Error("Default avatar image unavailable");
+        return r.blob();
+      })
       .then((blob) => {
+        if (!blob.type.startsWith("image/")) throw new Error("Invalid default avatar image");
         if (faceSelectionVersionRef.current !== 0) return;
-        const file = new File([blob], "default-face.jpg", { type: "image/jpeg" });
+        const file = new File([blob], "default-face.jpg", { type: blob.type });
         handleFile(file, DEFAULT_FACE_ID);
       })
       .catch(() => {});
@@ -724,6 +760,7 @@ export default function DemoPage({
   };
 
   const disconnect = async () => {
+    animeWaitRef.current?.abort(); setAnimeProgress("");
     setMeetLeaveArmed(false);
     stopMirrorInput();
     stopListening();
@@ -832,7 +869,9 @@ export default function DemoPage({
         "--format-index": activeFormatIndex,
       } as CSSProperties}
     >
-      {UI_FORMATS.map((format) => (
+      {/* Keep the cost/prepare disclosure visible in this first anime prototype.
+          Human formats stay identical; other anime formats are not advertised. */}
+      {(animeDemo ? UI_FORMATS.filter((format) => format.id === "apple") : UI_FORMATS).map((format) => (
         <button
           key={format.id}
           type="button"
@@ -844,11 +883,19 @@ export default function DemoPage({
           {format.label}
         </button>
       ))}
+      {!animeDemo && animeAvailable && <Link href="/anime" aria-label="Open anime demo">Anime</Link>}
     </nav>
   );
   const voiceAlert = voiceError ? <div role="alert" className="fixed top-16 left-1/2 -translate-x-1/2 z-[100] max-w-lg rounded-xl bg-red-950 px-5 py-3 text-sm text-white">{voiceError}</div> : null;
   const hiddenFaceInputs = (
     <>
+      {animeDemo && <aside role="status" className="fixed top-3 left-1/2 -translate-x-1/2 z-[100] max-w-xl rounded-xl bg-black/90 px-4 py-3 text-sm text-white">
+        <strong>Anime prototype · explicit Prepare &amp; Start</strong>
+        <p>Upload only selects your portrait. Start authorizes preparation, which may incur your account’s enrollment charge. No decorative background generation.</p>
+        {animeProgress && <p>{animeProgress}</p>}
+        {session.status === "connecting" && <button type="button" onClick={() => void disconnect()}>Cancel wait (submitted preparation may continue)</button>}
+        <Link href="/">Human demo</Link>
+      </aside>}
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
       <input
         ref={swapInputRef}
@@ -861,7 +908,7 @@ export default function DemoPage({
   );
 
   if (uiMode === "apple") {
-    const appleIdentity = selectedFaceId === DEFAULT_FACE_ID ? "John"
+    const appleIdentity = animeDemo ? "Anime" : selectedFaceId === DEFAULT_FACE_ID ? "John"
       : FACE_PRESETS.find((preset) => preset.id === selectedFaceId)?.label || "Custom";
     const appleStatus = session.status === "connecting"
       ? "Connecting"
@@ -933,7 +980,7 @@ export default function DemoPage({
                 <div className="apple-settings-section">
                   <span>Avatar</span>
                   <div className="apple-avatar-options">
-                    {FACE_PRESETS.map((preset) => (
+                    {facePresets.map((preset) => (
                       <button
                         key={preset.id}
                         type="button"
@@ -993,7 +1040,7 @@ export default function DemoPage({
                 aria-label={!isConnected ? "Start avatar" : voiceInputActive ? "Mute microphone" : "Start microphone"}
               >
                 <span>{!isConnected ? <PlayIcon /> : <MicIcon muted={!voiceInputActive} />}</span>
-                <small>{!isConnected ? "Start" : voiceInputActive ? "Mute" : "Talk"}</small>
+                <small>{!isConnected ? animeDemo ? "Prepare & Start" : "Start" : voiceInputActive ? "Mute" : "Talk"}</small>
               </button>
 
               <button
@@ -1128,7 +1175,7 @@ export default function DemoPage({
               </p>
             </div>
             <div className="teacher-avatar-strip">
-              {FACE_PRESETS.map((preset) => (
+              {facePresets.map((preset) => (
                 <button
                   key={preset.id}
                   type="button"
@@ -1369,7 +1416,7 @@ export default function DemoPage({
                   <div className="meet-settings-group">
                     <span className="meet-panel-label">Avatar</span>
                     <div className="meet-avatar-options">
-                      {FACE_PRESETS.map((preset) => (
+                      {facePresets.map((preset) => (
                         <button
                           key={preset.id}
                           type="button"
@@ -1543,7 +1590,7 @@ export default function DemoPage({
 
           <aside className="mirror-control-dock" aria-label="Mirror controls">
             <div className="mirror-avatar-row">
-              {FACE_PRESETS.map((preset) => (
+              {facePresets.map((preset) => (
                 <button
                   key={preset.id}
                   type="button"
@@ -1704,7 +1751,7 @@ export default function DemoPage({
 
             {!isConnected && (
               <div className="tiktok-avatar-strip absolute inset-x-4 top-4 z-30 flex gap-3 overflow-x-auto px-1 pb-2">
-                {FACE_PRESETS.map((preset) => (
+                {facePresets.map((preset) => (
                   <button
                     key={preset.id}
                     type="button"
@@ -1908,7 +1955,7 @@ export default function DemoPage({
                       </button>
                     ))}
                   </div>
-                  {FACE_PRESETS.map((preset) => (
+                  {facePresets.map((preset) => (
                     <button
                       key={preset.id}
                       type="button"

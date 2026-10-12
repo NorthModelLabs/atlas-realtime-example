@@ -18,10 +18,13 @@ export function accessGuard(req: Request, kind: string, id: string): NextRespons
   return valid(value, kind, id, secret()) ? null : NextResponse.json({error: "Resource not available in this browser"}, {status: 403});
 }
 export function grant(response: NextResponse, kind: string, id: string): NextResponse {
-  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(id)) throw new Error("Invalid resource reference");
+  // Enrollment handles contain periods, unlike legacy session/job ids. Keep
+  // this exception exact-kind/exact-format; do not widen the original guard.
+  const enrollment = kind === "anime_enrollment";
+  if (!(enrollment ? /^ae1\.[a-f0-9]{24}\.[A-Za-z0-9_-]{43}$/.test(id) : /^[a-zA-Z0-9_-]{1,128}$/.test(id))) throw new Error("Invalid resource reference");
   response.cookies.set(`atlas_demo_${kind}_${id}`, token(kind, id, secret()), {
     httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict",
-    maxAge: 3600, path: kind === "job" ? `/api/jobs/${id}` : `/api/session/${id}`,
+    maxAge: 3600, path: enrollment ? `/api/anime/enrollment/${id}` : kind === "job" ? `/api/jobs/${id}` : `/api/session/${id}`,
   });
   return response;
 }

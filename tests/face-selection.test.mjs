@@ -10,6 +10,8 @@ const tree = ts.createSourceFile('demo.tsx', source, ts.ScriptTarget.Latest, tru
 function callback(name) {
   let found;
   function walk(node) {
+    if (name === 'loadDefaultFace' && ts.isCallExpression(node) && node.expression.getText(tree) === 'useEffect'
+        && node.arguments[0]?.getText(tree).includes('fetch(DEFAULT_FACE_URL)')) found = node.arguments[0].getText(tree);
     if (ts.isVariableDeclaration(node) && node.name.getText(tree) === name) {
       assert.ok(ts.isCallExpression(node.initializer));
       found = node.initializer.arguments[0].getText(tree);
@@ -25,7 +27,8 @@ function setup(fetch, connected = true, timers = { setTimeout, clearTimeout }) {
   const state = { id: 'old', preview: 'old.png', loading: false, swapping: false, messages: [], file: null };
   const readers = [];
   const context = vm.createContext({
-    session: { sessionId: 'ses_0123456789abcdefabcd' }, isConnected: connected,
+    session: { sessionId: 'ses_0123456789abcdefabcd' }, isConnected: connected, animeDemo: false,
+    DEFAULT_FACE_URL: '/faces/enterprise-b1450303.jpg', DEFAULT_FACE_ID: 'enterprise-b1450303',
     currentFaceSessionRef: { current: { id: 'ses_0123456789abcdefabcd', connected } },
     faceSelectionVersionRef: { current: 0 }, faceSwapInFlightRef: { current: false },
     swapInputRef: { current: { value: 'chosen.png' } }, File, FormData, fetch, AbortController,
@@ -36,7 +39,7 @@ function setup(fetch, connected = true, timers = { setTimeout, clearTimeout }) {
     addMsg: (_, x) => state.messages.push(x),
     FileReader: class { readAsDataURL(file) { readers.push(() => this.onload({ target: { result: `data:${file.name}` } })); } },
   });
-  for (const name of ['handleFile', 'handleSwapFace', 'handleFileSelect', 'handleDrop', 'selectPresetFace'])
+  for (const name of ['handleFile', 'handleSwapFace', 'handleFileSelect', 'handleDrop', 'selectPresetFace', 'loadDefaultFace'])
     vm.runInContext(callback(name), context);
   return { context, state, readers };
 }
@@ -105,6 +108,33 @@ test('reselecting same uploaded file clears the native input and nested API erro
   await s.context.handleFileSelect({ target: input }); assert.equal(input.value, '');
   assert.equal(s.state.messages[0], 'Face swap failed: Session ended');
   assert.equal(s.context.swapInputRef.current.value, '');
+});
+
+test('FastAPI detail string preserves the actual failed upload reason', async () => {
+  const s = setup(async () => new Response(JSON.stringify({ detail: 'Unsupported portrait type' }), { status: 415 }));
+  await s.context.handleSwapFace(new File(['a'], 'a.png', { type: 'image/png' }));
+  assert.equal(s.state.messages[0], 'Face swap failed: Unsupported portrait type');
+  assert.equal(s.state.id, 'old'); assert.equal(s.state.swapping, false);
+});
+
+test('default initialization rejects 404/HTML instead of pretending they are JPEG', async () => {
+  for (const response of [new Response('<html>404</html>', { status: 404 }), new Response('<html>', { headers: { 'Content-Type': 'text/html' } })]) {
+    const s = setup(async () => response, false); s.context.loadDefaultFace();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(s.state.file, null); assert.equal(s.readers.length, 0);
+  }
+});
+
+test('anime upload selection does not enroll or generate, and pending selection is serialized', async () => {
+  let requests = 0;
+  const s = setup(async () => { requests++; throw new Error('must not call'); }, false);
+  s.context.animeDemo = true;
+  s.context.loadDefaultFace();
+  await s.context.handleFileSelect({ target: { files: [new File(['a'], 'a.png', { type: 'image/png' })], value: 'a.png' } });
+  assert.equal(requests, 0); assert.equal(s.state.file.name, 'a.png');
+  s.context.session.status = 'connecting';
+  await s.context.handleFileSelect({ target: { files: [new File(['b'], 'b.png', { type: 'image/png' })], value: 'b.png' } });
+  assert.equal(s.state.file.name, 'a.png'); assert.equal(requests, 0);
 });
 
 test('connected generic upload and drop update the live session, not just its preview', async () => {

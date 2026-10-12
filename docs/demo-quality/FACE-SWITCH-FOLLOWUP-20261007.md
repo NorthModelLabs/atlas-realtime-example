@@ -36,3 +36,61 @@ A disposable owned Chrome against a credential-free loopback development server 
 Private evidence: `/private/tmp/atlas-demo-face-switch-visual-20261007-DZzWgr/receipt.json` and four screenshots. The owned browser profile was removed after proving zero survivors. Local preview resolved installed Next.js 16.2.2 although package.json specifies 16.3.8; no dependency install/build was performed and no claim is made about a new production build.
 
 Production deployment remains held by the owner's latest instruction. The public demo still needs a reviewed frontend promotion before users receive this source fix.
+
+## October 12 source-only continuation
+
+The owner again reported friends unable to switch references and requested an
+anime demo. The retained served/source mismatch above explains the October 7
+incident, not necessarily the currently served implementation. Root's current
+read-only public GET returned HTTP200/9497B (HTML SHA
+`eb0f23e541b734663e696b5569d8e9fef50360b2d17285f46e1c6de194dfec16`).
+An initial parser incorrectly filtered out script URLs with `?dpl=` queries;
+root corrected that observation. The actual page title is Atlas Realtime
+Example App, deployment `dpl_4Gn3kBtiXyzeTusyp8y1b5imU3Ff`. Its exact
+`app/page-f0fd68c1014808eb.js?dpl=...` returned HTTP200/72326B, SHA
+`989028ec43749652fa2010d998ed97656b3f621351a69928545a5f08e5196308`.
+Deployment and bundle path match the retained October 7 witness. This child
+did not locate a retained October 7 whole-bundle SHA for a separate byte-level
+comparison; absence of minified variable names is not semantic proof. This
+child made no hosted requests or promotion. The reference fix still requires
+promotion of the exact dedicated-demo feature branch, not `main` or the
+separate legacy Vercel project's auto-deploy boundary.
+All four local preset files exist. Do not confuse the marketing site's
+`/demos` video gallery with this dedicated Demo Atlas application.
+
+Two additional code defects were fixed: FastAPI `detail: string` errors were
+hidden by a parser accepting only `detail.message`; initial default loading
+also converted a 404/HTML body into a purported JPEG. The new guards preserve
+real errors and refuse non-image/default-error bodies. Human swap serialization,
+queued-versus-applied semantics and timeout ambiguity remain intact.
+
+The new `/anime` prototype is OFF unless the server explicitly sets
+`ATLAS_ANIME_DEMO_ENABLED=true`. It reuses the SAME public `ATLAS_API_URL`,
+server-only API key, origin/browser capabilities, SDK and session lifecycle.
+Explicit **Prepare & Start** uploads to the existing authenticated enrollment
+API, polls its opaque handle, and creates a session only after authenticated
+readiness using `mouth_mode=anime_realtime`. Selecting/uploading alone does not
+enroll, generate, start a room or call Prodia. Cancellation stops waiting/new
+session creation but does not claim to cancel an accepted billable enrollment.
+The SDK still owns exact session cleanup if its final creation ACK is stale.
+
+Preparation may be billable under the configured API account; the interface
+states that explicitly, without inventing a live price. No human portraits or
+private accepted-bank assets were copied into public anime examples. Cross-bank
+live face refresh is not advertised: end the anime session before preparing a
+different portrait. Decorative background generation versus authored-mouth-bank
+preparation remains an owner clarification, not an automatic provider call.
+
+Before enabling/deploying, root must verify the CURRENT public enrollment
+availability, cost/hold policy, selected anime production route and bank
+readiness. Accepted F225 recordings/runtime do not prove arbitrary uploaded
+portrait enrollment, nor do local mocked route tests. No deploy, push, image
+build, provider/model call or live session occurred in this source continuation.
+
+Final local checks: 31 tests passed using the actual extracted face-selection,
+proxy/enrollment handlers, client enrollment/poll/start flow and capability
+grant code with synthetic transports; TypeScript no-emit passed; targeted ESLint
+has zero errors and the existing voice-hook dependency warning. A hosted build,
+live portrait switch, actual anime enrollment and production A/V acceptance
+were not run. The human reference-fix promotion does not depend on enabling
+this OFF anime prototype or authorizing new paid preparation.
