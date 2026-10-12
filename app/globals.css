@@ -665,29 +665,58 @@
 }
 
 .apple-avatar-options {
-  display: flex;
+  display: grid;
   gap: 9px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
 .apple-avatar-options button {
   background: transparent;
   border: 2px solid transparent;
-  height: 48px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
   overflow: hidden;
-  padding: 2px;
-  width: 48px;
+  padding: 5px 2px;
+  width: 100%;
 }
 
 .apple-avatar-options button.is-selected {
   border-color: white;
 }
 
-.apple-avatar-options img {
+.apple-avatar-option-image {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 16px !important;
+  display: flex;
+  flex: 0 0 48px;
+  height: 48px;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  width: 48px;
+}
+
+.apple-avatar-option-image img {
   height: 100%;
+  inset: 0;
   object-fit: cover;
+  position: absolute;
   width: 100%;
+}
+
+.apple-avatar-option-label {
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 10px;
+  line-height: 1.3;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .apple-settings-list {

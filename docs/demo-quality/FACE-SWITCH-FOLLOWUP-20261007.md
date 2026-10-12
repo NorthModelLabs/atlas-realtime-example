@@ -94,3 +94,38 @@ has zero errors and the existing voice-hook dependency warning. A hosted build,
 live portrait switch, actual anime enrollment and production A/V acceptance
 were not run. The human reference-fix promotion does not depend on enabling
 this OFF anime prototype or authorizing new paid preparation.
+
+## Current deployed reference chooser follow-up
+
+Root subsequently confirmed commit `1edea51038d234bd0df833adab6cc2d5ed70fc53`
+live on dedicated Demo Atlas deployment `dpl_8aeWX7srLternmRgmLGKr6CD1yYJ`,
+with all four reference assets returning HTTP 200 and matching local bytes.
+That supersedes the prior held-promotion status, not the absent browser/media
+acceptance. A newly reported Apple Settings screenshot showed an empty ring.
+No browser tool was available here, and source review did not prove that only
+one preset rendered: the human JSX maps all four, with no hide/nth-child rule.
+HTTP asset availability alone is not browser image decode or layout evidence.
+
+The concrete usability defect was image-only, empty-alt, lazy thumbnails with
+no visible names or image-failure fallback. The local follow-up adds four grid
+columns, fixed thumbnail boxes, eager loading, visible reference names and
+initial-letter fallback. An image error hides only that failed image; selection
+and session callbacks are unchanged, with no upload, generation or retry.
+Actual Apple JSX rendered through real Next/Image produces four named eager
+images and four working callback bindings in the local SSR check. This is not
+a hydrated browser screenshot reproduction or a hosted deployment claim.
+
+Local follow-up checks: 28 tests passed across the new chooser check and existing
+face selection/anime client/route checks; TypeScript no-emit passed; targeted
+ESLint has zero errors and the same pre-existing voice dependency warning.
+The new regression file is `tests/apple-reference-chooser.test.mjs`.
+
+Anime remains OFF. Local API source has authenticated POST/GET
+`/v1/realtime/anime/enrollments` and session creation with `anime_enrollment_id`
+plus `mouth_mode=anime_realtime`, matching the prototype. Actual serving-source
+and operational flags are not established by that local source review:
+enrollment availability requires enabled enrollment, cost guard, database,
+internal service/auth and handle secret; session routing requires enabled anime
+mode and its configured agent. The local default hold/charge values are not
+live prices. Confirm current costs and actual uploaded-bank readiness before
+enabling the UI. Paid generation on image selection remains absent.

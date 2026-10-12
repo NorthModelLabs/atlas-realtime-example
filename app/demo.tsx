@@ -979,7 +979,7 @@ export default function DemoPage({
 
                 <div className="apple-settings-section">
                   <span>Avatar</span>
-                  <div className="apple-avatar-options">
+                  <div className="apple-avatar-options" role="group" aria-label="Reference images">
                     {facePresets.map((preset) => (
                       <button
                         key={preset.id}
@@ -987,9 +987,18 @@ export default function DemoPage({
                         onClick={() => void selectPresetFace(preset)}
                         className={selectedFaceId === preset.id ? "is-selected" : ""}
                         aria-label={`Use ${preset.label} avatar`}
+                        aria-pressed={selectedFaceId === preset.id}
                         title={preset.label}
                       >
-                        <Image src={preset.src} alt="" width={72} height={72} unoptimized />
+                        {/* A thumbnail is not the only way to identify a choice.
+                            Keep all four names visible even if decoding fails;
+                            an image error must never trigger a session swap. */}
+                        <span className="apple-avatar-option-image" aria-hidden="true">
+                          <span>{preset.label.slice(0, 1)}</span>
+                          <Image src={preset.src} alt="" width={48} height={48} loading="eager" unoptimized
+                            onError={(event) => { event.currentTarget.style.visibility = "hidden"; }} />
+                        </span>
+                        <span className="apple-avatar-option-label">{preset.label}</span>
                       </button>
                     ))}
                   </div>
