@@ -25,7 +25,7 @@ export async function POST(req: NextRequest, context: Context) {
     // are not a ready bank. The API must also validate the exact handle.
     const ready = await animeUpstream(`/v1/realtime/anime/enrollments/${encodeURIComponent(id)}`);
     if (!ready.ok) return NextResponse.json(ready.data, { status: ready.status });
-    if (ready.data.enrollment_id !== id || ready.data.realtime_ready !== true) {
+    if (ready.data.enrollment_id !== id || ready.data.status !== "ready" || ready.data.realtime_ready !== true) {
       return NextResponse.json({ message: "Anime portrait is not ready to start." }, { status: 409 });
     }
     const result = await animeUpstream("/v1/realtime/session", { method: "POST",

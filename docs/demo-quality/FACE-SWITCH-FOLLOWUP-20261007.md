@@ -129,3 +129,69 @@ internal service/auth and handle secret; session routing requires enabled anime
 mode and its configured agent. The local default hold/charge values are not
 live prices. Confirm current costs and actual uploaded-bank readiness before
 enabling the UI. Paid generation on image selection remains absent.
+
+## Shared paid-demo account and hosted upload boundary audit
+
+The server authenticates every request with its configured `ATLAS_API_KEY`:
+the **demo operator's Atlas account** pays, not a visitor's personal account.
+The anime disclosure/progress now says so. Explicit Prepare & Start remains
+the only enrollment trigger; selection/drop/preview does not generate or bill.
+An origin check is CSRF protection, **not** visitor authentication or an
+anti-abuse quota. Browser resource capabilities authorize only subsequent
+access to the exact returned enrollment/session, not the initial spend.
+
+Atlas's direct API accepts 10 MiB, but the hosted multipart proxy is a Vercel
+Function with a 4.5 MB body cap ([official limit](https://vercel.com/docs/functions/limitations)).
+The old 10 MB demo promise could fail before the route's own code ran. Both
+human creation/face PATCH and anime enrollment now share a 4,000,000-byte
+portrait limit and 4,250,000-byte bounded multipart reader, including chunked
+bodies without Content-Length. Unsupported/duplicate fields are rejected;
+human creation still allows its existing `mode` field. The DEMO JSON proxy now
+rejects any `face_url` property (including null/empty/managed/HTTPS), bounds
+mode-only JSON to 16 KiB, and rejects malformed/null/array/primitive bodies
+before property access or upstream calls. Valid mode-only/default-portrait
+fallback remains. This is the demo proxy fix, not a claim that a new global API
+source bundle has been deployed. No resizing, new upload
+provider or automatic write retry was introduced. Client selection/drop/live
+swap rejects oversize before state/FileReader/PATCH, and host 413 HTML produces
+the size message rather than JSON parse failure. Existing capability, exact
+session, stale response, ACK/queued status and timeout ambiguity behavior stays.
+
+The public API maps completed durable enrollment to `status=ready`. The client
+and session-start proxy now reject failed/manual-review/unknown or inconsistent
+states, even if a conflicting `realtime_ready=true` is present. Same-content
+idempotency is retained: a failed terminal request may require a deliberate
+new upstream enrollment intent; this prototype does not silently change the
+key to spend again, retry an ambiguous POST, or promise cancellation of accepted
+work. Server-origin/browser ownership checks are unchanged.
+
+Local API source enforces API-key rate limits, pending enrollments per funded
+account, available credit reservation, source-bound idempotency and commit-last
+readiness. Those are source findings, not proof of the current production
+flags/balance/quota. There is no durable anonymous visitor spend limiter in the
+demo. Do not call a consent notice, in-process counter or Origin header an
+anti-abuse guarantee. Verify the operator's current allowed spend and upstream
+guards before public enablement; no price or free-use promise is inferred.
+
+Accepted F225 known/holdout A/V proves those retained banks/rendered sessions,
+not arbitrary upload -> authored closed/semi/full states -> immutable bundle ->
+ready pointer -> selected worker hydration. The runtime-only production release
+did not turn on the generic enrollment/bank correction by itself.
+
+The smallest controlled operational test is: one owner-approved nonpersonal
+portrait (exact hash, PNG/JPEG/WebP, <=4,000,000 bytes), the existing demo account
+and current verified hold/charge ceiling; exactly one enrollment POST with its
+content key; bounded authenticated polling of that exact handle (<=30 min,
+3-second interval, no resubmission); one session POST only after exact ready
+status; a short returned A/V check; exact session DELETE/reconciliation through
+the existing lifecycle. Normal enrollment may create a paid durable bank and
+consume the operator's credits; cancellation does not erase it and no bank
+delete endpoint is assumed. No other portraits/keys/models/GPU/image builds,
+decorative generation, production model change or financial adjustment is
+part of that test. Current API flags/route/cost readiness must be established
+first after normal authentication is restored, not fabricated from local tests.
+
+Local audit checks: 48 tests passed with actual source consumers and synthetic
+transports; TypeScript no-emit passed; targeted lint has zero errors and the
+existing voice-hook warning. No flag, credential, deployment, provider, paid
+enrollment, room or production resource was changed in this audit.

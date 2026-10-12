@@ -1,5 +1,6 @@
 import { accessGuard } from "@/app/lib/demo-access";
 import { NextRequest, NextResponse } from "next/server";
+import { portraitForm, portraitError, PortraitInputError } from "@/app/lib/demo-portrait";
 
 const ATLAS_API_URL = process.env.ATLAS_API_URL || "";
 const ATLAS_API_KEY = process.env.ATLAS_API_KEY || "";
@@ -69,7 +70,12 @@ export async function PATCH(
     );
   }
 
-  const form = await req.formData();
+  let form: FormData;
+  try { form = await portraitForm(req); }
+  catch (error) {
+    return NextResponse.json({ error: "invalid_portrait", message: error instanceof PortraitInputError
+      ? error.message : "Invalid portrait upload." }, { status: error instanceof PortraitInputError ? error.status : 400 });
+  }
   const face = form.get("face");
 
   if (!face || !(face instanceof Blob)) {
@@ -78,6 +84,8 @@ export async function PATCH(
       { status: 400 },
     );
   }
+  const invalid = portraitError(face);
+  if (invalid) return NextResponse.json({ error: "invalid_portrait", message: invalid }, { status: 413 });
 
   const upstream = new FormData();
   upstream.append("face", face);

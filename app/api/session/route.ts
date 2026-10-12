@@ -1,5 +1,6 @@
 import { creationGuard, grant } from "@/app/lib/demo-access";
 import { NextRequest, NextResponse } from "next/server";
+import { portraitForm, portraitError, PortraitInputError, demoModeJSON } from "@/app/lib/demo-portrait";
 
 const ATLAS_API_URL = process.env.ATLAS_API_URL || "";
 const ATLAS_API_KEY = process.env.ATLAS_API_KEY || "";
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
     let upstreamResp: Response;
 
     if (ct.includes("multipart/form-data")) {
-      const form = await req.formData();
+      const form = await portraitForm(req, ["face", "mode"]);
       const face = form.get("face");
       const mode = form.get("mode");
 
@@ -47,6 +48,8 @@ export async function POST(req: NextRequest) {
           { status: 400 },
         );
       }
+      const invalid = portraitError(face);
+      if (invalid) return NextResponse.json({ error: "invalid_portrait", message: invalid }, { status: 413 });
 
       if (mode && !VALID_MODES.has(String(mode))) {
         return NextResponse.json(
@@ -73,23 +76,18 @@ export async function POST(req: NextRequest) {
         );
       }
     } else {
-      let body: Record<string, unknown> = {};
-      try {
-        body = await req.json();
-      } catch {
-        // empty body is fine
-      }
-
-      const faceUrl = typeof body.face_url === "string" ? body.face_url.trim() : "";
-      if (faceUrl && !faceUrl.startsWith("https://")) {
+      const body = await demoModeJSON(req);
+      // Uploads only: HTTPS/managed/empty/null are still URL-field presence.
+      // Do not fetch a URL or smuggle an old portrait URL into the new flow.
+      if (Object.prototype.hasOwnProperty.call(body, "face_url")) {
         return NextResponse.json(
-          { error: "invalid_face_url", message: "face_url must use HTTPS." },
+          { error: "portrait_upload_required", message: "Upload the portrait file; face_url is not accepted by this demo." },
           { status: 400 },
         );
       }
 
       const mode = typeof body.mode === "string" ? body.mode : undefined;
-      if (mode && !VALID_MODES.has(mode)) {
+      if (Object.prototype.hasOwnProperty.call(body, "mode") && (!mode || !VALID_MODES.has(mode))) {
         return NextResponse.json(
           { error: "invalid_mode", message: "Mode must be 'conversation' or 'passthrough'." },
           { status: 400 },
@@ -97,7 +95,6 @@ export async function POST(req: NextRequest) {
       }
 
       const payload = {
-        face_url: faceUrl || undefined,
         mode: mode || undefined,
       };
       try {
@@ -128,6 +125,7 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json(data, { status: upstreamResp.status });
     return upstreamResp.ok && typeof data.session_id === "string" ? grant(response, "session", data.session_id) : response;
   } catch (err) {
+    if (err instanceof PortraitInputError) return NextResponse.json({ error: "invalid_portrait", message: err.message }, { status: err.status });
     console.error("[POST /api/session] UNHANDLED:", err);
     return NextResponse.json(
       { error: "internal_error", message: "An unexpected error occurred." },

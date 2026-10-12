@@ -10,6 +10,7 @@ import { useRealtimeVoice } from "@/app/lib/use-realtime-voice";
 import { probeAudio, probeScheduler, probeStats, probeVideo } from "@/app/lib/voice-diagnostics";
 import { observeReturnedSpeech } from "@/app/lib/returned-speech";
 import { startAnimeSession } from "@/app/lib/anime-start";
+import { portraitError, PORTRAIT_LIMIT_MESSAGE } from "@/app/lib/demo-portrait";
 
 const DEFAULT_FACE_ID = "enterprise-b1450303";
 const DEFAULT_FACE_URL = "/faces/enterprise-b1450303.jpg";
@@ -311,6 +312,7 @@ export default function DemoPage({
       }
       let res: Response;
       if (face) {
+        const invalid = portraitError(face); if (invalid) throw new Error(invalid);
         const form = new FormData();
         form.append("face", face);
         form.append("mode", "passthrough");
@@ -324,6 +326,7 @@ export default function DemoPage({
       } else {
         throw new Error("No face image provided");
       }
+      if (res.status === 413) throw new Error(PORTRAIT_LIMIT_MESSAGE);
       const data = await res.json();
       if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : data.detail?.message || data.message || data.error || "Failed to create session");
       return { sessionId: data.session_id, livekitUrl: data.livekit_url, token: data.token };
@@ -483,6 +486,7 @@ export default function DemoPage({
 
   const handleFile = useCallback((file: File, faceId = "custom", version?: number) => {
     if (!file.type.startsWith("image/")) return;
+    const invalid = portraitError(file); if (invalid) { addMsg("system", invalid); setFaceLoading(false); return; }
     const selectionVersion = version ?? faceSelectionVersionRef.current + 1;
     faceSelectionVersionRef.current = selectionVersion;
     setFaceFile(file);
@@ -496,11 +500,12 @@ export default function DemoPage({
       }
     };
     reader.readAsDataURL(file);
-  }, []);
+  }, [addMsg]);
 
   const handleSwapFace = useCallback(
     async (file: File, faceId = "custom", version?: number) => {
       if (!session.sessionId || !file.type.startsWith("image/")) return false;
+      const invalid = portraitError(file); if (invalid) { addMsg("system", invalid); return false; }
       if (animeDemo) {
         addMsg("system", "End this anime session before preparing another portrait. Human face refresh cannot activate an anime bank.");
         return false;
@@ -525,6 +530,7 @@ export default function DemoPage({
           body: form,
           signal: controller.signal,
         });
+        if (res.status === 413) { if (stillCurrent()) addMsg("system", PORTRAIT_LIMIT_MESSAGE); return false; }
         const data = await res.json();
         if (!stillCurrent()) return false;
         if (!res.ok || data.face_updated === false || data.metadata_pushed === false || data.face_update_status === "notification_failed") {
@@ -891,7 +897,7 @@ export default function DemoPage({
     <>
       {animeDemo && <aside role="status" className="fixed top-3 left-1/2 -translate-x-1/2 z-[100] max-w-xl rounded-xl bg-black/90 px-4 py-3 text-sm text-white">
         <strong>Anime prototype · explicit Prepare &amp; Start</strong>
-        <p>Upload only selects your portrait. Start authorizes preparation, which may incur your account’s enrollment charge. No decorative background generation.</p>
+        <p>Upload only selects your portrait (PNG, JPEG or WebP, up to 4 MB). Prepare &amp; Start authorizes preparation using the demo operator’s Atlas account and may consume its enrollment credits. This is not your personal Atlas billing account. No decorative background generation.</p>
         {animeProgress && <p>{animeProgress}</p>}
         {session.status === "connecting" && <button type="button" onClick={() => void disconnect()}>Cancel wait (submitted preparation may continue)</button>}
         <Link href="/">Human demo</Link>

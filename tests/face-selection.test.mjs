@@ -7,9 +7,13 @@ const require = createRequire(import.meta.url);
 const ts = require('typescript');
 const source = fs.readFileSync(new URL('../app/demo.tsx', import.meta.url), 'utf8');
 const tree = ts.createSourceFile('demo.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+const portrait = { exports: {}, Blob, Response };
+vm.runInNewContext(ts.transpileModule(fs.readFileSync(new URL('../app/lib/demo-portrait.ts', import.meta.url), 'utf8'),
+  { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText, portrait);
 function callback(name) {
   let found;
   function walk(node) {
+    if (name === 'createSession' && ts.isPropertyAssignment(node) && node.name.getText(tree) === name) found = node.initializer.getText(tree);
     if (name === 'loadDefaultFace' && ts.isCallExpression(node) && node.expression.getText(tree) === 'useEffect'
         && node.arguments[0]?.getText(tree).includes('fetch(DEFAULT_FACE_URL)')) found = node.arguments[0].getText(tree);
     if (ts.isVariableDeclaration(node) && node.name.getText(tree) === name) {
@@ -27,6 +31,7 @@ function setup(fetch, connected = true, timers = { setTimeout, clearTimeout }) {
   const state = { id: 'old', preview: 'old.png', loading: false, swapping: false, messages: [], file: null };
   const readers = [];
   const context = vm.createContext({
+    ...portrait.exports,
     session: { sessionId: 'ses_0123456789abcdefabcd' }, isConnected: connected, animeDemo: false,
     DEFAULT_FACE_URL: '/faces/enterprise-b1450303.jpg', DEFAULT_FACE_ID: 'enterprise-b1450303',
     currentFaceSessionRef: { current: { id: 'ses_0123456789abcdefabcd', connected } },
@@ -39,7 +44,7 @@ function setup(fetch, connected = true, timers = { setTimeout, clearTimeout }) {
     addMsg: (_, x) => state.messages.push(x),
     FileReader: class { readAsDataURL(file) { readers.push(() => this.onload({ target: { result: `data:${file.name}` } })); } },
   });
-  for (const name of ['handleFile', 'handleSwapFace', 'handleFileSelect', 'handleDrop', 'selectPresetFace', 'loadDefaultFace'])
+  for (const name of ['handleFile', 'handleSwapFace', 'handleFileSelect', 'handleDrop', 'selectPresetFace', 'loadDefaultFace', 'createSession'])
     vm.runInContext(callback(name), context);
   return { context, state, readers };
 }
@@ -57,6 +62,22 @@ test('connected preset completes loading, retains selected upload and supports n
   await s.context.selectPresetFace({ id: 'other', src: '/faces/default.png' });
   assert.equal(s.state.loading, false); assert.equal(s.state.id, 'other');
   assert.equal(calls.filter(x => x.options?.method === 'PATCH').length, 2);
+});
+test('actual create callback rejects oversize before POST and makes host 413 HTML clear', async () => {
+  let calls = 0;const s = setup(async () => { calls++;return new Response('FUNCTION_PAYLOAD_TOO_LARGE', { status: 413 }); });
+  await assert.rejects(s.context.createSession(new File([new Uint8Array(4_000_001)], 'large.png', { type: 'image/png' })), /4 MB/);
+  assert.equal(calls, 0);
+  await assert.rejects(s.context.createSession(new File(['small'], 'face.png', { type: 'image/png' })), /4 MB/);assert.equal(calls, 1);
+});
+
+test('oversized local upload, drop and live update are rejected before file read or PATCH', async () => {
+  let requests = 0; const s = setup(async () => { requests++; throw new Error('no external'); });
+  const file = new File([new Uint8Array(4_000_001)], 'large.png', { type: 'image/png' });
+  s.context.handleFile(file);assert.equal(s.readers.length, 0);assert.equal(s.state.id, 'old');
+  await s.context.handleFileSelect({ target: { files: [file], value: 'large.png' } });
+  await s.context.handleDrop({ preventDefault() {}, dataTransfer: { files: [file] } });
+  assert.equal(requests, 0);assert.equal(s.state.swapping, false);
+  assert.ok(s.state.messages.every(message => message.includes('4 MB')));
 });
 
 test('metadata not delivered is not reported or previewed as a successful swap', async () => {

@@ -8,7 +8,14 @@ const raw = fs.readFileSync(new URL('../app/lib/anime-start.ts', import.meta.url
 const javascript = ts.transpileModule(raw, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText;
 const id = `ae1.${'a'.repeat(24)}.${'B'.repeat(43)}`;
 function setup(fetch) {
-  const context = vm.createContext({ exports: {}, fetch, FormData, File, AbortController,
+  const load = name => {
+    const box = { exports: {}, Blob, Response, require: load };
+    const path = name === './anime-contract' ? '../app/lib/anime-contract.ts' : '../app/lib/demo-portrait.ts';
+    vm.runInNewContext(ts.transpileModule(fs.readFileSync(new URL(path, import.meta.url), 'utf8'),
+      { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText, box);
+    return box.exports;
+  };
+  const context = vm.createContext({ exports: {}, require: load, fetch, FormData, File, AbortController,
     Date, setTimeout(fn) { queueMicrotask(fn); return 1; }, clearTimeout() {} });
   vm.runInContext(javascript, context); return context.exports.startAnimeSession;
 }
@@ -20,12 +27,25 @@ test('actual client enrolls once, polls exact handle, starts only after ready', 
     calls.push([path, options?.method || 'GET']);
     if (path === '/api/anime/enrollment') return response({ enrollment_id: id, status: 'queued', realtime_ready: false }, 202);
     if (options?.method === 'POST') return response({ session_id: 'ses_' + 'a'.repeat(20), livekit_url: 'wss://LOCAL_ONLY', token: 'LOCAL_FAUX_NONAUTH' });
-    return response({ enrollment_id: id, status: 'completed', realtime_ready: true });
+    return response({ enrollment_id: id, status: 'ready', realtime_ready: true });
   });
   const result = await start(image(), value => progress.push(value), new AbortController().signal);
   assert.equal(result.session_id, 'ses_' + 'a'.repeat(20));
   assert.deepEqual(calls, [['/api/anime/enrollment', 'POST'], [`/api/anime/enrollment/${id}`, 'GET'], [`/api/anime/enrollment/${id}`, 'POST']]);
-  assert.match(progress[0], /may be billable/);
+  assert.match(progress[0], /demo operator’s enrollment credits/);
+});
+
+test('oversize is refused before billable enrollment and 413 HTML is understandable', async () => {
+  let calls = 0;const start = setup(async () => { calls++;return new Response('FUNCTION_PAYLOAD_TOO_LARGE', { status: 413 }); });
+  await assert.rejects(start(new File([new Uint8Array(4_000_001)], 'large.png', { type: 'image/png' }), () => {}, new AbortController().signal), /4 MB/);
+  assert.equal(calls, 0);
+  await assert.rejects(start(image(), () => {}, new AbortController().signal), /4 MB/);assert.equal(calls, 1);
+});
+test('failed or unknown status cannot use a conflicting true readiness flag', async () => {
+  for (const status of ['failed', 'manual_review', 'foreign', 'completed']) {
+    let calls = 0;const start = setup(async () => { calls++;return response({ enrollment_id: id, status, realtime_ready: true }); });
+    await assert.rejects(start(image(), () => {}, new AbortController().signal));assert.equal(calls, 1);
+  }
 });
 test('failed/foreign enrollment cannot create a session', async () => {
   for (const result of [{ enrollment_id: id, status: 'failed', realtime_ready: false }, { enrollment_id: 'bad', realtime_ready: true }]) {

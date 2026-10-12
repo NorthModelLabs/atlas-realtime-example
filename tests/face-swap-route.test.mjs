@@ -14,6 +14,11 @@ function setup(fetch, deny = false) {
     setTimeout(fn, delay) { assert.equal(delay, 30000); expire = fn; return 1; },
     clearTimeout(id) { assert.equal(id, 1); cleared = true; },
     require(name) {
+      if (name === '@/app/lib/demo-portrait') {
+        const box = { exports: {}, Blob, Response };
+        vm.runInNewContext(ts.transpileModule(fs.readFileSync(new URL('../app/lib/demo-portrait.ts', import.meta.url), 'utf8'),
+          { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText, box);return box.exports;
+      }
       if (name === '@/app/lib/demo-access') return { accessGuard() { guards++; return deny ? new Response('denied', { status: 403 }) : null; } };
       if (name === 'next/server') return { NextResponse: { json(data, options) { return new Response(JSON.stringify(data), options); } } };
       throw new Error(`Unexpected module ${name}`);
@@ -21,7 +26,7 @@ function setup(fetch, deny = false) {
   });
   vm.runInContext(javascript, context);
   const form = new FormData(); form.append('face', new Blob(['portrait'], { type: 'image/png' }));
-  return { context, req: { formData: async () => form }, params: { params: Promise.resolve({ id: 'ses_0123456789abcdefabcd' }) },
+  return { context, req: new Request('https://demo.invalid/api/session/id', { method: 'PATCH', body: form }), params: { params: Promise.resolve({ id: 'ses_0123456789abcdefabcd' }) },
     expire() { expire(); }, cleared: () => cleared, guards: () => guards };
 }
 test('guarded face update preserves multipart bytes, API response and timer cleanup', async () => {
@@ -35,6 +40,13 @@ test('guarded face update preserves multipart bytes, API response and timer clea
   const result = await s.context.exports.PATCH(s.req, s.params);
   assert.equal(result.status, 200); assert.equal((await result.json()).metadata_pushed, false);
   assert.equal(calls, 1); assert.equal(s.guards(), 1); assert.equal(s.cleared(), true);
+});
+
+test('oversized face update never sends a PATCH or creates an update timer', async () => {
+  const s = setup(() => assert.fail('no upstream'));
+  const body = new FormData();body.append('face', new Blob([new Uint8Array(4_000_001)], { type: 'image/png' }));
+  const result = await s.context.exports.PATCH(new Request('https://demo.invalid/api/session/id', { method: 'PATCH', body }), s.params);
+  assert.equal(result.status, 413);assert.equal(s.cleared(), false);assert.equal(s.guards(), 1);
 });
 test('upstream timeout is bounded, reports ambiguity and never retries', async () => {
   let calls = 0, started;

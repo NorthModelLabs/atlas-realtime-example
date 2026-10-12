@@ -11,9 +11,13 @@ function compiled(path) {
 }
 function context(path, upstream, { disabled = false, denied = false } = {}) {
   const grants = []; let requests = 0;
-  const sandbox = vm.createContext({ exports: {}, Blob, FormData, Buffer,
+  const sandbox = vm.createContext({ exports: {}, Blob, Response, FormData, Buffer,
     require(name) {
       if (name === 'node:crypto') return require(name);
+      if (name === '@/app/lib/demo-portrait') {
+        const box = { exports: {}, Blob, Response };
+        vm.runInNewContext(compiled('../app/lib/demo-portrait.ts'), box);return box.exports;
+      }
       if (name === 'next/server') return { NextResponse: { json(value, options) { return new Response(JSON.stringify(value), options); } } };
       if (name === '@/app/lib/demo-access') return {
         creationGuard() { return denied ? new Response('denied', { status: 403 }) : null; },
@@ -34,7 +38,7 @@ function context(path, upstream, { disabled = false, denied = false } = {}) {
 const params = { params: Promise.resolve({ id: handle }) };
 const request = () => {
   const body = new FormData(); body.append('face', new Blob(['LOCAL_FAUX_NONAUTH'], { type: 'image/png' }));
-  return { headers: new Headers({ 'content-type': 'multipart/form-data' }), formData: async () => body };
+  return new Request('https://demo.invalid/api/anime/enrollment', { method: 'POST', body });
 };
 test('actual enrollment handler guard/OFF cannot send an upstream request', async () => {
   for (const options of [{ disabled: true }, { denied: true }]) {
@@ -63,12 +67,29 @@ test('actual ready handler uses only accepted anime route and same session capab
   const calls = [], id = 'ses_' + 'a'.repeat(20);
   const s = context('../app/api/anime/enrollment/[id]/route.ts', async (path, options) => {
     calls.push(path);
-    if (!options) return { ok: true, status: 200, data: { enrollment_id: handle, realtime_ready: true } };
+    if (!options) return { ok: true, status: 200, data: { enrollment_id: handle, status: 'ready', realtime_ready: true } };
     assert.deepEqual(JSON.parse(options.body), { mode: 'passthrough', mouth_mode: 'anime_realtime', anime_enrollment_id: handle });
     return { ok: true, status: 200, data: { session_id: id, livekit_url: 'wss://LOCAL_ONLY', token: 'LOCAL_FAUX_NONAUTH' } };
   });
   assert.equal((await s.route.POST({}, params)).status, 200); assert.equal(calls.length, 2);
   assert.deepEqual(s.grants[0], ['session', id]);
+});
+
+test('server rejects oversized/chunked/duplicate uploads before any upstream request', async () => {
+  for (const req of [
+    new Request('https://demo.invalid/api/anime/enrollment', { method: 'POST', body: 'x', headers: { 'Content-Type': 'multipart/form-data; boundary=x', 'Content-Length': '4250001' } }),
+    new Request('https://demo.invalid/api/anime/enrollment', { method: 'POST', body: new Blob([new Uint8Array(4_250_001)]), headers: { 'Content-Type': 'multipart/form-data; boundary=x' } }),
+    (() => { const body = new FormData();body.append('face', new Blob(['a'], { type: 'image/png' }));body.append('face', new Blob(['b'], { type: 'image/png' }));return new Request('https://demo.invalid/api/anime/enrollment', { method: 'POST', body }); })(),
+  ]) {
+    const s = context('../app/api/anime/enrollment/route.ts', () => assert.fail('no upstream'));
+    assert.ok([400, 413].includes((await s.route.POST(req)).status));assert.equal(s.requests(), 0);assert.equal(s.grants.length, 0);
+  }
+});
+test('server rejects inconsistent readiness before creating a billable room', async () => {
+  for (const status of ['failed', 'manual_review', 'completed', undefined]) {
+    const s = context('../app/api/anime/enrollment/[id]/route.ts', async () => ({ ok: true, status: 200, data: { enrollment_id: handle, status, realtime_ready: true } }));
+    assert.equal((await s.route.POST({}, params)).status, 409);assert.equal(s.requests(), 1);assert.equal(s.grants.length, 0);
+  }
 });
 test('actual capability grant scopes dotted enrollment separately and leaves session paths unchanged', () => {
   const cookies = [], response = { cookies: { set(...args) { cookies.push(args); } } };
