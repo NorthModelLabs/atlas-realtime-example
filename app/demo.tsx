@@ -20,6 +20,7 @@ const FACE_PRESETS = [
     src: DEFAULT_FACE_URL,
   },
   { id: "jennifer", label: "Jennifer", src: "/faces/jennifer.png" },
+  { id: "anime-v578", label: "Anime", src: "/faces/anime.png" },
 ];
 
 type ChatMsg = {
@@ -288,6 +289,8 @@ export default function DemoPage({
   initialUiMode?: UiMode;
   initialVoiceMode?: VoiceMode;
 }) {
+  const animeModeRef = useRef(false);
+  const [animeMode, setAnimeMode] = useState(false);
   const session = useAtlasSession({
     autoEnableMic: false,
     createSession: async (face, faceUrl) => {
@@ -296,8 +299,9 @@ export default function DemoPage({
         const form = new FormData();
         form.append("face", face);
         form.append("mode", "passthrough");
-        res = await fetch("/api/session", { method: "POST", body: form });
+        res = await fetch(animeModeRef.current ? "/api/anime-session" : "/api/session", { method: "POST", body: form });
       } else if (faceUrl) {
+        if (animeModeRef.current) throw new Error("Choose the Anime avatar or upload an anime portrait before connecting.");
         res = await fetch("/api/session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -337,7 +341,8 @@ export default function DemoPage({
   const [voiceError, setVoiceError] = useState("");
   const [faceLoading, setFaceLoading] = useState(false);
 
-  const [configReady, setConfigReady] = useState<{ llm: boolean; tts: boolean } | null>(null);
+  const [configReady, setConfigReady] = useState<{ llm: boolean; tts: boolean; animeEnabled?: boolean } | null>(null);
+  const visiblePresets = FACE_PRESETS.filter(preset => preset.id !== "anime-v578" || configReady?.animeEnabled === true);
 
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [uiMode, setUiMode] = useState<UiMode>(() => getInitialUiMode(initialUiMode));
@@ -496,6 +501,10 @@ export default function DemoPage({
   const handleSwapFace = useCallback(
     async (file: File, faceId = "custom") => {
       if (!session.sessionId || !file.type.startsWith("image/")) return false;
+      if (animeModeRef.current) {
+        addMsg("system", "End this call before changing the anime portrait.");
+        return false;
+      }
       setSwapping(true);
       try {
         const form = new FormData();
@@ -530,6 +539,12 @@ export default function DemoPage({
 
   const selectPresetFace = useCallback(
     async (preset: (typeof FACE_PRESETS)[number]) => {
+      if (session.status === "connecting") return;
+      const nextAnimeMode = preset.id === "anime-v578";
+      if (isConnected && (nextAnimeMode || animeModeRef.current)) {
+        addMsg("system", "End this call before switching between human and anime avatars.");
+        return;
+      }
       const selectionVersion = faceSelectionVersionRef.current + 1;
       faceSelectionVersionRef.current = selectionVersion;
       setSelectedFaceId(preset.id);
@@ -537,9 +552,12 @@ export default function DemoPage({
       setFaceLoading(true);
       try {
         const res = await fetch(preset.src);
+        if (!res.ok) throw new Error("Avatar image unavailable");
         const blob = await res.blob();
         const file = new File([blob], `${preset.id}.png`, { type: blob.type || "image/png" });
         if (faceSelectionVersionRef.current !== selectionVersion) return;
+        animeModeRef.current = nextAnimeMode;
+        setAnimeMode(nextAnimeMode);
         if (isConnected) {
           await handleSwapFace(file, preset.id);
         } else {
@@ -555,7 +573,7 @@ export default function DemoPage({
         }
       }
     },
-    [addMsg, handleFile, handleSwapFace, isConnected],
+    [addMsg, handleFile, handleSwapFace, isConnected, session.status],
   );
 
   const downloadCurrentFace = useCallback(() => {
@@ -833,7 +851,7 @@ export default function DemoPage({
 
   if (uiMode === "apple") {
     const appleStatus = session.status === "connecting"
-      ? "Connecting"
+      ? animeMode ? "Preparing anime" : "Connecting"
       : isConnected
         ? avatarSpeaking
           ? "Speaking"
@@ -875,8 +893,8 @@ export default function DemoPage({
                 {appleStatus}
                 {isConnected && <small>{formatTime(sessionTime)}</small>}
               </div>
-              <div className="apple-identity-pill" aria-label={`John is ${appleStatus.toLowerCase()}`}>
-                <strong>John</strong>
+              <div className="apple-identity-pill" aria-label={`${animeMode ? "Anime" : "John"} is ${appleStatus.toLowerCase()}`}>
+                <strong>{animeMode ? "Anime" : "John"}</strong>
                 <span>{appleStatus}</span>
               </div>
               {session.status === "connecting" && <div className="apple-loading-ring" aria-hidden="true" />}
@@ -893,7 +911,7 @@ export default function DemoPage({
               <aside className="apple-settings-panel" aria-label="Avatar settings">
                 <header>
                   <div>
-                    <strong>Settings</strong>
+                    <strong>Settings · {animeMode ? "Anime" : "Human"}</strong>
                     <span>{configReady?.llm && configReady?.tts ? "AI voice ready" : "Voice setup needed"}</span>
                   </div>
                   <button type="button" onClick={() => setAppleSettingsOpen(false)} aria-label="Close settings">Done</button>
@@ -902,7 +920,7 @@ export default function DemoPage({
                 <div className="apple-settings-section">
                   <span>Avatar</span>
                   <div className="apple-avatar-options">
-                    {FACE_PRESETS.map((preset) => (
+                    {visiblePresets.map((preset) => (
                       <button
                         key={preset.id}
                         type="button"
@@ -1097,7 +1115,7 @@ export default function DemoPage({
               </p>
             </div>
             <div className="teacher-avatar-strip">
-              {FACE_PRESETS.map((preset) => (
+              {visiblePresets.map((preset) => (
                 <button
                   key={preset.id}
                   type="button"
@@ -1338,7 +1356,7 @@ export default function DemoPage({
                   <div className="meet-settings-group">
                     <span className="meet-panel-label">Avatar</span>
                     <div className="meet-avatar-options">
-                      {FACE_PRESETS.map((preset) => (
+                      {visiblePresets.map((preset) => (
                         <button
                           key={preset.id}
                           type="button"
@@ -1512,7 +1530,7 @@ export default function DemoPage({
 
           <aside className="mirror-control-dock" aria-label="Mirror controls">
             <div className="mirror-avatar-row">
-              {FACE_PRESETS.map((preset) => (
+              {visiblePresets.map((preset) => (
                 <button
                   key={preset.id}
                   type="button"
@@ -1676,7 +1694,7 @@ export default function DemoPage({
 
             {!isConnected && (
               <div className="tiktok-avatar-strip absolute inset-x-4 top-4 z-30 flex gap-3 overflow-x-auto px-1 pb-2">
-                {FACE_PRESETS.map((preset) => (
+                {visiblePresets.map((preset) => (
                   <button
                     key={preset.id}
                     type="button"
@@ -1880,7 +1898,7 @@ export default function DemoPage({
                       </button>
                     ))}
                   </div>
-                  {FACE_PRESETS.map((preset) => (
+                  {visiblePresets.map((preset) => (
                     <button
                       key={preset.id}
                       type="button"
