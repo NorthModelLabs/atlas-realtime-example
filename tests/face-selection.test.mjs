@@ -33,6 +33,9 @@ function setup(fetch, connected = true, timers = { setTimeout, clearTimeout }) {
   const context = vm.createContext({
     ...portrait.exports,
     session: { sessionId: 'ses_0123456789abcdefabcd' }, isConnected: connected, animeDemo: false,
+    animeAvailable: true, initialAnimeDemo: false,
+    setAnimeDemo: value => { context.animeDemo=value; },
+    setAnimeProgress: () => {}, setUiMode: () => {},
     DEFAULT_FACE_URL: '/faces/enterprise-b1450303.jpg', DEFAULT_FACE_ID: 'enterprise-b1450303',
     currentFaceSessionRef: { current: { id: 'ses_0123456789abcdefabcd', connected } },
     faceSelectionVersionRef: { current: 0 }, faceSwapInFlightRef: { current: false },
@@ -51,6 +54,34 @@ function setup(fetch, connected = true, timers = { setTimeout, clearTimeout }) {
 const preset = { id: 'reel', src: '/faces/reel-alt.png' };
 const image = () => new Blob(['portrait'], { type: 'image/png' });
 const ok = () => new Response(JSON.stringify({ face_updated: true, metadata_pushed: true }), { status: 200 });
+
+test('anime preset selection changes only the local mode until explicit Start', async () => {
+  const calls=[];const s=setup(async (url,options)=>{calls.push([url,options]);return new Response(image());},false);
+  await s.context.selectPresetFace({id:'anime-v578',src:'/faces/anime.png'});
+  assert.equal(s.context.animeDemo,true);assert.equal(s.state.id,'anime-v578');
+  assert.equal(calls.length,1);assert.equal(calls[0][1],undefined);
+  await s.context.selectPresetFace(preset);
+  assert.equal(s.context.animeDemo,false);assert.equal(s.state.id,preset.id);
+});
+
+test('connected or connecting sessions cannot switch renderer mode', async () => {
+  for (const [connected,status,anime] of [[true,'connected',false],[true,'connected',true],[false,'connecting',false]]) {
+    const s=setup(()=>assert.fail('no image fetch or upstream request'),connected);
+    s.context.session.status=status;s.context.animeDemo=anime;
+    await s.context.selectPresetFace(anime ? preset : {id:'anime-v578',src:'/faces/anime.png'});
+    assert.equal(s.state.id,'old');assert.ok(s.state.messages.length);
+  }
+});
+
+test('disabled anime cannot be selected and a failed image retains human mode', async () => {
+  const disabled=setup(()=>assert.fail('disabled preset must not fetch'),false);
+  disabled.context.animeAvailable=false;
+  await disabled.context.selectPresetFace({id:'anime-v578',src:'/faces/anime.png'});
+  assert.equal(disabled.context.animeDemo,false);
+  const failed=setup(async()=>new Response('missing',{status:404}),false);
+  await failed.context.selectPresetFace({id:'anime-v578',src:'/faces/anime.png'});
+  assert.equal(failed.context.animeDemo,false);assert.equal(failed.state.id,'old');
+});
 
 test('connected preset completes loading, retains selected upload and supports next swap', async () => {
   const calls = [];

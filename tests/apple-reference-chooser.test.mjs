@@ -11,10 +11,11 @@ const Image = require('next/image').default;
 const postcss = require('postcss');
 const source = fs.readFileSync(new URL('../app/demo.tsx', import.meta.url), 'utf8');
 const tree = ts.createSourceFile('demo.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-let options, presets, defaultUrl, errorHandler;
+let options, presets, visiblePresets, defaultUrl, errorHandler;
 function walk(node) {
   if (ts.isVariableDeclaration(node)) {
     if (node.name.getText(tree) === 'FACE_PRESETS') presets = node.initializer.getText(tree);
+    if (node.name.getText(tree) === 'facePresets') visiblePresets = node.initializer.getText(tree);
     if (node.name.getText(tree) === 'DEFAULT_FACE_URL') defaultUrl = node.initializer.getText(tree);
   }
   if (ts.isJsxElement(node) && node.openingElement.attributes.properties.some(p =>
@@ -28,12 +29,12 @@ function walk(node) {
   ts.forEachChild(node, walk);
 }
 walk(tree);
-function chooser() {
+function chooser(animeAvailable = false) {
   assert.ok(options && presets && defaultUrl);
   const clicks = [];
-  const context = vm.createContext({ require, exports: {}, Image, selectedFaceId: 'enterprise-b1450303',
+  const context = vm.createContext({ require, exports: {}, Image, animeAvailable, initialAnimeDemo: false, selectedFaceId: 'enterprise-b1450303',
     selectPresetFace: preset => clicks.push(preset.id) });
-  const code = ts.transpileModule(`const DEFAULT_FACE_URL=${defaultUrl};const facePresets=${presets};globalThis.chooser=(${options});`, {
+  const code = ts.transpileModule(`const DEFAULT_FACE_URL=${defaultUrl};const FACE_PRESETS=${presets};const facePresets=${visiblePresets};globalThis.chooser=(${options});`, {
     compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2020 },
   }).outputText;
   vm.runInContext(code, context);return { element: context.chooser, clicks };
@@ -52,6 +53,15 @@ test('actual Apple JSX + real Next/Image renders all four eager named choices', 
   }
   for (const button of React.Children.toArray(element.props.children)) button.props.onClick();
   assert.deepEqual(clicks, ['default', 'reel-alt', 'enterprise-b1450303', 'jennifer']);
+});
+
+test('enabled anime appears beside the four existing avatars with a named image', () => {
+  const {element, clicks}=chooser(true);const html=renderToStaticMarkup(element);
+  assert.equal((html.match(/<button\b/g)||[]).length,5);
+  assert.ok(html.includes('aria-label="Use Anime avatar"'));
+  assert.ok(html.includes('src="/faces/anime.png"'));
+  React.Children.toArray(element.props.children).at(-1).props.onClick();
+  assert.deepEqual(clicks,['anime-v578']);
 });
 
 test('actual image-error callback exposes local fallback without a session action', () => {

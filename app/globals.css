@@ -3945,3 +3945,8 @@ textarea::-webkit-scrollbar-thumb,
 .apple-caption.voice-dialogue { height: auto; min-height: 38px; width: min(100%, 640px); }
 .apple-caption.voice-dialogue p { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin: 4px 0; }
 .apple-caption.voice-dialogue strong { display: inline; margin-right: 6px; }
+
+/* Preparation information stays in the layout, clear of avatar/settings controls. */
+.anime-prepare-note { width: min(100%, 520px); flex-shrink: 0; margin: 8px 0; text-align: center; font-size: 12px; line-height: 1.4; color: #b7b7bd; }
+.anime-prepare-note p { margin: 0 0 4px; }
+.anime-prepare-note a, .anime-prepare-note button { text-decoration: underline; margin: 0 8px; }

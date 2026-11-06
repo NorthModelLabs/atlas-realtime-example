@@ -23,6 +23,7 @@ const FACE_PRESETS = [
     src: DEFAULT_FACE_URL,
   },
   { id: "jennifer", label: "Jennifer", src: "/faces/jennifer.png" },
+  { id: "anime-v578", label: "Anime", src: "/faces/anime.png" },
 ];
 
 type ChatMsg = {
@@ -287,7 +288,7 @@ function formatTime(s: number) {
 export default function DemoPage({
   initialUiMode = "apple",
   initialVoiceMode = "ai",
-  animeDemo = false,
+  animeDemo: initialAnimeDemo = false,
   animeAvailable = false,
 }: {
   initialUiMode?: UiMode;
@@ -296,8 +297,9 @@ export default function DemoPage({
   animeAvailable?: boolean;
 }) {
   const animeWaitRef = useRef<AbortController | null>(null);
+  const [animeDemo, setAnimeDemo] = useState(initialAnimeDemo);
   const [animeProgress, setAnimeProgress] = useState("");
-  const facePresets = animeDemo ? [] : FACE_PRESETS;
+  const facePresets = FACE_PRESETS.filter((preset) => preset.id !== "anime-v578" || animeAvailable || initialAnimeDemo);
   useEffect(() => () => animeWaitRef.current?.abort(), []);
   const session = useAtlasSession({
     autoEnableMic: false,
@@ -308,7 +310,7 @@ export default function DemoPage({
         try {
           const data = await startAnimeSession(face, setAnimeProgress, wait.signal);
           return { sessionId: data.session_id as string, livekitUrl: data.livekit_url as string, token: data.token as string };
-        } finally { if (animeWaitRef.current === wait) animeWaitRef.current = null; }
+        } finally { if (animeWaitRef.current === wait) { animeWaitRef.current = null; setAnimeProgress(""); } }
       }
       let res: Response;
       if (face) {
@@ -591,6 +593,16 @@ export default function DemoPage({
 
   const selectPresetFace = useCallback(
     async (preset: (typeof FACE_PRESETS)[number]) => {
+      if (session.status === "connecting") {
+        addMsg("system", "Finish or cancel connection before choosing another avatar.");
+        return;
+      }
+      const nextAnime = preset.id === "anime-v578";
+      if (nextAnime && !animeAvailable && !initialAnimeDemo) return;
+      if (isConnected && (nextAnime || animeDemo)) {
+        addMsg("system", "End this session before switching between human and anime avatars.");
+        return;
+      }
       if (faceSwapInFlightRef.current) {
         addMsg("system", "A face swap is still in progress. Please wait for it to finish.");
         return;
@@ -608,6 +620,9 @@ export default function DemoPage({
         if (isConnected) {
           await handleSwapFace(file, preset.id, selectionVersion);
         } else {
+          setAnimeDemo(nextAnime);
+          setAnimeProgress("");
+          if (nextAnime) setUiMode("apple");
           handleFile(file, preset.id, selectionVersion);
         }
       } catch {
@@ -620,7 +635,7 @@ export default function DemoPage({
         }
       }
     },
-    [addMsg, handleFile, handleSwapFace, isConnected],
+    [addMsg, handleFile, handleSwapFace, isConnected, session.status, animeDemo, animeAvailable, initialAnimeDemo],
   );
 
   const downloadCurrentFace = useCallback(() => {
@@ -892,16 +907,10 @@ export default function DemoPage({
       {!animeDemo && animeAvailable && <Link href="/anime" aria-label="Open anime demo">Anime</Link>}
     </nav>
   );
-  const voiceAlert = voiceError ? <div role="alert" className="fixed top-16 left-1/2 -translate-x-1/2 z-[100] max-w-lg rounded-xl bg-red-950 px-5 py-3 text-sm text-white">{voiceError}</div> : null;
+  const visibleError = session.error || voiceError;
+  const voiceAlert = visibleError ? <div role="alert" className="fixed top-16 left-1/2 -translate-x-1/2 z-[100] max-w-lg rounded-xl bg-red-950 px-5 py-3 text-sm text-white">{visibleError}</div> : null;
   const hiddenFaceInputs = (
     <>
-      {animeDemo && <aside role="status" className="fixed top-3 left-1/2 -translate-x-1/2 z-[100] max-w-xl rounded-xl bg-black/90 px-4 py-3 text-sm text-white">
-        <strong>Anime prototype · explicit Prepare &amp; Start</strong>
-        <p>Upload only selects your portrait (PNG, JPEG or WebP, up to 4 MB). Prepare &amp; Start authorizes preparation using the demo operator’s Atlas account and may consume its enrollment credits. This is not your personal Atlas billing account. No decorative background generation.</p>
-        {animeProgress && <p>{animeProgress}</p>}
-        {session.status === "connecting" && <button type="button" onClick={() => void disconnect()}>Cancel wait (submitted preparation may continue)</button>}
-        <Link href="/">Human demo</Link>
-      </aside>}
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
       <input
         ref={swapInputRef}
@@ -971,6 +980,13 @@ export default function DemoPage({
               {appleCaption && <p><strong>Atlas</strong> {appleCaption}</p>}
             </div>
           </section>
+
+          {animeDemo && !isConnected && <aside role="status" className="anime-prepare-note">
+            <p>Prepare &amp; Start uses the demo’s credits to prepare your anime portrait.</p>
+            {animeProgress && <p>{animeProgress}</p>}
+            {session.status === "connecting" && <button type="button" onClick={() => void disconnect()}>Cancel wait</button>}
+            <Link href="/">Human demo</Link>
+          </aside>}
 
           <div className="apple-controls-wrap">
             {appleSettingsOpen && (
