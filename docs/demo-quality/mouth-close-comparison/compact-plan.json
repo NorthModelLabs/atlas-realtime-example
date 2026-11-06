@@ -1,0 +1,28 @@
+{
+  "instance_id": "6843802051555820318",
+  "project": "atlas-stg-isolated-20260831",
+  "zone": "us-west1-a",
+  "instance": "atlas-stg-mouth-tail-20261001",
+  "action": "restart same stopped owned probe with cached pinned images; no additional GPU",
+  "cloud_stop_seconds": 1800,
+  "guest_stop_minutes": 18,
+  "startup_sha256": "9f09870a56d0eea5a71df9105fbe4eeffd7d4f244ca7f34e8b43ebdae302b1d1",
+  "startup_bytes": 25664,
+  "input_fixtures": {
+    "0": {
+      "sha256": "26c3f4c421ffb3c12022e46e6e970fbff8bf04faf38f07e46cb4facda761c586",
+      "bytes": 368640
+    },
+    "1": {
+      "sha256": "205fa644b0dafb306b310c425cbe99979409a77eb925f7fab3628828624e1eab",
+      "bytes": 368640
+    }
+  },
+  "conditions": {
+    "baseline": 8,
+    "clamp": 2,
+    "repeat": 8
+  },
+  "production_changes": false,
+  "acceptance": "exact input equality, compact archive SHA, all frames/calls accounted, independent visual review; not live transport acceptance"
+}

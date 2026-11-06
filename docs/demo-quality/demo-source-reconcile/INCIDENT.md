@@ -30,3 +30,15 @@ During the temporary legacy rollout, its session creation could fail because the
 Rollback used Vercel's [project rollback endpoint](https://vercel.com/docs/rest-api/projects/point-production-traffic-to-a-previous-production-deployment-by-id), followed by the [alias assignment endpoint](https://vercel.com/docs/rest-api/aliases/assign-an-alias) for the branch alias. Durable prevention used `DELETE /v9/projects/{projectId}/link`, the exact endpoint implemented by `disconnectGitProvider` in the installed Vercel CLI `dist/chunks/chunk-XQQGQ55A.js`. [Vercel's Git settings documentation](https://vercel.com/docs/project-configuration/git-settings) describes project-scoped Git disconnection.
 
 Any later reconnection must be a separate reviewed operation with compatible runtime settings and explicit deployment intent. It is not needed for the merged source or current public demo. Mouth-tail and intermittent playback investigations remain separate and unresolved by this source merge.
+
+## Canonical source and public asset receipt
+
+Read-only follow-up on 2026-10-01 20:26 UTC: recovery-only PR #2 is merged as `da4a1665a887c6711a0708ec58a88c11d19ef0fa`. Its post-merge checks observed no new deployments or alias changes across five snapshots; both demo project Git links remained absent.
+
+The public demo still resolves to `dpl_4Gn3kBtiXyzeTusyp8y1b5imU3Ff`, commit `d618f07a59c7e9a4e6dba575f3ec1297043b96cb`. The merged source is ahead of that runtime; merging did not deploy the new diagnostic code or the teacher-mode cleanup.
+
+- Live `/nml-icon.png` and `/favicon.ico` returned 200 and matched source bytes exactly. The PNG matches `Desktop/website/public/logo.png`; visual inspection confirms the requested white-filled interior. Public HTML references these assets for favicon, shortcut icon and apple-touch icon. PNG SHA-256: `df3595b88b6ff49d53f50763084b610857ebede056e42b2c544c94c74cae1b24`; ICO SHA-256: `9dd5cb39a1ff66a81958c438805741bf50ce0e74efc6b729257b63cf59e5a184`.
+- Full recursive Git-tree comparison finds exactly two changed files under `app/` and `public/`: `app/demo.tsx` and `app/lib/voice-diagnostics.ts`. Their differences are additional diagnostics gated by `NEXT_PUBLIC_VOICE_DIAGNOSTICS === "true"` and removal of a duplicate teacher-mode `voiceAlert`. The teacher alert cleanup is source-only, not yet public.
+- Captions, voice prompt route, realtime voice hook, returned-speech observer, layout and icon assets are identical between public deployment source and merged main. Those existing captions/prompt/icon changes are already deployed; this comparison does not claim they resolve the mouth-tail or intermittent playback reports.
+
+Private read-only receipt: `/private/tmp/atlas-demo-recovery-pr2-20261001/favicon-source-status.json`. No deployment or project mutation was performed for this follow-up.

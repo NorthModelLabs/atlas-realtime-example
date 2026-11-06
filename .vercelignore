@@ -4,3 +4,10 @@ node_modules
 .env*
 *.tsbuildinfo
 tests
+docs
+experiments
+scripts
+AGENTS.md
+CLAUDE.md
+RESTORATION.md
+/mFj8b_LZXhk-1tKd46boe_gLu18ShZ copy.png

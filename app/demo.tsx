@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useRef, useCallback, useEffect, type CSSProperties, type DragEvent, type ChangeEvent } from "react";
 import { flushSync } from "react-dom";
 import { useAtlasSession } from "@northmodellabs/atlas-react";
@@ -8,6 +9,8 @@ import { LocalAudioTrack, Track, RoomEvent, type RemoteTrack } from "livekit-cli
 import { useRealtimeVoice } from "@/app/lib/use-realtime-voice";
 import { probeAudio, probeScheduler, probeStats, probeVideo } from "@/app/lib/voice-diagnostics";
 import { observeReturnedSpeech } from "@/app/lib/returned-speech";
+import { startAnimeSession } from "@/app/lib/anime-start";
+import { portraitError, PORTRAIT_LIMIT_MESSAGE } from "@/app/lib/demo-portrait";
 
 const DEFAULT_FACE_ID = "enterprise-b1450303";
 const DEFAULT_FACE_URL = "/faces/enterprise-b1450303.jpg";
@@ -20,6 +23,7 @@ const FACE_PRESETS = [
     src: DEFAULT_FACE_URL,
   },
   { id: "jennifer", label: "Jennifer", src: "/faces/jennifer.png" },
+  { id: "anime-v578", label: "Anime", src: "/faces/anime.png" },
 ];
 
 type ChatMsg = {
@@ -284,15 +288,33 @@ function formatTime(s: number) {
 export default function DemoPage({
   initialUiMode = "apple",
   initialVoiceMode = "ai",
+  animeDemo: initialAnimeDemo = false,
+  animeAvailable = false,
 }: {
   initialUiMode?: UiMode;
   initialVoiceMode?: VoiceMode;
+  animeDemo?: boolean;
+  animeAvailable?: boolean;
 }) {
+  const animeWaitRef = useRef<AbortController | null>(null);
+  const [animeDemo, setAnimeDemo] = useState(initialAnimeDemo);
+  const [animeProgress, setAnimeProgress] = useState("");
+  const facePresets = FACE_PRESETS.filter((preset) => preset.id !== "anime-v578" || animeAvailable || initialAnimeDemo);
+  useEffect(() => () => animeWaitRef.current?.abort(), []);
   const session = useAtlasSession({
     autoEnableMic: false,
     createSession: async (face, faceUrl) => {
+      if (animeDemo) {
+        if (!face) throw new Error("Upload an anime portrait before starting.");
+        const wait = new AbortController(); animeWaitRef.current = wait;
+        try {
+          const data = await startAnimeSession(face, setAnimeProgress, wait.signal);
+          return { sessionId: data.session_id as string, livekitUrl: data.livekit_url as string, token: data.token as string };
+        } finally { if (animeWaitRef.current === wait) { animeWaitRef.current = null; setAnimeProgress(""); } }
+      }
       let res: Response;
       if (face) {
+        const invalid = portraitError(face); if (invalid) throw new Error(invalid);
         const form = new FormData();
         form.append("face", face);
         form.append("mode", "passthrough");
@@ -306,11 +328,13 @@ export default function DemoPage({
       } else {
         throw new Error("No face image provided");
       }
+      if (res.status === 413) throw new Error(PORTRAIT_LIMIT_MESSAGE);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || data.error || "Failed to create session");
+      if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : data.detail?.message || data.message || data.error || "Failed to create session");
       return { sessionId: data.session_id, livekitUrl: data.livekit_url, token: data.token };
     },
     deleteSession: async (sessionId) => {
+      animeWaitRef.current?.abort();
       try {
         const res = await fetch(`/api/session/${sessionId}`, { method: "DELETE" });
         if (!res.ok) {
@@ -352,6 +376,9 @@ export default function DemoPage({
   const [mirrorInputActive, setMirrorInputActive] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const faceSwapInFlightRef = useRef(false);
+  const currentFaceSessionRef = useRef({ id: session.sessionId, connected: session.status === "connected" });
+  currentFaceSessionRef.current = { id: session.sessionId, connected: session.status === "connected" };
   const swapInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const faceSelectionVersionRef = useRef(0);
@@ -461,11 +488,13 @@ export default function DemoPage({
 
   const handleFile = useCallback((file: File, faceId = "custom", version?: number) => {
     if (!file.type.startsWith("image/")) return;
+    const invalid = portraitError(file); if (invalid) { addMsg("system", invalid); setFaceLoading(false); return; }
     const selectionVersion = version ?? faceSelectionVersionRef.current + 1;
     faceSelectionVersionRef.current = selectionVersion;
     setFaceFile(file);
     setSelectedFaceId(faceId);
     setFaceUrl("");
+    setFaceLoading(false);
     const reader = new FileReader();
     reader.onload = (e) => {
       if (faceSelectionVersionRef.current === selectionVersion) {
@@ -473,76 +502,127 @@ export default function DemoPage({
       }
     };
     reader.readAsDataURL(file);
-  }, []);
-
-  const handleDrop = useCallback(
-    (e: DragEvent) => {
-      e.preventDefault();
-      setDragOver(false);
-      const file = e.dataTransfer.files[0];
-      if (file) handleFile(file);
-    },
-    [handleFile],
-  );
-
-  const handleFileSelect = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) handleFile(file);
-    },
-    [handleFile],
-  );
+  }, [addMsg]);
 
   const handleSwapFace = useCallback(
-    async (file: File, faceId = "custom") => {
+    async (file: File, faceId = "custom", version?: number) => {
       if (!session.sessionId || !file.type.startsWith("image/")) return false;
+      const invalid = portraitError(file); if (invalid) { addMsg("system", invalid); return false; }
+      if (animeDemo) {
+        addMsg("system", "End this anime session before preparing another portrait. Human face refresh cannot activate an anime bank.");
+        return false;
+      }
+      if (faceSwapInFlightRef.current) {
+        addMsg("system", "A face swap is still in progress. Please wait for it to finish.");
+        return false;
+      }
+      const sessionId = session.sessionId;
+      const selectionVersion = version ?? faceSelectionVersionRef.current + 1;
+      faceSelectionVersionRef.current = selectionVersion;
+      faceSwapInFlightRef.current = true;
       setSwapping(true);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 35_000);
+      const stillCurrent = () => currentFaceSessionRef.current.id === sessionId && currentFaceSessionRef.current.connected;
       try {
         const form = new FormData();
         form.append("face", file);
-        const res = await fetch(`/api/session/${session.sessionId}`, {
+        const res = await fetch(`/api/session/${sessionId}`, {
           method: "PATCH",
           body: form,
+          signal: controller.signal,
         });
-        if (!res.ok) {
-          const data = await res.json();
-          addMsg("system", `Face swap failed: ${data.message || "Unknown error"}`);
+        if (res.status === 413) { if (stillCurrent()) addMsg("system", PORTRAIT_LIMIT_MESSAGE); return false; }
+        const data = await res.json();
+        if (!stillCurrent()) return false;
+        if (!res.ok || data.face_updated === false || data.metadata_pushed === false || data.face_update_status === "notification_failed") {
+          // FastAPI returns both detail:string and detail:{message}. Dropping
+          // the string hid real upload/session errors behind "Unknown error".
+          addMsg("system", `Face swap failed: ${typeof data.detail === "string" ? data.detail : data.detail?.message || data.message || (data.metadata_pushed === false ? "The avatar worker did not receive the image. Please retry." : "Unknown error")}`);
           return false;
         } else {
-          addMsg("system", "Face swapped");
-          faceSelectionVersionRef.current += 1;
-          setSelectedFaceId(faceId);
-          const reader = new FileReader();
-          reader.onload = (e) => setFacePreview(e.target?.result as string);
-          reader.readAsDataURL(file);
+          if (faceSelectionVersionRef.current !== selectionVersion) return false;
+          // Persisted revision / metadata delivery is not the renderer's ACK.
+          // Accept the current API contract as well as older queued responses.
+          const queued = data.face_applied === false || data.face_update_status === "queued" || data.applied === false || data.status === "queued";
+          addMsg("system", queued ? "Image queued for the avatar; waiting for it to apply." : "Image sent to the avatar");
+          handleFile(file, faceId, selectionVersion);
           return true;
         }
       } catch {
-        addMsg("system", "Face swap failed");
+        if (stillCurrent()) addMsg("system", controller.signal.aborted
+          ? "Face swap timed out. Check the current avatar before retrying; the image may have reached the worker."
+          : "Face swap failed. Please try again.");
         return false;
       } finally {
+        clearTimeout(timeout);
+        faceSwapInFlightRef.current = false;
         setSwapping(false);
+        if (faceSelectionVersionRef.current === selectionVersion) setFaceLoading(false);
         if (swapInputRef.current) swapInputRef.current.value = "";
       }
     },
-    [session.sessionId, addMsg],
+    [session.sessionId, addMsg, handleFile, animeDemo],
+  );
+
+  // All upload inputs and drag/drop use the same live-session update path.
+  const handleFileSelect = useCallback(
+    async (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      if (!file) return;
+      if (animeDemo && session.status === "connecting") { addMsg("system", "Cancel preparation before choosing another portrait."); return; }
+      if (isConnected) await handleSwapFace(file);
+      else handleFile(file);
+    },
+    [handleFile, handleSwapFace, isConnected, animeDemo, session.status, addMsg],
+  );
+
+  const handleDrop = useCallback(
+    async (e: DragEvent) => {
+      e.preventDefault();
+      setDragOver(false);
+      const file = e.dataTransfer.files[0];
+      if (!file) return;
+      if (animeDemo && session.status === "connecting") { addMsg("system", "Cancel preparation before choosing another portrait."); return; }
+      if (isConnected) await handleSwapFace(file);
+      else handleFile(file);
+    },
+    [handleFile, handleSwapFace, isConnected, animeDemo, session.status, addMsg],
   );
 
   const selectPresetFace = useCallback(
     async (preset: (typeof FACE_PRESETS)[number]) => {
+      if (session.status === "connecting") {
+        addMsg("system", "Finish or cancel connection before choosing another avatar.");
+        return;
+      }
+      const nextAnime = preset.id === "anime-v578";
+      if (nextAnime && !animeAvailable && !initialAnimeDemo) return;
+      if (isConnected && (nextAnime || animeDemo)) {
+        addMsg("system", "End this session before switching between human and anime avatars.");
+        return;
+      }
+      if (faceSwapInFlightRef.current) {
+        addMsg("system", "A face swap is still in progress. Please wait for it to finish.");
+        return;
+      }
       const selectionVersion = faceSelectionVersionRef.current + 1;
       faceSelectionVersionRef.current = selectionVersion;
-      setSelectedFaceId(preset.id);
-      setFacePreview(preset.src);
       setFaceLoading(true);
       try {
         const res = await fetch(preset.src);
+        if (!res.ok) throw new Error("Avatar image unavailable");
         const blob = await res.blob();
+        if (!blob.type.startsWith("image/")) throw new Error("Invalid avatar image");
         const file = new File([blob], `${preset.id}.png`, { type: blob.type || "image/png" });
         if (faceSelectionVersionRef.current !== selectionVersion) return;
         if (isConnected) {
-          await handleSwapFace(file, preset.id);
+          await handleSwapFace(file, preset.id, selectionVersion);
         } else {
+          setAnimeDemo(nextAnime);
+          setAnimeProgress("");
+          if (nextAnime) setUiMode("apple");
           handleFile(file, preset.id, selectionVersion);
         }
       } catch {
@@ -555,7 +635,7 @@ export default function DemoPage({
         }
       }
     },
-    [addMsg, handleFile, handleSwapFace, isConnected],
+    [addMsg, handleFile, handleSwapFace, isConnected, session.status, animeDemo, animeAvailable, initialAnimeDemo],
   );
 
   const downloadCurrentFace = useCallback(() => {
@@ -569,11 +649,20 @@ export default function DemoPage({
   }, [facePreview, selectedFaceId]);
 
   useEffect(() => {
+    // Anime selection is not a hidden billable enrollment, and human presets
+    // are not published anime examples. Reuse only the user's explicit upload.
+    if (animeDemo) return;
     fetch(DEFAULT_FACE_URL)
-      .then((r) => r.blob())
+      .then((r) => {
+        // A missing preset is HTML, not a JPEG. Never manufacture a valid
+        // MIME type for an error body and enable Start with that invalid face.
+        if (!r.ok) throw new Error("Default avatar image unavailable");
+        return r.blob();
+      })
       .then((blob) => {
+        if (!blob.type.startsWith("image/")) throw new Error("Invalid default avatar image");
         if (faceSelectionVersionRef.current !== 0) return;
-        const file = new File([blob], "default-face.jpg", { type: "image/jpeg" });
+        const file = new File([blob], "default-face.jpg", { type: blob.type });
         handleFile(file, DEFAULT_FACE_ID);
       })
       .catch(() => {});
@@ -692,6 +781,7 @@ export default function DemoPage({
   };
 
   const disconnect = async () => {
+    animeWaitRef.current?.abort(); setAnimeProgress("");
     setMeetLeaveArmed(false);
     stopMirrorInput();
     stopListening();
@@ -800,7 +890,9 @@ export default function DemoPage({
         "--format-index": activeFormatIndex,
       } as CSSProperties}
     >
-      {UI_FORMATS.map((format) => (
+      {/* Keep the cost/prepare disclosure visible in this first anime prototype.
+          Human formats stay identical; other anime formats are not advertised. */}
+      {(animeDemo ? UI_FORMATS.filter((format) => format.id === "apple") : UI_FORMATS).map((format) => (
         <button
           key={format.id}
           type="button"
@@ -812,9 +904,11 @@ export default function DemoPage({
           {format.label}
         </button>
       ))}
+      {!animeDemo && animeAvailable && <Link href="/anime" aria-label="Open anime demo">Anime</Link>}
     </nav>
   );
-  const voiceAlert = voiceError ? <div role="alert" className="fixed top-16 left-1/2 -translate-x-1/2 z-[100] max-w-lg rounded-xl bg-red-950 px-5 py-3 text-sm text-white">{voiceError}</div> : null;
+  const visibleError = session.error || voiceError;
+  const voiceAlert = visibleError ? <div role="alert" className="fixed top-16 left-1/2 -translate-x-1/2 z-[100] max-w-lg rounded-xl bg-red-950 px-5 py-3 text-sm text-white">{visibleError}</div> : null;
   const hiddenFaceInputs = (
     <>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
@@ -822,16 +916,15 @@ export default function DemoPage({
         ref={swapInputRef}
         type="file"
         accept="image/*"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) handleSwapFace(file);
-        }}
+        onChange={handleFileSelect}
         className="hidden"
       />
     </>
   );
 
   if (uiMode === "apple") {
+    const appleIdentity = animeDemo ? "Anime" : selectedFaceId === DEFAULT_FACE_ID ? "John"
+      : FACE_PRESETS.find((preset) => preset.id === selectedFaceId)?.label || "Custom";
     const appleStatus = session.status === "connecting"
       ? "Connecting"
       : isConnected
@@ -875,8 +968,8 @@ export default function DemoPage({
                 {appleStatus}
                 {isConnected && <small>{formatTime(sessionTime)}</small>}
               </div>
-              <div className="apple-identity-pill" aria-label={`John is ${appleStatus.toLowerCase()}`}>
-                <strong>John</strong>
+              <div className="apple-identity-pill" aria-label={`${appleIdentity} is ${appleStatus.toLowerCase()}`}>
+                <strong>{appleIdentity}</strong>
                 <span>{appleStatus}</span>
               </div>
               {session.status === "connecting" && <div className="apple-loading-ring" aria-hidden="true" />}
@@ -887,6 +980,13 @@ export default function DemoPage({
               {appleCaption && <p><strong>Atlas</strong> {appleCaption}</p>}
             </div>
           </section>
+
+          {animeDemo && !isConnected && <aside role="status" className="anime-prepare-note">
+            <p>Prepare &amp; Start uses the demo’s credits to prepare your anime portrait.</p>
+            {animeProgress && <p>{animeProgress}</p>}
+            {session.status === "connecting" && <button type="button" onClick={() => void disconnect()}>Cancel wait</button>}
+            <Link href="/">Human demo</Link>
+          </aside>}
 
           <div className="apple-controls-wrap">
             {appleSettingsOpen && (
@@ -901,17 +1001,26 @@ export default function DemoPage({
 
                 <div className="apple-settings-section">
                   <span>Avatar</span>
-                  <div className="apple-avatar-options">
-                    {FACE_PRESETS.map((preset) => (
+                  <div className="apple-avatar-options" role="group" aria-label="Reference images">
+                    {facePresets.map((preset) => (
                       <button
                         key={preset.id}
                         type="button"
                         onClick={() => void selectPresetFace(preset)}
                         className={selectedFaceId === preset.id ? "is-selected" : ""}
                         aria-label={`Use ${preset.label} avatar`}
+                        aria-pressed={selectedFaceId === preset.id}
                         title={preset.label}
                       >
-                        <Image src={preset.src} alt="" width={72} height={72} unoptimized />
+                        {/* A thumbnail is not the only way to identify a choice.
+                            Keep all four names visible even if decoding fails;
+                            an image error must never trigger a session swap. */}
+                        <span className="apple-avatar-option-image" aria-hidden="true">
+                          <span>{preset.label.slice(0, 1)}</span>
+                          <Image src={preset.src} alt="" width={48} height={48} loading="eager" unoptimized
+                            onError={(event) => { event.currentTarget.style.visibility = "hidden"; }} />
+                        </span>
+                        <span className="apple-avatar-option-label">{preset.label}</span>
                       </button>
                     ))}
                   </div>
@@ -962,7 +1071,7 @@ export default function DemoPage({
                 aria-label={!isConnected ? "Start avatar" : voiceInputActive ? "Mute microphone" : "Start microphone"}
               >
                 <span>{!isConnected ? <PlayIcon /> : <MicIcon muted={!voiceInputActive} />}</span>
-                <small>{!isConnected ? "Start" : voiceInputActive ? "Mute" : "Talk"}</small>
+                <small>{!isConnected ? animeDemo ? "Prepare & Start" : "Start" : voiceInputActive ? "Mute" : "Talk"}</small>
               </button>
 
               <button
@@ -1097,7 +1206,7 @@ export default function DemoPage({
               </p>
             </div>
             <div className="teacher-avatar-strip">
-              {FACE_PRESETS.map((preset) => (
+              {facePresets.map((preset) => (
                 <button
                   key={preset.id}
                   type="button"
@@ -1338,7 +1447,7 @@ export default function DemoPage({
                   <div className="meet-settings-group">
                     <span className="meet-panel-label">Avatar</span>
                     <div className="meet-avatar-options">
-                      {FACE_PRESETS.map((preset) => (
+                      {facePresets.map((preset) => (
                         <button
                           key={preset.id}
                           type="button"
@@ -1512,7 +1621,7 @@ export default function DemoPage({
 
           <aside className="mirror-control-dock" aria-label="Mirror controls">
             <div className="mirror-avatar-row">
-              {FACE_PRESETS.map((preset) => (
+              {facePresets.map((preset) => (
                 <button
                   key={preset.id}
                   type="button"
@@ -1667,16 +1776,13 @@ export default function DemoPage({
               ref={swapInputRef}
               type="file"
               accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleSwapFace(file);
-              }}
+              onChange={handleFileSelect}
               className="hidden"
             />
 
             {!isConnected && (
               <div className="tiktok-avatar-strip absolute inset-x-4 top-4 z-30 flex gap-3 overflow-x-auto px-1 pb-2">
-                {FACE_PRESETS.map((preset) => (
+                {facePresets.map((preset) => (
                   <button
                     key={preset.id}
                     type="button"
@@ -1880,7 +1986,7 @@ export default function DemoPage({
                       </button>
                     ))}
                   </div>
-                  {FACE_PRESETS.map((preset) => (
+                  {facePresets.map((preset) => (
                     <button
                       key={preset.id}
                       type="button"
@@ -2177,10 +2283,7 @@ export default function DemoPage({
               ref={swapInputRef}
               type="file"
               accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleSwapFace(file);
-              }}
+              onChange={handleFileSelect}
               className="hidden"
             />
 

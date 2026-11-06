@@ -1,0 +1,9 @@
+{
+  "local_test_command": "python3 -m unittest test_fixture_driver test_drain_acceptance test_drain_control test_mouth_report test_rtc_timing test_compact_timing",
+  "directory": "/private/tmp/atlas-glitch-fullpath-20261001",
+  "tests": 36,
+  "result": "PASS",
+  "native_runtime_executed": false,
+  "production_changes": false,
+  "scope": "Exact fixture identity, final stream/segment/AV queue drain and post-drain observed silence; not mouth aesthetics or glitch root-cause acceptance."
+}

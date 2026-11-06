@@ -12,5 +12,5 @@ function parseUiMode(ui?: string): UiMode {
 
 export default async function Page({ searchParams }: PageProps) {
   const params = await searchParams;
-  return <Demo initialUiMode={parseUiMode(params?.ui)} initialVoiceMode="ai" />;
+  return <Demo initialUiMode={parseUiMode(params?.ui)} initialVoiceMode="ai" animeAvailable={process.env.ATLAS_ANIME_DEMO_ENABLED === "true"} />;
 }

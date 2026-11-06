@@ -1,0 +1,120 @@
+{
+  "archive_validation": {
+    "reports": [
+      {
+        "condition": "baseline",
+        "archive_sha256": "427e16947a8fa6c4e214b22c6b5a62441e21d73ff4b159ac28538980aecdd070",
+        "archive_bytes": 197881,
+        "archive_integrity_verified": true,
+        "completion_marker": true,
+        "trials": 2,
+        "frames_per_trial": 288,
+        "mouth_frames_per_trial": 66,
+        "jpeg_quality": 60,
+        "model_input_fingerprints_equal_expected": true
+      },
+      {
+        "condition": "clamp",
+        "archive_sha256": "0bacda90cbeeb86f793e22bfe904313c83aab248ff87d40cdb9742bcbe5763f9",
+        "archive_bytes": 197916,
+        "archive_integrity_verified": true,
+        "completion_marker": true,
+        "trials": 2,
+        "frames_per_trial": 288,
+        "mouth_frames_per_trial": 66,
+        "jpeg_quality": 60,
+        "model_input_fingerprints_equal_expected": true
+      },
+      {
+        "condition": "repeat",
+        "archive_sha256": "c1bffd228b275c59550730782371516d945617255f3b34b9996b4bd08f90125a",
+        "archive_bytes": 197900,
+        "archive_integrity_verified": true,
+        "completion_marker": true,
+        "trials": 2,
+        "frames_per_trial": 288,
+        "mouth_frames_per_trial": 66,
+        "jpeg_quality": 60,
+        "model_input_fingerprints_equal_expected": true
+      }
+    ],
+    "missing": [],
+    "all_conditions_accounted": true,
+    "invalid_serial_lines": 0,
+    "fullpath_acceptance": false,
+    "visual_acceptance": false,
+    "limitation": "Original full RGBA hashes are producer receipts only; archive retains reduced JPEG evidence, not all raw video."
+  },
+  "comparisons": [
+    {
+      "left": "baseline",
+      "right": "clamp",
+      "trial": 0,
+      "exact_input_pcm_equal": true,
+      "identical_whole_RGBA_calls": [],
+      "image_equality": [
+        {
+          "kind": "mouth",
+          "identical_jpeg_frames": []
+        },
+        {
+          "kind": "full",
+          "identical_jpeg_frames": []
+        }
+      ]
+    },
+    {
+      "left": "baseline",
+      "right": "clamp",
+      "trial": 1,
+      "exact_input_pcm_equal": true,
+      "identical_whole_RGBA_calls": [],
+      "image_equality": [
+        {
+          "kind": "mouth",
+          "identical_jpeg_frames": []
+        },
+        {
+          "kind": "full",
+          "identical_jpeg_frames": []
+        }
+      ]
+    },
+    {
+      "left": "baseline",
+      "right": "repeat",
+      "trial": 0,
+      "exact_input_pcm_equal": true,
+      "identical_whole_RGBA_calls": [],
+      "image_equality": [
+        {
+          "kind": "mouth",
+          "identical_jpeg_frames": []
+        },
+        {
+          "kind": "full",
+          "identical_jpeg_frames": []
+        }
+      ]
+    },
+    {
+      "left": "baseline",
+      "right": "repeat",
+      "trial": 1,
+      "exact_input_pcm_equal": true,
+      "identical_whole_RGBA_calls": [],
+      "image_equality": [
+        {
+          "kind": "mouth",
+          "identical_jpeg_frames": []
+        },
+        {
+          "kind": "full",
+          "identical_jpeg_frames": []
+        }
+      ]
+    }
+  ],
+  "visual_acceptance": false,
+  "fullpath_acceptance": false
+}
